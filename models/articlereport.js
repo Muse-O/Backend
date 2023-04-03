@@ -73,6 +73,12 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW,
       field: 'created_at',
     },
+    updatedAt: {
+      allowNull: true,
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      field: 'updated_at'
+    }
   }, {
     sequelize,
     modelName: 'ArticleReport',

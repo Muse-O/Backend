@@ -54,6 +54,12 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW,
       field: 'updated_at',
     },
+    updatedAt: {
+      allowNull: true,
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      field: 'updated_at'
+    }
   }, {
     sequelize,
     modelName: 'ArtgramScrap',
