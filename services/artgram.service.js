@@ -21,11 +21,11 @@ class ArtgramService {
     return postartgram;
   };
 
-  modifyArtgram = async (artgramId, artgram_title, artgram_desc) => {
+  modifyArtgram = async (artgramId, artgramTitle, artgramDesc) => {
     const patchartgram = await this.artgramRepository.modifyArtgram(
       artgramId,
-      artgram_title,
-      artgram_desc
+      artgramTitle,
+      artgramDesc
     );
     return patchartgram;
   };

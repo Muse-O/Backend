@@ -48,24 +48,28 @@ class ArtgramRepository extends Artgrams {
     return createArtgram;
   };
 
-  modifyArtgram = async (artgramId, artgram_title, artgram_desc) => {
-    const cngArtgram = await Artgrams.update({
-      artgramId,
-      artgram_title,
-      artgram_desc,
-    });
+  modifyArtgram = async (artgramId, artgramTitle, artgramDesc) => {
+    const cngArtgram = await Artgrams.update(
+      {
+        artgramTitle,
+        artgramDesc,
+      },
+      {
+        where: { artgramId },
+      }
+    );
     return cngArtgram;
   };
 
   removeArtgram = async (artgramId) => {
-    const deleteArtgram = await Artgrams.update({
-      where: [{ artgramId }],
-      attributes: [
-        {
-          artgram_status: AS04,
-        },
-      ],
-    });
+    const deleteArtgram = await Artgrams.update(
+      {
+        artgramStatus: "AS04",
+      },
+      {
+        where: { artgramId },
+      }
+    );
     return deleteArtgram;
   };
 }
