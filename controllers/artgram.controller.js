@@ -34,11 +34,11 @@ class ArtgramController {
   modifyArtgram = async (req, res, next) => {
     //   try {
     const { artgramId } = req.params;
-    const { artgram_title, artgram_desc } = req.body;
+    const { artgramTitle, artgramDesc } = req.body;
     const cngArtgram = await this.artgramService.modifyArtgram(
       artgramId,
-      artgram_title,
-      artgram_desc
+      artgramTitle,
+      artgramDesc
     );
     res.status(200).json({ message: "아트그램이 수정되었습니다." });
     //   } catch (error) {}
