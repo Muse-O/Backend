@@ -1,6 +1,7 @@
 const UserService = require("../services/user.service");
 const UserRepository = require("../repositories/user.repository")
 const logger = require("../middlewares/logger.js");
+const Boom = require("boom");
 // const userSchema = require("../schemas/User")
 
 const re_email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
