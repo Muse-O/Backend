@@ -1,4 +1,5 @@
-const { Artgrams } = require("../models");
+const { Artgrams, ArtgramImg, UserProfile } = require("../models");
+const { Op } = require("sequelize");
 
 class ArtgramRepository extends Artgrams {
   constructor() {
@@ -7,37 +8,66 @@ class ArtgramRepository extends Artgrams {
 
   allArtgrams = async () => {
     const artgrams = await Artgrams.findAll({
+      raw: true,
+      include: [
+        {
+          model: ArtgramImg,
+          attributes: [],
+        },
+      ],
       attributes: [
-        "artgram_id",
-        "user_email",
-        // "nickname",
-        // "profile_image",
-        // "image",
-        "artgram_title",
-        "artgram_desc",
+        "artgramId",
+        "userEmail",
+        // "UserProfile.profile_nickname",
+        // "UserProfile.profile_img",
+        // "ArtgramImg.img_url",
+        "artgramTitle",
+        "artgramDesc",
         // "like_count",
         // "comment_count",
-        "created_at",
-        "updated_at",
+        "createdAt",
+        "updatedAt",
       ],
+      where: {
+        artgram_status: {
+          [Op.ne]: "AS04",
+        },
+      },
     });
     return artgrams;
   };
 
-  //   postArtgram = async () => {
-  //     const createArtgram = await Artgrams.create({});
-  //     return createArtgram;
-  //   };
+  postArtgram = async (userEmail, imgUrl, artgramTitle, artgramDesc) => {
+    const createArtgram = await Artgrams.create({
+      where: { ArtgramImg },
+      userEmail,
+      imgUrl: ArtgramImg.imgUrl,
+      artgramTitle,
+      artgramDesc,
+    });
+    return createArtgram;
+  };
 
-  //   modifyArtgram = async () => {
-  //     const cngArtgram = await Artgrams.update({});
-  //     return createArtgram;
-  //   };
+  modifyArtgram = async (artgramId, artgram_title, artgram_desc) => {
+    const cngArtgram = await Artgrams.update({
+      artgramId,
+      artgram_title,
+      artgram_desc,
+    });
+    return cngArtgram;
+  };
 
-  //   removeArtgram = async () => {
-  //     const deleteArtgram = await Artgrams.update({});
-  //     return deleteArtgram;
-  //   };
+  removeArtgram = async (artgramId) => {
+    const deleteArtgram = await Artgrams.update({
+      where: [{ artgramId }],
+      attributes: [
+        {
+          artgram_status: AS04,
+        },
+      ],
+    });
+    return deleteArtgram;
+  };
 }
 
 module.exports = ArtgramRepository;

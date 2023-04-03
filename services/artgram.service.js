@@ -11,20 +11,29 @@ class ArtgramService {
     return artgrams;
   };
 
-  //   postArtgram = async (artgramId) => {
-  //     const artgram = await this.artgramRepository.postArtgram(artgramId);
-  //     return artgram;
-  //   };
+  postArtgram = async (userEmail, imgUrl, artgramTitle, artgramDesc) => {
+    const postartgram = await this.artgramRepository.postArtgram(
+      userEmail,
+      imgUrl,
+      artgramTitle,
+      artgramDesc
+    );
+    return postartgram;
+  };
 
-  //   modifyArtgram = async (artgramId) => {
-  //     const artgram = await this.artgramRepository.modifyArtgram(artgramId);
-  //     return artgram;
-  //   };
+  modifyArtgram = async (artgramId, artgram_title, artgram_desc) => {
+    const patchartgram = await this.artgramRepository.modifyArtgram(
+      artgramId,
+      artgram_title,
+      artgram_desc
+    );
+    return patchartgram;
+  };
 
-  //   removeArtgram = async (artgramId) => {
-  //     const artgram = await this.artgramRepository.removeArtgram(artgramId);
-  //     return artgram;
-  //   };
+  removeArtgram = async (artgramId) => {
+    const deleteartgram = await this.artgramRepository.removeArtgram(artgramId);
+    return deleteartgram;
+  };
 }
 
 module.exports = ArtgramService;

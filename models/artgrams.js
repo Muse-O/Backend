@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 const Sequelize = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Artgrams extends Model {
@@ -43,53 +41,65 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "userEmail", // Users 모델의 userEmail 컬럼을
         foreignKey: "userEmail", // 현재 모델의 userEmail이 외래키로 가진다.
       });
+      this.belongsTo(models.UserProfile, {
+        sourceKey: "profileId", // Users 모델의 userEmail 컬럼을
+        foreignKey: "profileId", // 현재 모델의 userEmail이 외래키로 가진다.
+      });
     }
   }
-  Artgrams.init({
-    artgramId: {
-      allowNull: false,
-      primaryKey: true,
-      type: DataTypes.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      field: 'artgram_id'
+  Artgrams.init(
+    {
+      artgramId: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        field: "artgram_id",
+      },
+      userEmail: {
+        allowNull: false,
+        type: DataTypes.STRING,
+        field: "user_email",
+      },
+      profileId: {
+        allowNull: false,
+        type: DataTypes.UUID,
+        field: "profile_id",
+      },
+      artgramTitle: {
+        allowNull: false,
+        type: DataTypes.STRING,
+        field: "artgram_title",
+      },
+      artgramDesc: {
+        allowNull: true,
+        type: DataTypes.STRING,
+        field: "artgram_desc",
+      },
+      artgramStatus: {
+        allowNull: true,
+        type: DataTypes.STRING,
+        field: "artgram_status",
+        defaultValue: "AS01",
+      },
+      createdAt: {
+        allowNull: true,
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        field: "created_at",
+      },
+      updatedAt: {
+        allowNull: true,
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        field: "updated_at",
+      },
     },
-    userEmail: {
-      allowNull: false,
-      type: DataTypes.STRING,
-      field: 'user_email'
-    },
-    artgramTitle: {
-      allowNull: false,
-      type: DataTypes.STRING,
-      field: 'artgram_title'
-    },
-    artgramDesc: {
-      allowNull: true,
-      type: DataTypes.STRING,
-      field: 'artgram_desc'
-    },
-    artgramStatus: {
-      allowNull: true,
-      type: DataTypes.STRING,
-      field: 'artgram_status',
-      defaultValue: 'AS01'
-    },
-    createdAt: {
-      allowNull: true,
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-      field: 'created_at',
-    },
-    updatedAt: {
-      allowNull: true,
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-      field: 'updated_at',
-    },
-  }, {
-    sequelize,
-    modelName: 'Artgrams',
-    tableName: 'artgrams'
-  });
+    {
+      sequelize,
+      modelName: "Artgrams",
+      tableName: "artgrams",
+    }
+  );
   return Artgrams;
 };
