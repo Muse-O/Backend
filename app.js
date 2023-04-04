@@ -34,12 +34,6 @@ app.use('/', routes);
 
 // 에러 핸들러
 app.use((err, req, res, next) => {
-
-  console.log('\n err => ', typeof(err))
-  console.log('\n req => ', typeof(err))
-  console.log('\n res => ', typeof(err))
-  console.log('\n next => ', typeof(err))
-
   errorHandler(err, req, res, next);
 });
 
