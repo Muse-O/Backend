@@ -3,10 +3,11 @@ const UserRepository = require("../repositories/user.repository");
 const jwt = require("jsonwebtoken");
 const { createHashPassword, comparePassword } = require("../modules/cryptoUtils.js");
 const Boom = require("boom");
+const RedisConnector = require("../config/redisConnector");
 const { transport } = require('../config/email')
 
 class UserService {
-  
+  redisClient = RedisConnector.getClient();
   userRepository = new UserRepository();
   
   //로그인
@@ -45,7 +46,20 @@ class UserService {
   // 이메일 인증 번호 발송
   sendMail = async (email) => {
     const randomNumber = Math.floor(Math.random() * 900000) + 100000;
-    console.log("인증번호 콘솔창에 찍어보아",randomNumber)
+    console.log("인증번호 콘솔창에 찍어보아용",randomNumber)
+
+    const randomNumToken = jwt.sign({randomNumber}, 
+      process.env.RANDOM_NUM_TOKEN_KEY,{
+      expiresIn: "3m"
+      });
+    
+    try {
+      await this.redisClient.set(email, randomNumToken);
+      await this.redisClient.expire(email, 240);
+      console.log("Data stored in Redis");
+    } catch (err) {
+      console.error(err);
+    }
 
     const mailContent = {
       from: {
@@ -61,10 +75,25 @@ class UserService {
       if (err) {
         throw Boom.internal('이메일 발송 중 예상하지 못한 에러가 발생하였습니다.')
       } else {
-        console.log(info.response)
+        console.log("메일이 잘 전송되면 뜨는 메시지", info.response)
       };
     })
     return result
+  }
+
+  // 인증번호 검증
+  emailValidateNumCheck = async(email, code) => {
+    const token = await this.redisClient.get(email);
+    if (!token){
+      throw Boom.unauthorized('인증 시간이 만료되었습니다.');
+    }
+    const {randomNumber} = jwt.verify(token, process.env.RANDOM_NUM_TOKEN_KEY)
+
+    if (randomNumber!==code){
+      throw Boom.unauthorized('이메일 인증코드가 일치하지 않습니다.');
+    };
+
+    return { message: '이메일 인증에 성공하였습니다' }
   }
 
   // 회원가입
