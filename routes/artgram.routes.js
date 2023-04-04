@@ -8,7 +8,7 @@ const ArtgramController = require("../controllers/artgram.controller");
 const artgramController = new ArtgramController();
 
 //아트그램 전체조회
-router.get("/", authMiddleware, artgramController.allArtgrams);
+router.get("/", artgramController.allArtgrams);
 //아트그램 작성
 router.post("/", authMiddleware, artgramController.postArtgram);
 //아트그램 수정
@@ -19,12 +19,8 @@ router.patch(
   authMiddleware,
   artgramController.removeArtgram
 );
-// //아트그램 좋아요등록/취소
-// router.post(
-//   "/:artgramId/likes",
-//   authMiddleware,
-//   artgramController.likeArtgram
-// );
+//아트그램 좋아요등록/취소
+router.post("/:artgramId/likes", authMiddleware, artgramController.likeArtgram);
 // //댓글 작성
 // router.post(
 //   "/:artgramId/comments",

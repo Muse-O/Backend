@@ -19,10 +19,6 @@ module.exports = (sequelize, DataTypes) => {
         targetKey: "userEmail", // Users 모델의 userEmail 컬럼을
         foreignKey: "userEmail", // 현재 모델 userEmail가 외래키로 가지겠다.
       });
-      this.hasMany(models.Artgrams, {
-        sourceKey: "profileId",
-        foreignKey: "profileId",
-      });
     }
   }
   UserProfile.init(

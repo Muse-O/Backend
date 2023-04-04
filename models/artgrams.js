@@ -41,10 +41,6 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "userEmail", // Users 모델의 userEmail 컬럼을
         foreignKey: "userEmail", // 현재 모델의 userEmail이 외래키로 가진다.
       });
-      this.belongsTo(models.UserProfile, {
-        sourceKey: "profileId", // Users 모델의 userEmail 컬럼을
-        foreignKey: "profileId", // 현재 모델의 userEmail이 외래키로 가진다.
-      });
     }
   }
   Artgrams.init(
@@ -60,11 +56,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.STRING,
         field: "user_email",
-      },
-      profileId: {
-        allowNull: false,
-        type: DataTypes.UUID,
-        field: "profile_id",
       },
       artgramTitle: {
         allowNull: false,
