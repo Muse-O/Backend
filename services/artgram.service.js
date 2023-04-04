@@ -40,7 +40,22 @@ class ArtgramService {
   };
 
   //아트그램 좋아요등록/취소
-  // likeArtgram = async();
+  likeArtgram = async (artgramId, userEmail) => {
+    const likeartgram = await this.artgramRepository.likeArtgram(
+      artgramId,
+      userEmail
+    );
+    return likeartgram;
+  };
+
+  //아트그램 스크랩등록/취소
+  scrapArtgram = async (artgramId, userEmail) => {
+    const scrapartgram = await this.artgramRepository.scrapArtgram(
+      artgramId,
+      userEmail
+    );
+    return scrapartgram;
+  };
 }
 
 module.exports = ArtgramService;

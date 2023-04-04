@@ -20,7 +20,17 @@ router.patch(
   artgramController.removeArtgram
 );
 //아트그램 좋아요등록/취소
-router.post("/:artgramId/likes", authMiddleware, artgramController.likeArtgram);
+router.patch(
+  "/:artgramId/likes",
+  authMiddleware,
+  artgramController.likeArtgram
+);
+//아트그램 스크랩등록/취소
+router.patch(
+  "/:artgramId/scrap",
+  authMiddleware,
+  artgramController.scrapArtgram
+);
 // //댓글 작성
 // router.post(
 //   "/:artgramId/comments",
