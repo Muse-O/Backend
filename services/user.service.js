@@ -1,26 +1,16 @@
 require("dotenv").config();
-
-const Joi = require("joi");
 const UserRepository = require("../repositories/user.repository");
 const jwt = require("jsonwebtoken");
-const {
-  createHashPassword,
-  comparePassword,
-} = require("../modules/cryptoUtils.js");
+const { createHashPassword, comparePassword } = require("../modules/cryptoUtils.js");
 const Boom = require("boom");
 
 class UserService {
-  constructor() {
-    this.userRepository = new UserRepository();
-  }
-
-  /**
-   * @param {String} email
-   * @param {String} password
-   */
+  
+  userRepository = new UserRepository();
+  
   //로그인
   userLogin = async (email, password) => {
-    const user = await this.userRepository.findByID(email);
+    const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
       throw Boom.notFound("존재하지 않는 이메일 주소입니다");
@@ -33,9 +23,6 @@ class UserService {
     }
   };
 
-  /**
-   * @param {String} email
-   */
   //토큰 생성
   generateToken = async (email) => {
     const token = jwt.sign({ email }, process.env.SECRET_KEY, {
@@ -54,11 +41,7 @@ class UserService {
     }
   }
 
-  /**
-   * @param {String} email
-   * @param {String} password
-   */
-  //회원가입
+  // 회원가입
   userSignup = async (email, nickname, password, author) => {
     const hashedPassword = await createHashPassword(password);
 
