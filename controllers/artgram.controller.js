@@ -99,47 +99,6 @@ class ArtgramController {
       next(error);
     }
   };
-
-  //     commentCreate = async (req, res ,next) => {
-  //         try{
-  // const createArtgram = await this.artgramService.postArtgram();
-  //         }catch(error){
-
-  //         }
-  //     }
-
-  //     allComment = async (req, res ,next) => {
-  //         try{
-  // const createArtgram = await this.artgramService.postArtgram();
-  //         }catch(error){
-
-  //         }
-  //     }
-
-  //     modifyComment = async (req, res ,next) => {
-  //         try{
-  // const createArtgram = await this.artgramService.postArtgram();
-  //         }catch(error){
-
-  //         }
-  //     }
-
-  //     removeComment = async (req, res ,next) => {
-  //         try{
-  // const createArtgram = await this.artgramService.postArtgram();
-  //         }catch(error){
-
-  //         }
-  //     }
-
-  //     postArtgram = async (req, res ,next) => {
-  //         try{
-  // const createArtgram = await this.artgramService.postArtgram();
-  //         }catch(error){
-
-  //         }
-  //     }
-  // };
 }
 
 module.exports = ArtgramController;

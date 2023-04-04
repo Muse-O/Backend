@@ -5,6 +5,7 @@ const {
   UserProfile,
   ArtgramLike,
   ArtgramScrap,
+  sequelize,
 } = require("../models");
 const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
@@ -16,15 +17,15 @@ class ArtgramRepository extends Artgrams {
 
   //아트그램 전체조회
   allArtgrams = async () => {
-    const latestArtgram = await Artgrams.findOne({
+    const allEmailFind = await Artgrams.findAll({
       order: [["createdAt", "DESC"]],
+      attributes: ["userEmail"],
+      group: ["userEmail"],
     });
 
-    if (!latestArtgram) {
-      throw new Error("No Artgrams found");
-    }
-
-    const userEmail = latestArtgram.userEmail;
+    const userEmail = allEmailFind.map(
+      (artgram) => artgram.dataValues.userEmail
+    );
     const user = await Users.findOne({
       where: { userEmail: userEmail },
       include: [{ model: UserProfile }],
@@ -39,14 +40,30 @@ class ArtgramRepository extends Artgrams {
           model: ArtgramImg,
           attributes: ["imgUrl"],
         },
+        {
+          model: ArtgramLike,
+          attributes: [
+            [
+              sequelize.fn("count", sequelize.col("artgram_like_id")),
+              "likecount",
+            ],
+          ],
+        },
+        {
+          model: ArtgramScrap,
+          attributes: [
+            [
+              sequelize.fn("count", sequelize.col("artgram_scrap_id")),
+              "scrapcount",
+            ],
+          ],
+        },
       ],
       attributes: [
         "artgramId",
         "userEmail",
         "artgramTitle",
         "artgramDesc",
-        // 'like_count',
-        // 'comment_count',
         "createdAt",
         "updatedAt",
       ],
@@ -56,6 +73,7 @@ class ArtgramRepository extends Artgrams {
           [Op.ne]: "AS04",
         },
       },
+      group: ["Artgrams.artgram_id"],
     });
 
     const findArtgrams = artgrams.map((artgram) => ({

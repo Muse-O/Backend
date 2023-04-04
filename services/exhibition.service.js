@@ -1,4 +1,3 @@
-
 const Boom = require("boom");
 const ExhibitionRepository = require("../repositories/exhibition.repository");
 
