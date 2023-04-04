@@ -45,15 +45,24 @@ class UserService {
     return token;
   };
 
+  // 회원가입 전 이메일 중복확인
+  findByEmail = async (email) => {
+    const existingUser = await this.userRepository.findByEmail(email);
+    
+    if (existingUser) {
+      throw Boom.conflict("중복된 이메일입니다");
+    }
+  }
+
   /**
    * @param {String} email
    * @param {String} password
    */
   //회원가입
-  userSignup = async (email, password) => {
+  userSignup = async (email, nickname, password, author) => {
     const hashedPassword = await createHashPassword(password);
 
-    await this.userRepository.userSignup(email, hashedPassword);
+    await this.userRepository.userSignup(email, nickname, hashedPassword, author);
   };
 }
 module.exports = UserService;
