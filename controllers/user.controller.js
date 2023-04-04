@@ -8,8 +8,7 @@ const re_password = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]
 
 
 const userSchema = Joi.object({
-  email: Joi.string().email().pattern(re_email).required().messages({
-    'string.email': '이메일 주소 형식이 올바르지 않습니다.',
+  email: Joi.string().pattern(re_email).required().messages({
     'string.pattern.base': '이메일 주소 형식이 올바르지 않습니다.',
     'any.required': '이메일 주소를 입력해주세요.',
     'string.empty': '이메일 주소를 입력해주세요.'
@@ -34,7 +33,7 @@ class UserController {
       await this.userService.userLogin(email, password);
 
       const token = await this.userService.generateToken(email);
-      res.set("Authorization", `Bearer ${token}`);
+      res.set("Authorization", `${token}`);
 
       return res.status(201).json({ message: "로그인에 성공했습니다" });
     } catch (error) {
@@ -55,6 +54,21 @@ class UserController {
       await this.userService.findByEmail(email)
 
       return res.status(201).json({ message: "가입 가능한 이메일입니다." });
+    } catch (error) {
+      logger.error(error.message);
+      next(error);
+    }
+  }
+
+  // 인증번호 메일 전송
+  emailValidate = async (req, res, next) => {
+    try {
+      const { email } = req.body
+      if (!email){
+        throw Boom.badRequest("요청한 데이터 형식이 올바르지 않습니다.")
+      }
+      await this.userService.sendMail(email)
+      return res.status(201).json({ message: "인증 메일이 성공적으로 발송되었습니다." });
     } catch (error) {
       logger.error(error.message);
       next(error);
