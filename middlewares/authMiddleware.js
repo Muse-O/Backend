@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const { Users } = require("../models");
 
 module.exports = async (req, res, next) => {
-  const authorization = req.headers.authorization;
+  const authorization = req.headers.Authorization;
 
   const [authType, authToken] = (authorization ?? "").split(" ");
 
@@ -16,9 +16,9 @@ module.exports = async (req, res, next) => {
 
   try {
     const { email } = jwt.verify(authToken, process.env.SECRET_KEY);
-    
+
     const user = await Users.findOne({
-      where: { email },
+      where: { userEmail: email },
     });
 
     res.locals.user = user;
