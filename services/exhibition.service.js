@@ -1,12 +1,9 @@
 const Boom = require("boom");
 const ExhibitionRepository = require("../repositories/exhibition.repository");
-const redis = require("redis");
-const RedisConnector = require("../config/redisConnector");
 
 class ExhibitionService {
   constructor() {
     this.exhibitionRepository = new ExhibitionRepository();
-    this.redisClient = RedisConnector.getClient();
   }
 
   /**
