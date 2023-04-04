@@ -9,6 +9,9 @@ const userController = new UserController();
 // 회원가입 전 이메일 중복확인
 router.post("/emailconfirm", userController.emailConfirm);
 
+// 인증 메일 발송
+router.post("/emailvalidate", userController.emailValidate);
+
 // 회원가입
 router.post("/signup", userController.userSignup);
 
