@@ -16,9 +16,9 @@ module.exports = async (req, res, next) => {
 
   try {
     const { email } = jwt.verify(authToken, process.env.SECRET_KEY);
-    
+
     const user = await Users.findOne({
-      where: { userEmail: email }, // 여기 오류날까봐 일단 수정함 원래 {email}
+      where: { userEmail: email },
     });
 
     res.locals.user = user;
