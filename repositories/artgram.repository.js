@@ -1,7 +1,13 @@
-const { Artgrams, ArtgramImg, Users, UserProfile } = require("../models");
+const {
+  Artgrams,
+  ArtgramImg,
+  Users,
+  UserProfile,
+  ArtgramLike,
+  ArtgramScrap,
+} = require("../models");
 const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
-const artgrams = require("../models/artgrams");
 
 class ArtgramRepository extends Artgrams {
   constructor() {
@@ -98,6 +104,46 @@ class ArtgramRepository extends Artgrams {
       ],
     });
     return deleteArtgram;
+  };
+
+  //아트그램 좋아요등록/취소
+  likeArtgram = async (artgramId, userEmail) => {
+    const likeartgram = await ArtgramLike.findOrCreate({
+      where: {
+        [Op.and]: [{ artgramId }, { userEmail }],
+      },
+      defaults: {
+        artgramId,
+        userEmail,
+      },
+    }).then(([data, created]) => {
+      if (!created) {
+        data.destroy();
+        return "delete";
+      }
+      return "create";
+    });
+    return likeartgram;
+  };
+
+  //아트그램 스크랩등록/취소
+  scrapArtgram = async (artgramId, userEmail) => {
+    const scrapArtgram = await ArtgramScrap.findOrCreate({
+      where: {
+        [Op.and]: [{ artgramId }, { userEmail }],
+      },
+      defaults: {
+        artgramId,
+        userEmail,
+      },
+    }).then(([data, created]) => {
+      if (!created) {
+        data.destroy();
+        return "delete";
+      }
+      return "create";
+    });
+    return scrapArtgram;
   };
 }
 
