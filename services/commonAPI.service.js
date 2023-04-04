@@ -14,13 +14,13 @@ class CoomonAPIService {
    */
   getCategory = async (category) => {
 
-    const category = await this.commonAPIRepository.findCategory(category);
+    const searchCategory = await this.commonAPIRepository.findCategory(category);
 
-    if(!category) {
+    if(!searchCategory) {
       throw Boom.notFound("검색된 카테고리가 존재하지 않습니다.");
     }
 
-    return category;
+    return searchCategory;
   };
 
 }

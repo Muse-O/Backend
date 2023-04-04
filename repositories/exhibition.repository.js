@@ -1,3 +1,4 @@
+const { off } = require("../app");
 const { Exhibitions } = require("../models");
 const { Op } = require("sequelize");
 
@@ -13,11 +14,14 @@ class ExhibitionRepository extends Exhibitions {
    * @returns exhibitionItem
    */
   getExhibitionList = async (limit, offset) => {
+
     const exhibitionList = await Exhibitions.findAndCountAll({
-      limit,
-      offset,
-      order: [['createdAt', 'DESC']],
+      limit: limit,
+      offset: offset,
+      order: [['createdAt', 'DESC']]
     })
+
+    console.log('\n\n',exhibitionList,'\n\n')
 
     const exhibitionCnt = await Exhibitions.count();
 
@@ -32,7 +36,6 @@ class ExhibitionRepository extends Exhibitions {
 
     return {exhibitionList, paginationInfo};
   }
-
 }
 
-module.exports = CommonAPIRepository;
+module.exports = ExhibitionRepository;

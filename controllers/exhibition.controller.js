@@ -13,8 +13,8 @@ class ExhibitionController {
       const { limit = 10, offset = 0 } = req.query;
 
       const exhibitionItem = await this.exhibitionService.getExhibitionList(
-        limit,
-        offset
+        Number(limit),
+        Number(offset)
       );
 
       return res
@@ -24,7 +24,6 @@ class ExhibitionController {
           message: "전시회 정보를 정상적으로 가져왔습니다.",
         });
     } catch (error) {
-      logger.error(error.message);
       next(error);
     }
   };
