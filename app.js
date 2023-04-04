@@ -9,6 +9,7 @@ const cors = require("cors");
 
 const routes = require("./routes");
 const logger = require("./middlewares/logger.js");
+const errorHandler = require("./middlewares/errorHandler.js")
 const PORT = process.env.SERVER_PORT;
 
 // morgan
@@ -33,10 +34,13 @@ app.use('/', routes);
 
 // 에러 핸들러
 app.use((err, req, res, next) => {
-  logger.error(err.stack);
-  return res.status(err.output.payload.statusCode || 500).json({
-    errorMessage: err.output.payload.message || "서버 에러가 발생했습니다.",
-  });
+
+  console.log('\n err => ', typeof(err))
+  console.log('\n req => ', typeof(err))
+  console.log('\n res => ', typeof(err))
+  console.log('\n next => ', typeof(err))
+
+  errorHandler(err, req, res, next);
 });
 
 app.get("/", (req, res) => {
