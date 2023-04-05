@@ -20,14 +20,12 @@ class ArtgramController {
     try {
       const { userEmail } = res.locals.user;
       const { artgramId } = req.params;
-      const { imgUrl, artgramTitle, artgramDesc } = req.body;
+      const { artgramTitle, artgramDesc } = req.body;
       const files = req.files;
-      imgUrl = files;
-      console.log(imgUrl);
       const createArtgram = await this.artgramService.postArtgram(
         artgramId,
         userEmail,
-        imgUrl,
+        files,
         artgramTitle,
         artgramDesc
       );
