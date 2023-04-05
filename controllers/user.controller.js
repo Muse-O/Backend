@@ -74,6 +74,19 @@ class UserController {
       next(error);
     }
   }
+
+  // 인증번호 검증
+  emailValidateNumCheck = async (req, res, next) => {
+    try {
+      const { email, code } = req.body;
+      const result = await this.userService.emailValidateNumCheck(email, code)
+
+      return res.status(200).json(result)
+    } catch (error) {
+      logger.error(error.message);
+      next(error);
+    }
+  }
   
 
   // 회원가입
