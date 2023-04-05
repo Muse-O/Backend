@@ -7,12 +7,22 @@ const { upload } = require("../middlewares/multer");
 const ArtgramController = require("../controllers/artgram.controller");
 const artgramController = new ArtgramController();
 
+/**
+ * @swagger
+ * /artgram:
+ *   get:
+ *     summary: Get all artgrams
+ *     description: Retrieve a list of all artgrams
+ *     responses:
+ *       200:
+ *         description: A list of artgrams
+ */
 //아트그램 전체조회
 router.get("/", artgramController.allArtgrams);
 //아트그램 작성
 router.post(
-  "/",
-  upload.array("img", 5),
+  "/:artgramId",
+  upload.array("imgUrl", 5),
   authMiddleware,
   artgramController.postArtgram
 );
