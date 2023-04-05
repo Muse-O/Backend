@@ -16,9 +16,10 @@ class ArtgramService {
   postArtgram = async (
     artgramId,
     userEmail,
-    files,
+    imgUrl,
     artgramTitle,
-    artgramDesc
+    artgramDesc,
+    files
   ) => {
     const imgUrl = files.map((file) => ({
       filename: file.filename,
