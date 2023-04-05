@@ -7,12 +7,78 @@ const { upload } = require("../middlewares/multer");
 const ArtgramController = require("../controllers/artgram.controller");
 const artgramController = new ArtgramController();
 
+/**
+ * @swagger
+ * /artgram:
+ *   get:
+ *     summary: "Search all Artgrams"
+ *     responses:
+ *       "200":
+ *         description: "Retrieves all artgrams."
+ * /artgram/{artgramId}:
+ *   post:
+ *     summary: "Create artgram"
+ *     parameters:
+ *       - name: artgramId
+ *         in: path
+ *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - name: imgUrl
+ *         in: formData
+ *         description: "Url of the artgram image"
+ *         type: string
+ *       - name: artgramTitle
+ *         in: formData
+ *         description: "Title of the artgram"
+ *         required: true
+ *         type: string
+ *       - name: artgramDesc
+ *         in: formData
+ *         description: "Description of the artgram"
+ *         required: true
+ *         type: string
+ *     responses:
+ *       "200":
+ *         description: "Artgram created"
+ *       "400":
+ *         description: "Invalid input"
+ *     security:
+ *       - jwt: []
+
+ *   patch:
+ *     summary: "Modify artgram"
+ *     responses:
+ *       "200":
+ *         description: "Modify an artgram."
+ * /artgram/{artgramId}/remove:
+ *   patch:
+ *     summary: "Remove artgram"
+ *     responses:
+ *       "200":
+ *         description: "Remove an artgram."
+ * /artgram/{artgramId}/likes:
+ *   patch:
+ *     summary: "Register or cancel Artgram like"
+ *     responses:
+ *       "200":
+ *         description: "Register or cancel an Artgram like."
+ * /artgram/{artgramId}/scrap:
+ *   patch:
+ *     summary: "Register or cancel Artgram scrap"
+ *     responses:
+ *       "200":
+ *         description: "Register or cancel an Artgram scrap."
+ */
+
 //아트그램 전체조회
 router.get("/", artgramController.allArtgrams);
+
 //아트그램 작성
 router.post(
-  "/",
-  upload.array("img", 5),
+  "/:artgramId",
+  upload.array("imgUrl", 5),
   authMiddleware,
   artgramController.postArtgram
 );
