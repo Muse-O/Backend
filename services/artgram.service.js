@@ -7,8 +7,11 @@ class ArtgramService {
   }
 
   //아트그램 전체조회
-  allArtgrams = async () => {
-    const artgrams = await this.artgramRepository.allArtgrams();
+  allArtgrams = async (limit, offset) => {
+    const artgrams = await this.artgramRepository.allArtgrams(limit, offset);
+    if (!artgrams.artgramList) {
+      throw Boom.notFound("아트그램 정보가 더이상 없습니다.");
+    }
     return artgrams;
   };
 

@@ -8,7 +8,11 @@ class ArtgramController {
   //아트그램 전체조회
   allArtgrams = async (req, res, next) => {
     try {
-      const artgrams = await this.artgramService.allArtgrams();
+      const { limit = 10, offset = 0 } = req.query;
+      const artgrams = await this.artgramService.allArtgrams(
+        Number(limit),
+        Number(offset)
+      );
       res.status(200).json({ allArtgram: artgrams });
     } catch (error) {
       next(error);

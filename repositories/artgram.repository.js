@@ -16,7 +16,7 @@ class ArtgramRepository extends Artgrams {
   }
 
   //아트그램 전체조회
-  allArtgrams = async () => {
+  allArtgrams = async (limit, offset) => {
     const allEmailFind = await Artgrams.findAll({
       order: [["createdAt", "DESC"]],
       attributes: ["userEmail"],
@@ -81,7 +81,35 @@ class ArtgramRepository extends Artgrams {
       profileImg,
       profileNickname,
     }));
-    return findArtgrams;
+
+    const artgramList = await Artgrams.findAndCountAll({
+      limit: limit,
+      offset: offset,
+      order: [["createdAt", "DESC"]],
+    });
+    const findArtgramsList = findArtgrams.map((findArtgram) => ({
+      ...findArtgram,
+      profileImg,
+      profileNickname,
+    }));
+
+    const artgramCnt = await Artgrams.count();
+    const hasNextPage = offset + limit < artgramCnt;
+
+    const paginationInfo = {
+      limit,
+      offset,
+      artgramCnt,
+      hasNextPage,
+    };
+
+    return {
+      artgramList: {
+        count: artgramList.count,
+        rows: [...artgramList.rows, ...findArtgramsList],
+      },
+      paginationInfo,
+    };
   };
 
   //아트그램 작성
