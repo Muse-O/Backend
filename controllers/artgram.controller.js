@@ -7,20 +7,22 @@ class ArtgramController {
 
   //아트그램 전체조회
   allArtgrams = async (req, res, next) => {
-    // try {
-    const artgrams = await this.artgramService.allArtgrams();
-    res.status(200).json({ allArtgram: artgrams });
-    // } catch (error) {
-    //   next(error);
-    // }
+    try {
+      const artgrams = await this.artgramService.allArtgrams();
+      res.status(200).json({ allArtgram: artgrams });
+    } catch (error) {
+      next(error);
+    }
   };
 
   //아트그램 작성
   postArtgram = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
+      const { artgramId } = req.params;
       const { imgUrl, artgramTitle, artgramDesc } = req.body;
       const createArtgram = await this.artgramService.postArtgram(
+        artgramId,
         userEmail,
         imgUrl,
         artgramTitle,
@@ -28,7 +30,10 @@ class ArtgramController {
       );
       res
         .status(200)
-        .json({ createArtgram, message: "아트그램이 생성되었습니다." });
+        .json({
+          artgram: createArtgram,
+          message: "아트그램이 생성되었습니다.",
+        });
     } catch (error) {
       next(error);
     }

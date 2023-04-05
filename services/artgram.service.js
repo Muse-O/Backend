@@ -13,8 +13,15 @@ class ArtgramService {
   };
 
   //아트그램 작성
-  postArtgram = async (userEmail, imgUrl, artgramTitle, artgramDesc) => {
+  postArtgram = async (
+    artgramId,
+    userEmail,
+    imgUrl,
+    artgramTitle,
+    artgramDesc
+  ) => {
     const postartgram = await this.artgramRepository.postArtgram(
+      artgramId,
       userEmail,
       imgUrl,
       artgramTitle,
