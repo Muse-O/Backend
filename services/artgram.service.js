@@ -19,7 +19,6 @@ class ArtgramService {
   postArtgram = async (
     artgramId,
     userEmail,
-    imgUrl,
     artgramTitle,
     artgramDesc,
     files
