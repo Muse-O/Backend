@@ -18,8 +18,13 @@ class ArtgramService {
     userEmail,
     imgUrl,
     artgramTitle,
-    artgramDesc
+    artgramDesc,
+    files
   ) => {
+    const imgUrl = files.map((file) => ({
+      filename: file.filename,
+      path: file.path,
+    }));
     const postartgram = await this.artgramRepository.postArtgram(
       artgramId,
       userEmail,
