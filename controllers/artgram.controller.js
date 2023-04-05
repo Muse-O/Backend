@@ -21,6 +21,9 @@ class ArtgramController {
       const { userEmail } = res.locals.user;
       const { artgramId } = req.params;
       const { imgUrl, artgramTitle, artgramDesc } = req.body;
+      const files = req.files;
+      imgUrl = files;
+      console.log(imgUrl);
       const createArtgram = await this.artgramService.postArtgram(
         artgramId,
         userEmail,
@@ -28,12 +31,10 @@ class ArtgramController {
         artgramTitle,
         artgramDesc
       );
-      res
-        .status(200)
-        .json({
-          artgram: createArtgram,
-          message: "아트그램이 생성되었습니다.",
-        });
+      res.status(200).json({
+        artgram: createArtgram,
+        message: "아트그램이 생성되었습니다.",
+      });
     } catch (error) {
       next(error);
     }
