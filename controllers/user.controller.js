@@ -24,7 +24,7 @@ class UserController {
   userService = new UserService();
 
   // 로그인
-  userLogin = async (req, res, next) => {
+  localLogin = async (req, res, next) => {
     try {
       const { email, password } = req.body;
       if (!email || !password){
@@ -41,6 +41,21 @@ class UserController {
       next(error);
     }
   };
+
+  // kakaoStategy 성공 시
+  kakaoCallback = async (req,res, next) => {
+    try {
+      const email = req.user.userEmail
+      const token = await this.userService.generateToken(email);
+      res.set("Authorization", `${token}`);
+      // res.cookie("authorization", `Bearer ${token}`);
+      console.log("카카오스트래터지 성고오오오오오옹시 데이터어어어어",email)
+      res.redirect("http://localhost:4000");
+    } catch (error){
+      logger.error(error.message);
+      next(error);
+    }
+  }
 
   // 회원가입 전 이메일 중복확인
   emailConfirm = async (req, res, next) => {
