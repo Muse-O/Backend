@@ -1,6 +1,14 @@
-const { Exhibitions, ExhibitionImg, ExhibitionCategory, ExhibitionAuthor, ExhibitionAddress} = require("../models");
+const {
+  Exhibitions,
+  ExhibitionImg,
+  ExhibitionCategory,
+  ExhibitionAuthor,
+  ExhibitionAddress,
+} = require("../models");
 const { Op } = require("sequelize");
-const Boom = require("boom")
+const Boom = require("boom");
+const _ = require("lodash");
+const {convertArrayToString} = require("../modules/convertArrayToString")
 
 class ExhibitionRepository extends Exhibitions {
   constructor() {
@@ -34,6 +42,45 @@ class ExhibitionRepository extends Exhibitions {
     return { exhibitionList, paginationInfo };
   };
 
+  getExhibitionInfo = async (exhibitionId) => {
+    const exhibitionItem = await Exhibitions.findOne({
+      where: { exhibitionId },
+      include: [
+        {
+          model: ExhibitionImg,
+          attributes: ["img_url"],
+          order: [["img_order", "ASC"]],
+        },
+        {
+          model: ExhibitionAuthor,
+          attributes: ["author_name"],
+          order: [["created_at", "ASC"]],
+        },
+        { model: ExhibitionCategory, attributes: ["exhibition_code"] },
+        {
+          model: ExhibitionAddress,
+          attributes: [
+            "zonecode",
+            "address",
+            "addressEnglish",
+            "addressType",
+            "buildingName",
+            "buildingCode",
+            "roadAddress",
+            "roadAddressEnglish",
+            "autoJibunAddress",
+            "autoJibunAddressEnglish",
+            "roadname",
+            "roadnameCode",
+            "roadnameEnglish",
+          ],
+        },
+      ],
+    });
+
+    return convertArrayToString(exhibitionItem.toJSON());
+  };
+
   /**
    * 전시회 정보 입력
    * @param {string} mode 작성/수정 모드
@@ -51,7 +98,7 @@ class ExhibitionRepository extends Exhibitions {
         userEmail,
         ...exhibitionInfo,
       });
-    } else if(mode === "U") {
+    } else if (mode === "U") {
       // 수정
       updateExhibition = await Exhibitions.update(
         {
@@ -63,7 +110,7 @@ class ExhibitionRepository extends Exhibitions {
         }
       );
 
-      updateExhibition.exhibitionId = exhibitionObj.exhibitionId
+      updateExhibition.exhibitionId = exhibitionObj.exhibitionId;
     }
 
     return updateExhibition;
@@ -78,37 +125,35 @@ class ExhibitionRepository extends Exhibitions {
    * @returns deleteImgCnt: number, updateImgCnt: number 이미지 수정 정보
    */
   updateExhibitionImg = async (mode, exhibitionId, delImage, artImage) => {
-    let updateImgStatus = {deleteImgCnt: 0, updateImgCnt: 0};
+    let updateImgStatus = { deleteImgCnt: 0, updateImgCnt: 0 };
     let updateExhibitionArtImg = null;
 
     // order가 작은순대로 정렬
     artImage.sort((a, b) => parseInt(a.order) - parseInt(b.order));
 
-    const rowToArtImg = artImage.map(({order, imgUrl, imgCaption}) => ({
+    const rowToArtImg = artImage.map(({ order, imgUrl, imgCaption }) => ({
       exhibitionId,
       imgOrder: parseInt(order),
       imgUrl,
-      imgCaption
+      imgCaption,
     }));
 
     if (mode === "C") {
       // 이미지 추가
       updateExhibitionArtImg = await ExhibitionImg.bulkCreate(rowToArtImg);
 
-      updateImgStatus.updateImgCnt = updateExhibitionArtImg.length
+      updateImgStatus.updateImgCnt = updateExhibitionArtImg.length;
     } else if (mode === "U") {
       // 기존 이미지 삭제
-      const deleteCnt = await ExhibitionImg.destroy(
-        {
-          where: {exhibitionId}
-        }
-      );
+      const deleteCnt = await ExhibitionImg.destroy({
+        where: { exhibitionId },
+      });
       updateImgStatus.deleteImgCnt = deleteCnt;
       // 이미지 추가
       updateExhibitionArtImg = await ExhibitionImg.bulkCreate(rowToArtImg);
-      updateImgStatus.updateImgCnt = updateExhibitionArtImg.length
+      updateImgStatus.updateImgCnt = updateExhibitionArtImg.length;
     } else {
-      updateImgStatus.updateImgCnt = 0
+      updateImgStatus.updateImgCnt = 0;
     }
     return updateImgStatus;
   };
@@ -121,35 +166,40 @@ class ExhibitionRepository extends Exhibitions {
    * @returns deleteCategoriesCnt: number, updateCategoriesCnt: number 카테고리 수정 정보
    */
   updateExhibitionCategory = async (mode, exhibitionId, categories) => {
-    let updateCategoryStatus = {deleteCategoriesCnt: 0, updateCategoriesCnt: 0};
+    let updateCategoryStatus = {
+      deleteCategoriesCnt: 0,
+      updateCategoriesCnt: 0,
+    };
     let updateExhibitionCategories = null;
 
-    const rowToCategories = categories.map(categoryCode => ({
+    const rowToCategories = categories.map((categoryCode) => ({
       exhibitionId,
-      categoryCode
+      categoryCode,
     }));
 
     if (mode === "C") {
       // 카테고리 추가
-      updateExhibitionCategories = await ExhibitionCategory.bulkCreate(rowToCategories);
+      updateExhibitionCategories = await ExhibitionCategory.bulkCreate(
+        rowToCategories
+      );
 
-      updateCategoryStatus.updateCategoriesCnt = updateExhibitionCategories.length;
+      updateCategoryStatus.updateCategoriesCnt =
+        updateExhibitionCategories.length;
     } else if (mode === "U") {
       // 기존 카테고리 삭제
-      const deleteCategoriesCnt = await ExhibitionCategory.destroy(
-        {
-          where: { exhibitionId }
-        }
-      );
-      updateCategoryStatus.deleteCategoriesCnt = deleteCategoriesCnt
-
-      console.log('\n\n',rowToCategories, '\n\n');
+      const deleteCategoriesCnt = await ExhibitionCategory.destroy({
+        where: { exhibitionId },
+      });
+      updateCategoryStatus.deleteCategoriesCnt = deleteCategoriesCnt;
       // 카테고리 추가
-      updateExhibitionCategories = await ExhibitionCategory.bulkCreate(rowToCategories);
+      updateExhibitionCategories = await ExhibitionCategory.bulkCreate(
+        rowToCategories
+      );
 
-      updateCategoryStatus.updateCategoriesCnt = updateExhibitionCategories.length;
+      updateCategoryStatus.updateCategoriesCnt =
+        updateExhibitionCategories.length;
     } else {
-      updateCategoryStatus.updateCategoriesCnt = 0
+      updateCategoryStatus.updateCategoriesCnt = 0;
     }
     return updateCategoryStatus;
   };
@@ -162,15 +212,15 @@ class ExhibitionRepository extends Exhibitions {
    * @returns deleteAuthorCnt: number, updateAuthorCnt: number 작사 수정 정보
    */
   updateExhibitionAuthors = async (mode, exhibitionId, authors) => {
-    let updateAuthorStatus = {deleteAuthorCnt: 0, updateAuthorCnt: 0};
+    let updateAuthorStatus = { deleteAuthorCnt: 0, updateAuthorCnt: 0 };
     let updateExhibitionAuthor = null;
 
     // order가 작은순대로 정렬
     authors.sort((a, b) => parseInt(a.order) - parseInt(b.order));
 
-    const rowToAuthor = authors.map(({author}) => ({
+    const rowToAuthor = authors.map(({ author }) => ({
       exhibitionId,
-      authorName: author
+      authorName: author,
     }));
 
     if (mode === "C") {
@@ -180,18 +230,16 @@ class ExhibitionRepository extends Exhibitions {
       updateAuthorStatus.updateAuthorCnt = updateExhibitionAuthor.length;
     } else if (mode === "U") {
       // 기존 카테고리 삭제
-      const deleteAuthorCnt = await ExhibitionAuthor.destroy(
-        {
-          where: { exhibitionId }
-        }
-      );
-      updateAuthorStatus.deleteAuthorCnt = deleteAuthorCnt
+      const deleteAuthorCnt = await ExhibitionAuthor.destroy({
+        where: { exhibitionId },
+      });
+      updateAuthorStatus.deleteAuthorCnt = deleteAuthorCnt;
       // 전시회 추가
       updateExhibitionAuthor = await ExhibitionAuthor.bulkCreate(rowToAuthor);
 
       updateAuthorStatus.updateAuthorCnt = updateExhibitionAuthor.length;
     } else {
-      updateAuthorStatus.updateAuthorCnt = 0
+      updateAuthorStatus.updateAuthorCnt = 0;
     }
     return updateAuthorStatus;
   };
@@ -204,38 +252,36 @@ class ExhibitionRepository extends Exhibitions {
    * @returns deleteLocationCnt: number, updateLocationCnt: number 장소 수정 정보
    */
   updateExhibitionLocation = async (mode, exhibitionId, detailLocation) => {
-    let updateLocationStatus = {deleteLocationCnt: 0, updateLocationCnt: 0};
+    let updateLocationStatus = { deleteLocationCnt: 0, updateLocationCnt: 0 };
     let updateExhibitionLocation = null;
 
     if (mode === "C") {
       // 장소 추가
       updateExhibitionLocation = await ExhibitionAddress.create({
         exhibitionId,
-        ...detailLocation
+        ...detailLocation,
       });
 
-      if(updateExhibitionLocation){
-        updateLocationStatus.updateLocationCnt = 1
+      if (updateExhibitionLocation) {
+        updateLocationStatus.updateLocationCnt = 1;
       }
     } else if (mode === "U") {
       // 기존 장소 삭제
-      const deleteLocationCnt = await ExhibitionAddress.destroy(
-        {
-          where: { exhibitionId }
-        }
-      );
-      updateLocationStatus.deleteLocationCnt = deleteLocationCnt
+      const deleteLocationCnt = await ExhibitionAddress.destroy({
+        where: { exhibitionId },
+      });
+      updateLocationStatus.deleteLocationCnt = deleteLocationCnt;
       // 장소 추가
       updateExhibitionLocation = await ExhibitionAddress.create({
         exhibitionId,
-        ...detailLocation
+        ...detailLocation,
       });
 
-      if(updateExhibitionLocation){
-        updateLocationStatus.updateLocationCnt = 1
+      if (updateExhibitionLocation) {
+        updateLocationStatus.updateLocationCnt = 1;
       }
     } else {
-      updateLocationStatus.updateLocationCnt = 0
+      updateLocationStatus.updateLocationCnt = 0;
     }
     return updateLocationStatus;
   };
