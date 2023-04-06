@@ -42,36 +42,20 @@ class UserController {
     }
   };
 
-  // kakaoStategy 성공 시
-  kakaoCallback = async (req,res, next) => {
-    try {
-      const email = req.user.userEmail
-      const token = await this.userService.generateToken(email);
-      res.set("Authorization", `${token}`);
-      // res.cookie("authorization", `Bearer ${token}`);
-      console.log("카카오스트래터지 성고오오오오오옹시 데이터어어어어",email)
-      res.redirect("http://localhost:4000");
-    } catch (error){
-      logger.error(error.message);
-      next(error);
-    }
-  };
-
-  googleCallback = async (req,res, next) => {
+  // Stategy 성공 시
+  socialCallback = async (req,res, next) => {
     try {
       const email = req.user.userEmail
       const token = await this.userService.generateToken(email);
       // res.set("Authorization", `${token}`);
       res.cookie("authorization", `Bearer ${token}`);
-      console.log("구우우글스트래터지 성고오오오오오옹시 데이터어어어어",email)
+      console.log("strategy 성공시", email)
       res.redirect("http://localhost:4000");
     } catch (error){
       logger.error(error.message);
       next(error);
     }
   };
-
-
 
   // 회원가입 전 이메일 중복확인
   emailConfirm = async (req, res, next) => {

@@ -30,7 +30,7 @@ router.get("/kakao/callback", passport.authenticate('kakao',{
     failureRedirect: '/',
     failureFlash: true,
     session: false,
-    }), userController.kakaoCallback)
+    }), userController.socialCallback)
 
 // 구글 로그인 auth/google
 router.get("/google", passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -40,6 +40,16 @@ router.get("/google/callback", passport.authenticate('google', {
         failureRedirect: '/',
         failureFlash: true,
         session: false,
-    }), userController.googleCallback);
+    }), userController.socialCallback);
+
+// 네이버 로그인 auth/naver
+router.get('/naver', passport.authenticate('naver', { authType: 'reprompt' }));
+
+// 구글 콜백 auth/google/callback
+router.get("/naver/callback", passport.authenticate('naver', {
+    failureRedirect: '/',
+    failureFlash: true,
+    session: false,
+}), userController.socialCallback);
 
 module.exports = router;
