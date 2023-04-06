@@ -11,13 +11,17 @@ const artgramController = new ArtgramController();
  * @swagger
  * /artgram:
  *   get:
- *     summary: "Search all Artgrams"
+ *     tags:
+ *       - artgram
+ *     summary: "전체 아트그램 조회"
  *     responses:
  *       "200":
- *         description: "Retrieves all artgrams."
+ *         description: "아트그램의 전체목록을 조회합니다"
  * /artgram/{artgramId}:
  *   post:
- *     summary: "Create artgram"
+ *     tags:
+ *       - artgram
+ *     summary: "아트그램 생성"
  *     parameters:
  *       - name: artgramId
  *         in: path
@@ -27,61 +31,102 @@ const artgramController = new ArtgramController();
  *           type: string
  *       - name: imgUrl
  *         in: formData
- *         description: "Url of the artgram image"
+ *         description: "이미지 Url을 입력하는 곳입니다"
  *         type: string
  *       - name: artgramTitle
  *         in: formData
- *         description: "Title of the artgram"
+ *         description: "아트그램의 제목을 입력하는 곳입니다."
  *         required: true
  *         type: string
  *       - name: artgramDesc
  *         in: formData
- *         description: "Description of the artgram"
+ *         description: "아트그램의 내용을 입력하는 부분입니다."
  *         required: true
  *         type: string
  *     responses:
  *       "200":
- *         description: "Artgram created"
+ *         description: "아트그램을 생성하였습니다."
  *       "400":
- *         description: "Invalid input"
+ *         description: "오류"
  *     security:
  *       - jwt: []
-
  *   patch:
- *     summary: "Modify artgram"
+ *     tags:
+ *       - artgram
+ *     summary: "아트그램 수정"
+ *     parameters:
+ *       - name: artgramId
+ *         in: path
+ *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - name: artgramTitle
+ *         in: formData
+ *         description: "아트그램의 제목을 적는 곳입니다."
+ *         required: true
+ *         type: string
+ *       - name: artgramDesc
+ *         in: formData
+ *         description: "아트그램의 내용을 적는 곳입니다."
+ *         required: true
+ *         type: string
  *     responses:
  *       "200":
- *         description: "Modify an artgram."
+ *         description: "아트그램을 수정했습니다."
  * /artgram/{artgramId}/remove:
  *   patch:
- *     summary: "Remove artgram"
+ *     tags:
+ *       - artgram
+ *     summary: "아트그램 삭제"
+ *     parameters:
+ *       - name: artgramId
+ *         in: path
+ *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
  *       "200":
- *         description: "Remove an artgram."
+ *         description: "아트그램이 삭제되었습니다."
  * /artgram/{artgramId}/likes:
  *   patch:
- *     summary: "Register or cancel Artgram like"
+ *     tags:
+ *       - artgram
+ *     summary: "아트그램 좋아요등록/취소"
+ *     parameters:
+ *       - name: artgramId
+ *         in: path
+ *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
  *       "200":
- *         description: "Register or cancel an Artgram like."
+ *         description: "아트그램의 좋아요 등록/취소 되었습니다."
  * /artgram/{artgramId}/scrap:
  *   patch:
- *     summary: "Register or cancel Artgram scrap"
+ *     tags:
+ *       - artgram
+ *     summary: "아트그램 스크랩등록/취소"
+ *     parameters:
+ *       - name: artgramId
+ *         in: path
+ *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
  *       "200":
- *         description: "Register or cancel an Artgram scrap."
+ *         description: "아트그램의 스크랩 등록/취소 되었습니다."
  */
 
 //아트그램 전체조회
 router.get("/", artgramController.allArtgrams);
 
+//제한하지않고
 //아트그램 작성
-router.post(
-  "/:artgramId",
-  upload.array("imgUrl", 5),
-  authMiddleware,
-  artgramController.postArtgram
-);
+router.post("/:artgramId", authMiddleware, artgramController.postArtgram);
 //아트그램 수정
 router.patch("/:artgramId", authMiddleware, artgramController.modifyArtgram);
 //아트그램 삭제
