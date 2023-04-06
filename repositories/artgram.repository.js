@@ -116,19 +116,27 @@ class ArtgramRepository extends Artgrams {
   postArtgram = async (
     artgramId,
     userEmail,
-    imgUrl,
     artgramTitle,
-    artgramDesc
+    artgramDesc,
+    imgUrl
   ) => {
-    const artgramImg = await ArtgramImg.create({ artgramId, imgUrl });
-    console.log(artgramImg);
+    const splitImg = imgUrl.split(",");
+    const artgramImgs = [];
+    for (let i = 0; i < splitImg.length; i++) {
+      const artgramImg = await ArtgramImg.create({
+        artgramId,
+        imgUrl: imgUrl[1],
+        imgOrder: i + 1,
+      });
+      artgramImgs.push(artgramImg);
+    }
+
     const createArtgram = await Artgrams.create({
       userEmail,
-      imgUrl: artgramImg,
       artgramTitle,
       artgramDesc,
     });
-    return [createArtgram, artgramImg];
+    return [createArtgram, artgramImgs];
   };
 
   //아트그램 수정
