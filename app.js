@@ -20,7 +20,7 @@ const swaggerOptions = {
     info: {
       title: "Muse_O",
       version: "1.0.0",
-      description: "전시회",
+      description: "전시회페이지",
     },
     securityDefinitions: {
       jwt: {
