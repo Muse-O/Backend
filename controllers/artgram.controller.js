@@ -23,11 +23,9 @@ class ArtgramController {
   postArtgram = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
-      const { artgramId } = req.params;
       const { artgramTitle, artgramDesc, imgUrl } = req.body;
       console.log(imgUrl);
       const createArtgram = await this.artgramService.postArtgram(
-        artgramId,
         userEmail,
         artgramTitle,
         artgramDesc,
