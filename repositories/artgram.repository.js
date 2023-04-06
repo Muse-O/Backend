@@ -114,22 +114,34 @@ class ArtgramRepository extends Artgrams {
 
   //아트그램 작성
   postArtgram = async (userEmail, artgramTitle, artgramDesc, imgUrl) => {
-    const splitImg = imgUrl.join(",").split(",");
-    const artgramImgs = [];
-
+    let artgramImgs = [];
     const createArtgram = await Artgrams.create({
       userEmail,
       artgramTitle,
       artgramDesc,
     });
-    for (let i = 0; i < splitImg.length; i++) {
+
+    if (!imgUrl || imgUrl.length === 0) {
+      return createArtgram;
+    } else if (imgUrl.length === 1) {
       const artgramImg = await ArtgramImg.create({
         artgramId: createArtgram.artgramId,
-        imgUrl: imgUrl[1],
-        imgOrder: i + 1,
+        imgUrl: imgUrl[0],
+        imgOrder: 1,
       });
       artgramImgs.push(artgramImg);
+    } else {
+      let splitImg = imgUrl.join(",").split(",");
+      for (let i = 0; splitImg.length > i; i++) {
+        const artgramImg = await ArtgramImg.create({
+          artgramId: createArtgram.artgramId,
+          imgUrl: splitImg[i],
+          imgOrder: i + 1,
+        });
+        artgramImgs.push(artgramImg);
+      }
     }
+
     return [createArtgram, artgramImgs];
   };
 
