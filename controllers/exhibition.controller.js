@@ -32,17 +32,16 @@ class ExhibitionController {
    */
   getExhibitionDetail = async (req, res, next) => {
     try {
-      const { exhibitionId } = req.param;
+      const { exhibitionId } = req.params;
 
-      const exhibitionInfo = await this.exhibitionService.getExhibitionDetail(
+      const exhibitionInfo = await this.exhibitionService.getExhibitionInfo(
         exhibitionId
       );
 
       return res
         .status(200)
-        .json({ exhibitionInfo, message: "로그인에 성공했습니다" });
+        .json({ exhibitionInfo, message: "게시글을 조회했습니다." });
     } catch (error) {
-      logger.error(error.message);
       next(error);
     }
   };
