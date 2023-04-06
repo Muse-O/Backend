@@ -17,18 +17,11 @@ const artgramController = new ArtgramController();
  *     responses:
  *       "200":
  *         description: "아트그램의 전체목록을 조회합니다"
- * /artgram/{artgramId}:
  *   post:
  *     tags:
  *       - artgram
  *     summary: "아트그램 생성"
  *     parameters:
- *       - name: artgramId
- *         in: path
- *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
- *         required: true
- *         schema:
- *           type: string
  *       - name: imgUrl
  *         in: formData
  *         description: "이미지 Url을 입력하는 곳입니다"
@@ -50,6 +43,7 @@ const artgramController = new ArtgramController();
  *         description: "오류"
  *     security:
  *       - jwt: []
+ * /artgram/{artgramId}:
  *   patch:
  *     tags:
  *       - artgram
@@ -126,7 +120,7 @@ router.get("/", artgramController.allArtgrams);
 
 //제한하지않고
 //아트그램 작성
-router.post("/:artgramId", authMiddleware, artgramController.postArtgram);
+router.post("/", authMiddleware, artgramController.postArtgram);
 //아트그램 수정
 router.patch("/:artgramId", authMiddleware, artgramController.modifyArtgram);
 //아트그램 삭제
