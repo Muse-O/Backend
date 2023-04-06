@@ -88,6 +88,11 @@ module.exports = (sequelize, DataTypes) => {
       field: 'entrance_fee',
       defaultValue: 'not written entrance fee'
     },
+    postImage: {
+      allowNull: true,
+      type: DataTypes.STRING,
+      field: 'post_image'
+    },
     artWorkCnt: {
       allowNull: true,
       type: DataTypes.STRING,
