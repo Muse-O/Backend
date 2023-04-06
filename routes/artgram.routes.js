@@ -46,27 +46,64 @@ const artgramController = new ArtgramController();
  *         description: "Invalid input"
  *     security:
  *       - jwt: []
-
  *   patch:
  *     summary: "Modify artgram"
+ *     parameters:
+ *       - name: artgramId
+ *         in: path
+ *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - name: artgramTitle
+ *         in: formData
+ *         description: "Title of the artgram"
+ *         required: true
+ *         type: string
+ *       - name: artgramDesc
+ *         in: formData
+ *         description: "Description of the artgram"
+ *         required: true
+ *         type: string
  *     responses:
  *       "200":
  *         description: "Modify an artgram."
  * /artgram/{artgramId}/remove:
  *   patch:
  *     summary: "Remove artgram"
+ *     parameters:
+ *       - name: artgramId
+ *         in: path
+ *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
  *       "200":
  *         description: "Remove an artgram."
  * /artgram/{artgramId}/likes:
  *   patch:
  *     summary: "Register or cancel Artgram like"
+ *     parameters:
+ *       - name: artgramId
+ *         in: path
+ *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
  *       "200":
  *         description: "Register or cancel an Artgram like."
  * /artgram/{artgramId}/scrap:
  *   patch:
  *     summary: "Register or cancel Artgram scrap"
+ *     parameters:
+ *       - name: artgramId
+ *         in: path
+ *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
  *       "200":
  *         description: "Register or cancel an Artgram scrap."

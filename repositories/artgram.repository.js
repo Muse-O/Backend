@@ -135,7 +135,6 @@ class ArtgramRepository extends Artgrams {
   modifyArtgram = async (artgramId, artgramTitle, artgramDesc) => {
     const cngArtgram = await Artgrams.update(
       {
-        artgramId,
         artgramTitle,
         artgramDesc,
       },

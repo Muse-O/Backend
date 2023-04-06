@@ -26,6 +26,7 @@ class ArtgramController {
       const { artgramId } = req.params;
       const { artgramTitle, artgramDesc } = req.body;
       const files = req.files;
+      console.log(files);
       const createArtgram = await this.artgramService.postArtgram(
         artgramId,
         userEmail,
@@ -52,7 +53,9 @@ class ArtgramController {
         artgramTitle,
         artgramDesc
       );
-      res.status(200).json({ message: "아트그램이 수정되었습니다." });
+      res
+        .status(200)
+        .json({ cngArtgram, message: "아트그램이 수정되었습니다." });
     } catch (error) {
       next(error);
     }
