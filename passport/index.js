@@ -1,7 +1,7 @@
 const kakao = require('./kakao');
-// const google = require('')
+const google = require('./google')
 
 module.exports = () => {
     kakao();
-    // google();
+    google();
 }

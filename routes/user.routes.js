@@ -30,16 +30,16 @@ router.get("/kakao/callback", passport.authenticate('kakao',{
     failureRedirect: '/',
     failureFlash: true,
     session: false,
-}), userController.kakaoCallback)
+    }), userController.kakaoCallback)
 
 // 구글 로그인 auth/google
-// router.get("/kakao", passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get("/google", passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// // 구글 콜백 auth/google/callback
-// router.get("/google/callback", passport.authenticate('google', {
-//         failureRedirect: '/',
-//         failureFlash: true,
-//         session: false,
-//     }), userController.googleCallback);
+// 구글 콜백 auth/google/callback
+router.get("/google/callback", passport.authenticate('google', {
+        failureRedirect: '/',
+        failureFlash: true,
+        session: false,
+    }), userController.googleCallback);
 
 module.exports = router;
