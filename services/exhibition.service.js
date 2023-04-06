@@ -25,7 +25,16 @@ class ExhibitionService {
     return exhibitionItem;
   };
 
-  getExhibitionDetail = async (mode) => {};
+  getExhibitionInfo = async (exhibitionId) => {
+    
+    const exhibitionInfo = await this.exhibitionRepository.getExhibitionInfo(exhibitionId);
+
+    if(!exhibitionInfo) {
+      throw Boom.notFound("해당 게시글이 존재하지 않습니다.");
+    }
+
+    return exhibitionInfo;
+  };
 
   /**
    * 전시회 작성/수정
