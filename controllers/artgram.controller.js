@@ -24,14 +24,14 @@ class ArtgramController {
     try {
       const { userEmail } = res.locals.user;
       const { artgramId } = req.params;
-      const { artgramTitle, artgramDesc } = req.body;
-      const files = req.files;
+      const { artgramTitle, artgramDesc, imgUrl } = req.body;
+      console.log(imgUrl);
       const createArtgram = await this.artgramService.postArtgram(
         artgramId,
         userEmail,
-        files,
         artgramTitle,
-        artgramDesc
+        artgramDesc,
+        imgUrl
       );
       res.status(200).json({
         artgram: createArtgram,
@@ -52,7 +52,9 @@ class ArtgramController {
         artgramTitle,
         artgramDesc
       );
-      res.status(200).json({ message: "아트그램이 수정되었습니다." });
+      res
+        .status(200)
+        .json({ cngArtgram, message: "아트그램이 수정되었습니다." });
     } catch (error) {
       next(error);
     }
