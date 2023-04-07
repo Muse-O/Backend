@@ -6,7 +6,7 @@ const artgramRouter = require("./artgram.routes");
 const artgramCommentRouter = require("./artgramComment.routes");
 const exhibitionRouter = require("./exhibition.routes");
 
-router.use("/user", userRouter);
+router.use("/auth", userRouter);
 router.use("/artgram", [artgramRouter, artgramCommentRouter]);
 router.use("/exhibition", exhibitionRouter)
 
