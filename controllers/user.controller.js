@@ -3,6 +3,7 @@ const logger = require("../middlewares/logger.js");
 const Boom = require("boom");
 const userSchema = require("../schemas/userReqSchema");
 
+
 class UserController {
   userService = new UserService();
 
@@ -10,13 +11,8 @@ class UserController {
   localLogin = async (req, res, next) => {
     try {
       const { email, password } = req.body;
-      
-      const validate = userSchema.validate(req.body);
-
-      if (validate.error) {
-        throw Boom.badRequest(validate.error.message);
-      } else {
-        console.log("Valid input!");
+      if (!email || !password){
+        throw Boom.badRequest("요청한 데이터 형식이 올바르지 않습니다.")
       }
       await this.userService.userLogin(email, password);
 
