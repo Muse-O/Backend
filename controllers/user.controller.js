@@ -24,7 +24,7 @@ class UserController {
   userService = new UserService();
 
   // 로그인
-  userLogin = async (req, res, next) => {
+  localLogin = async (req, res, next) => {
     try {
       const { email, password } = req.body;
       if (!email || !password){
@@ -37,6 +37,24 @@ class UserController {
 
       return res.status(201).json({ message: "로그인에 성공했습니다" });
     } catch (error) {
+      logger.error(error.message);
+      next(error);
+    }
+  };
+
+  // Stategy 성공 시
+  socialCallback = async (req,res, next) => {
+    try {
+      const email = req.user.userEmail
+      const token = await this.userService.generateToken(email);
+      // res.set("Authorization", `${token}`);
+      // res.cookie("authorization", `Bearer ${token}`);
+      console.log("strategy 성공시", email)
+      // res.redirect("http://localhost:4000");
+      return (res.redirect('http://localhost:3000',301, {
+        'Authorization': `Bearer ${token}`
+        }));
+    } catch (error){
       logger.error(error.message);
       next(error);
     }

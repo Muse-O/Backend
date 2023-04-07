@@ -12,6 +12,8 @@ const errorHandler = require("./middlewares/errorHandler.js");
 const swaggerJSDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const glob = require("glob");
+const passport = require("passport");
+const passportConfig = require('./passport')
 
 const PORT = process.env.SERVER_PORT;
 const swaggerOptions = {
@@ -76,6 +78,8 @@ app.use(express.urlencoded({ extended: false })); // x-www-form-urlencoded형태
 app.use(cookieParser());
 app.use("/", routes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+passportConfig(); // 패스포트 설정
 
 // 에러 핸들러
 app.use((err, req, res, next) => {
