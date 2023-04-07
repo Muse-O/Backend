@@ -7,16 +7,18 @@ class ArtgramController {
 
   //아트그램 전체조회
   allArtgrams = async (req, res, next) => {
-    try {
-      const { limit = 10, offset = 0 } = req.query;
-      const artgrams = await this.artgramService.allArtgrams(
-        Number(limit),
-        Number(offset)
-      );
-      res.status(200).json({ allArtgram: artgrams });
-    } catch (error) {
-      next(error);
-    }
+    // try {
+    const limit = Number(req.query.limit);
+    const offset = Number(req.query.offset);
+
+    console.log("limit=", limit, "offset=", offset);
+    const artgrams = await this.artgramService.allArtgrams(limit, offset);
+    res
+      .status(200)
+      .json({ ...artgrams, message: "아트그램을 정상적으로 가져왔습니다." });
+    // } catch (error) {
+    //   next(error);
+    // }
   };
 
   //아트그램 작성
