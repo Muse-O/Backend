@@ -48,9 +48,12 @@ class UserController {
       const email = req.user.userEmail
       const token = await this.userService.generateToken(email);
       // res.set("Authorization", `${token}`);
-      res.cookie("authorization", `Bearer ${token}`);
+      // res.cookie("authorization", `Bearer ${token}`);
       console.log("strategy 성공시", email)
-      res.redirect("http://localhost:4000");
+      // res.redirect("http://localhost:4000");
+      return (res.redirect('http://localhost:3000',301, {
+        'Authorization': `Bearer ${token}`
+        }));
     } catch (error){
       logger.error(error.message);
       next(error);
