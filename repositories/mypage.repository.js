@@ -15,7 +15,8 @@ class MypageRepository{
             profileIntro: introduction
          }, { where: {user_email:userEmail} });
 
-        return result;
+        const updatedProfile = await this.findProfileByEmail(userEmail);
+        return updatedProfile;
     }
 }
 

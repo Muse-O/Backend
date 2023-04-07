@@ -10,7 +10,12 @@ class MypageController {
         try {
             const { userEmail } = res.locals.user;
             const result = await this.mypageService.getMyProfile(userEmail);
-            return res.status(200).json(result);
+
+            return res.status(200).json({
+                profileImg: result.profileImg, 
+                nickname: result.profileNickname, 
+                introduction: result.profileIntro
+            });
         } catch (error) {
             logger.error(error.message);
             next(error);
@@ -30,7 +35,12 @@ class MypageController {
               }
 
             const updatedProfile = await this.mypageService.updateMyProfile(profileImg, nickname, introduction, userEmail)
-            return res.status(200).json({message: "프로필 수정 성공했습니다.", updatedProfile})
+            const result = {
+                profileImg: updatedProfile.profileImg, 
+                nickname: updatedProfile.profileNickname, 
+                introduction: updatedProfile.profileIntro
+            }
+            return res.status(200).json({message: "프로필 수정 성공했습니다.", result})
         } catch (error) {
             logger.error(error.message);
             next(error);
