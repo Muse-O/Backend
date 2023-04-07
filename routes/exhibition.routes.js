@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const authLoginMiddleware = require('../middlewares/authMiddleware');
+const authMiddleware = require('../middlewares/authMiddleware');
 const ExhibitionController = require("../controllers/exhibition.controller");
 const CommonAPIController = require("../controllers/commonAPI.controller")
 
@@ -13,11 +13,11 @@ router.get("/", exhibitionController.getExhibitionList);
 // 전시회 상세 조회
 router.get("/view/:exhibitionId", exhibitionController.getExhibitionDetail);
 // 전시회 등록
-router.post("/write", authLoginMiddleware, exhibitionController.writeExhibition);
+router.post("/write", authMiddleware, exhibitionController.writeExhibition);
 // 전시회 수정
-router.patch("/update/:exhibitionId", authLoginMiddleware, exhibitionController.updateExhibition);
-// // 전시회 삭제
-// router.delete("/delete/:exhibitionId", exhibitionController.deleteExhibition);
+router.patch("/update/:exhibitionId", authMiddleware, exhibitionController.updateExhibition);
+// 전시회 삭제
+router.delete("/delete/:exhibitionId", authMiddleware, exhibitionController.deleteExhibition);
 // // 전시회 스크랩
 // router.patch("/scrap/:exhibitionId", exhibitionController.scrapExhibition);
 // // 전시회 좋아요

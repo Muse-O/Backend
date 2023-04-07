@@ -19,7 +19,7 @@ class ExhibitionService {
     );
 
     if (!exhibitionItem.exhibitionList) {
-      throw Boom.notFound("전시회 정보가 더 이상 없습니다.");
+      throw Boom.notFound("전시회 정보가 더 이상 없습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다.");
     }
 
     return exhibitionItem;
@@ -30,7 +30,7 @@ class ExhibitionService {
     const exhibitionInfo = await this.exhibitionRepository.getExhibitionInfo(exhibitionId);
 
     if(!exhibitionInfo) {
-      throw Boom.notFound("해당 게시글이 존재하지 않습니다.");
+      throw Boom.notFound("해당 게시글이 존재하지 않습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다.");
     }
 
     return exhibitionInfo;
@@ -63,12 +63,17 @@ class ExhibitionService {
         exhibitionObj
       );
 
-    if (!updateExhibitionItem) {
-      if (mode === "C")
-        throw new Boom.badRequest("전시회 게시글 작성에 실패했습니다.");
-      if (mode === "U")
-        throw new Boom.badRequest("전시회 게시글 수정에 실패했습니다.");
-    }
+      if (mode === "C"){
+        if(!updateExhibitionItem){
+          throw Boom.badRequest("전시회 게시글 작성에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다.");
+        }
+      }
+
+      if (mode === "U"){
+        if(updateExhibitionItem[0] === 0){
+          throw Boom.badRequest("전시회 게시글 수정에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다.")
+        }
+      }
 
     if (artImage.length > 0) {
       // 이미지
@@ -120,7 +125,27 @@ class ExhibitionService {
     return updateInfo;
   };
 
-  deleteExhibition = async (mode) => {};
+  /**
+   * 전시 게시글 삭제
+   * @param {string} userEmail 
+   * @param {string} exhibitionId 
+   * @returns 삭제 갯수
+   */
+  deleteExhibition = async (userEmail, exhibitionId) => {
+    
+    const deleteExhibitionCnt = await this.exhibitionRepository.deleteExhibition(
+      userEmail,
+      exhibitionId
+    );
+
+    console.log('\n\n\n',deleteExhibitionCnt,'\n\n\n')
+
+    if(deleteExhibitionCnt[0] === 0){
+      throw Boom.notFound("게시글 삭제에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다.");
+    }
+
+    return deleteExhibitionCnt;
+  };
 
   scrapExhibition = async (mode) => {};
 
