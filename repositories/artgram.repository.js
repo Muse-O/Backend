@@ -113,29 +113,42 @@ class ArtgramRepository extends Artgrams {
   };
 
   //아트그램 작성
-  postArtgram = async (
-    artgramId,
-    userEmail,
-    imgUrl,
-    artgramTitle,
-    artgramDesc
-  ) => {
-    const artgramImg = await ArtgramImg.create({ artgramId, imgUrl });
-    console.log(artgramImg);
+  postArtgram = async (userEmail, artgramTitle, artgramDesc, imgUrl) => {
+    let artgramImgs = [];
     const createArtgram = await Artgrams.create({
       userEmail,
-      imgUrl: artgramImg,
       artgramTitle,
       artgramDesc,
     });
-    return [createArtgram, artgramImg];
+
+    if (!imgUrl || imgUrl.length === 0) {
+      return createArtgram;
+    } else if (imgUrl.length === 1) {
+      const artgramImg = await ArtgramImg.create({
+        artgramId: createArtgram.artgramId,
+        imgUrl: imgUrl[0],
+        imgOrder: 1,
+      });
+      artgramImgs.push(artgramImg);
+    } else {
+      let splitImg = imgUrl.join(",").split(",");
+      for (let i = 0; splitImg.length > i; i++) {
+        const artgramImg = await ArtgramImg.create({
+          artgramId: createArtgram.artgramId,
+          imgUrl: splitImg[i],
+          imgOrder: i + 1,
+        });
+        artgramImgs.push(artgramImg);
+      }
+    }
+
+    return [createArtgram, artgramImgs];
   };
 
   //아트그램 수정
   modifyArtgram = async (artgramId, artgramTitle, artgramDesc) => {
     const cngArtgram = await Artgrams.update(
       {
-        artgramId,
         artgramTitle,
         artgramDesc,
       },

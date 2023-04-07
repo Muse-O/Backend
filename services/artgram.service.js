@@ -16,23 +16,12 @@ class ArtgramService {
   };
 
   //아트그램 작성
-  postArtgram = async (
-    artgramId,
-    userEmail,
-    artgramTitle,
-    artgramDesc,
-    files
-  ) => {
-    const imgUrl = files.map((file) => ({
-      filename: file.filename,
-      path: file.path,
-    }));
+  postArtgram = async (userEmail, artgramTitle, artgramDesc, imgUrl) => {
     const postartgram = await this.artgramRepository.postArtgram(
-      artgramId,
       userEmail,
-      imgUrl,
       artgramTitle,
-      artgramDesc
+      artgramDesc,
+      imgUrl
     );
     return postartgram;
   };

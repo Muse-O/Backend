@@ -23,15 +23,20 @@ class ArtgramController {
   postArtgram = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
-      const { artgramId } = req.params;
-      const { artgramTitle, artgramDesc } = req.body;
-      const files = req.files;
-      const createArtgram = await this.artgramService.postArtgram(
-        artgramId,
-        userEmail,
-        files,
+      const { artgramTitle, artgramDesc, imgUrl } = req.body;
+      console.log(
+        "artgramTitle:",
         artgramTitle,
-        artgramDesc
+        "artgramDesc:",
+        artgramDesc,
+        "imgUrl:",
+        imgUrl
+      );
+      const createArtgram = await this.artgramService.postArtgram(
+        userEmail,
+        artgramTitle,
+        artgramDesc,
+        imgUrl
       );
       res.status(200).json({
         artgram: createArtgram,
@@ -52,7 +57,9 @@ class ArtgramController {
         artgramTitle,
         artgramDesc
       );
-      res.status(200).json({ message: "아트그램이 수정되었습니다." });
+      res
+        .status(200)
+        .json({ cngArtgram, message: "아트그램이 수정되었습니다." });
     } catch (error) {
       next(error);
     }
