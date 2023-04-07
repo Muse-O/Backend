@@ -16,7 +16,6 @@ class ArtgramRepository extends Artgrams {
   }
 
   //아트그램 전체조회
-  //아트그램 전체조회
   allArtgrams = async (limit, offset) => {
     const allEmailFind = await Artgrams.findAll({
       order: [["createdAt", "DESC"]],
@@ -56,7 +55,12 @@ class ArtgramRepository extends Artgrams {
           [Op.ne]: "AS04",
         },
       },
+      include: [{ model: ArtgramImg, attributes: ["imgUrl", "imgOrder"] }],
       group: ["Artgrams.artgram_id"],
+      order: [["createdAt", "DESC"]],
+      distinct: true,
+      limit: limit,
+      offset: offset,
     });
 
     const getArtgramImages = async (artgramId) => {
@@ -64,6 +68,7 @@ class ArtgramRepository extends Artgrams {
         attributes: ["imgUrl", "imgOrder"],
         where: { artgramId: artgramId },
         order: [["imgOrder", "ASC"]],
+        distinct: true,
       });
 
       return artgramImages;
@@ -81,6 +86,7 @@ class ArtgramRepository extends Artgrams {
         };
       })
     );
+    console.log("findArtgrams", findArtgrams);
 
     const artgramList = await Artgrams.findAndCountAll({
       limit: limit,
@@ -101,7 +107,7 @@ class ArtgramRepository extends Artgrams {
     return {
       artgramList: {
         count: artgramList.count,
-        rows: [...artgramList.rows, ...findArtgrams],
+        rows: findArtgrams,
       },
       paginationInfo,
     };
