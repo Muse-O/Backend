@@ -8,7 +8,9 @@ const {
 const { Op } = require("sequelize");
 const Boom = require("boom");
 const _ = require("lodash");
-const {convertArrayToString} = require("../modules/convertArrayToString")
+const {
+  convertIncludeDataToArray,
+} = require("../modules/convertIncludeDataToArray");
 
 class ExhibitionRepository extends Exhibitions {
   constructor() {
@@ -25,6 +27,7 @@ class ExhibitionRepository extends Exhibitions {
     const exhibitionList = await Exhibitions.findAndCountAll({
       limit: limit,
       offset: offset,
+      where: { exhibition_status: { [Op.ne]: ["ES04"] } },
       order: [["createdAt", "DESC"]],
     });
 
@@ -48,13 +51,13 @@ class ExhibitionRepository extends Exhibitions {
       include: [
         {
           model: ExhibitionImg,
-          attributes: ["img_url"],
+          attributes: ["img_url", "img_caption"],
           order: [["img_order", "ASC"]],
         },
         {
           model: ExhibitionAuthor,
           attributes: ["author_name"],
-          order: [["created_at", "ASC"]],
+          order: [["author_id", "ASC"]],
         },
         { model: ExhibitionCategory, attributes: ["exhibition_code"] },
         {
@@ -78,7 +81,7 @@ class ExhibitionRepository extends Exhibitions {
       ],
     });
 
-    return convertArrayToString(exhibitionItem.toJSON());
+    return exhibitionItem.toJSON();
   };
 
   /**
@@ -100,13 +103,19 @@ class ExhibitionRepository extends Exhibitions {
       });
     } else if (mode === "U") {
       // 수정
+
       updateExhibition = await Exhibitions.update(
         {
           userEmail,
           ...exhibitionObj,
         },
         {
-          where: { exhibitionId: exhibitionObj.exhibitionId },
+          where: {
+            [Op.and]: [
+              { exhibitionId: exhibitionObj.exhibitionId },
+              { userEmail },
+            ],
+          },
         }
       );
 
@@ -284,6 +293,36 @@ class ExhibitionRepository extends Exhibitions {
       updateLocationStatus.updateLocationCnt = 0;
     }
     return updateLocationStatus;
+  };
+
+  /**
+   * 전시 게시글 삭제
+   * @param {string} userEmail
+   * @param {string} exhibitionId
+   * @returns 삭제 게시글 갯수
+   */
+  deleteExhibition = async (userEmail, exhibitionId) => {
+
+    const searchExhibitionCnt = await Exhibitions.findOne({
+      where: {
+        [Op.and]: [{ userEmail }, { exhibitionId }],
+      },
+    })
+
+    console.log('\n',searchExhibitionCnt,'\n')
+
+    const removeExhibitionCnt = await Exhibitions.update(
+      {
+        exhibitionStatus: "ES04",
+      },
+      {
+        where: {
+          [Op.and]: [{ userEmail }, { exhibitionId }],
+        },
+      }
+    );
+
+    return removeExhibitionCnt;
   };
 }
 

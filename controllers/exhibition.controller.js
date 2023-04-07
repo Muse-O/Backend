@@ -52,30 +52,23 @@ class ExhibitionController {
   writeExhibition = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
-      const validatedData = await exhibitionSchema.validateAsync(req.body).catch(err => {
-        console.log(err);
-        return res.status(400).json({ message: err.message });
-      });
+      const validatedData = await exhibitionSchema
+        .validateAsync(req.body)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
 
-      if (validatedData.error) {
-        throw Boom.badRequest(validatedData.error.message);
-      } else {
-        console.log("Valid input!");
-      }
-
-      const writeExhibitionInfo =
-      await this.exhibitionService.updateExhibition(
+      const writeExhibitionInfo = await this.exhibitionService.updateExhibition(
         "C",
         userEmail,
         validatedData
       );
 
-      return res
-        .status(201)
-        .json({
-          writeExhibitionInfo,
-          message: "전시회 게시글을 작성했습니다.",
-        });
+      return res.status(201).json({
+        writeExhibitionInfo,
+        message: "전시회 게시글을 작성했습니다.",
+      });
     } catch (error) {
       next(error);
     }
@@ -88,17 +81,13 @@ class ExhibitionController {
     try {
       const { exhibitionId } = req.params;
       const { userEmail } = res.locals.user;
-      const validatedData = await exhibitionSchema.validateAsync(req.body).catch(err => {
-        console.log(err);
-        return res.status(400).json({ message: err.message });
-      });;
+      const validatedData = await exhibitionSchema
+        .validateAsync(req.body)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       validatedData.exhibitionId = exhibitionId;
-
-      if (validatedData.error) {
-        throw Boom.badRequest(validatedData.error.message);
-      } else {
-        console.log("Valid input!");
-      }
 
       const updateExhibitionInfo =
         await this.exhibitionService.updateExhibition(
@@ -107,12 +96,9 @@ class ExhibitionController {
           validatedData
         );
 
-      return res
-        .status(200)
-        .json({
-          updateExhibitionInfo,
-          message: "전시회 게시글을 수정했습니다.",
-        });
+      return res.status(200).json({
+        message: "전시회 게시글을 수정했습니다.",
+      });
     } catch (error) {
       next(error);
     }
@@ -122,13 +108,22 @@ class ExhibitionController {
    * 전시회 삭제
    */
   deleteExhibition = async (req, res, next) => {
-    // try {
-    //   const { email, password } = req.body;
-    //   return res.status(201).json({ message: "로그인에 성공했습니다" });
-    // } catch (error) {
-    //   logger.error(error.message);
-    //   next(error);
-    // }
+    try {
+      const { exhibitionId } = req.params;
+      const { userEmail } = res.locals.user;
+
+      const deleteExhibitionInfo =
+        await this.exhibitionService.deleteExhibition(
+          userEmail,
+          exhibitionId
+        );
+
+      return res.status(200).json({
+        message: "전시회 게시글을 삭제했습니다.",
+      })
+    } catch (error) {
+      next(error);
+    }
   };
 
   /**
