@@ -1,24 +1,7 @@
 const UserService = require("../services/user.service");
 const logger = require("../middlewares/logger.js");
 const Boom = require("boom");
-const Joi = require("joi")
-
-const re_email = /^[a-zA-Z0-9+\-\_.]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-.]+$/;
-const re_password = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{6,15}$/;
-
-
-const userSchema = Joi.object({
-  email: Joi.string().pattern(re_email).required().messages({
-    'string.pattern.base': '이메일 주소 형식이 올바르지 않습니다.',
-    'any.required': '이메일 주소를 입력해주세요.',
-    'string.empty': '이메일 주소를 입력해주세요.'
-  }),
-  password: Joi.string().pattern(re_password).required().messages({
-    'string.pattern.base': '비밀번호 형식이 올바르지 않습니다.',
-    'any.required': '비밀번호를 입력해주세요.',
-    'string.empty': '비밀번호를 입력해주세요.'
-  })
-});
+const userSchema = require("../schemas/userReqSchema");
 
 class UserController {
   userService = new UserService();
@@ -27,8 +10,13 @@ class UserController {
   localLogin = async (req, res, next) => {
     try {
       const { email, password } = req.body;
-      if (!email || !password){
-        throw Boom.badRequest("요청한 데이터 형식이 올바르지 않습니다.")
+      
+      const validate = userSchema.validate(req.body);
+
+      if (validate.error) {
+        throw Boom.badRequest(validate.error.message);
+      } else {
+        console.log("Valid input!");
       }
       await this.userService.userLogin(email, password);
 
