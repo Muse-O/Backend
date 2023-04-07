@@ -21,21 +21,24 @@ const artgramController = new ArtgramController();
  *     tags:
  *       - artgram
  *     summary: "아트그램 생성"
- *     parameters:
- *       - name: imgUrl
- *         in: formData
- *         description: "이미지 Url을 입력하는 곳입니다"
- *         type: string
- *       - name: artgramTitle
- *         in: formData
- *         description: "아트그램의 제목을 입력하는 곳입니다."
- *         required: true
- *         type: string
- *       - name: artgramDesc
- *         in: formData
- *         description: "아트그램의 내용을 입력하는 부분입니다."
- *         required: true
- *         type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               imgUrl:
+ *                 type: string
+ *                 description: "이미지 Url을 입력하는 곳입니다"
+ *               artgramTitle:
+ *                 type: string
+ *                 description: "아트그램의 제목을 입력하는 곳입니다."
+ *               artgramDesc:
+ *                 type: string
+ *                 description: "아트그램의 내용을 입력하는 부분입니다."
+ *             required:
+ *               - artgramTitle
+ *               - artgramDesc
  *     responses:
  *       "200":
  *         description: "아트그램을 생성하였습니다."
@@ -55,16 +58,21 @@ const artgramController = new ArtgramController();
  *         required: true
  *         schema:
  *           type: string
- *       - name: artgramTitle
- *         in: formData
- *         description: "아트그램의 제목을 적는 곳입니다."
- *         required: true
- *         type: string
- *       - name: artgramDesc
- *         in: formData
- *         description: "아트그램의 내용을 적는 곳입니다."
- *         required: true
- *         type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               artgramTitle:
+ *                 type: string
+ *                 description: "아트그램의 제목을 적는 곳입니다."
+ *               artgramDesc:
+ *                 type: string
+ *                 description: "아트그램의 내용을 적는 곳입니다."
+ *             required:
+ *               - artgramTitle
+ *               - artgramDesc
  *     responses:
  *       "200":
  *         description: "아트그램을 수정했습니다."
@@ -83,6 +91,7 @@ const artgramController = new ArtgramController();
  *     responses:
  *       "200":
  *         description: "아트그램이 삭제되었습니다."
+
  * /artgram/{artgramId}/likes:
  *   patch:
  *     tags:
