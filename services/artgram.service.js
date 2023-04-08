@@ -19,12 +19,14 @@ class ArtgramService {
     }
     return artgrams;
   };
+
   /**
    * 아트그램 작성
    * @param {string} userEmail 유저이메일
    * @param {artgramSchema} validatedData 검증된 아트그램객체{ artgramTitle, artgramDesc, imgUrl }
    * @returns 작성 결과
    */
+
   postArtgram = async (userEmail, validatedData) => {
     const { artgramTitle, artgramDesc, imgUrl } = validatedData;
     const postartgram = await this.artgramRepository.postArtgram(
@@ -43,7 +45,6 @@ class ArtgramService {
    */
   modifyArtgram = async (artgramId, artgramReq) => {
     const { artgramTitle, artgramDesc } = artgramReq;
-
     const patchartgram = await this.artgramRepository.modifyArtgram(
       artgramId,
       artgramTitle,

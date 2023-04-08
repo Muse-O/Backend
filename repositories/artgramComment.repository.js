@@ -59,6 +59,7 @@ class ArtgramCommentRepository extends ArtgramsComment {
           [Op.ne]: "CS04",
         },
       },
+
       attributes: ["commentId", "userEmail", "comment", "createdAt"],
       order: [["createdAt", "DESC"]],
     });
