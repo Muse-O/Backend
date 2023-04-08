@@ -12,7 +12,9 @@ class ArtgramCommentController {
     this.artgramCommentService = new ArtgramCommentService();
   }
 
-  //댓글작성
+  /**
+   * 댓글작성
+   */
   commentCreate = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
@@ -34,7 +36,9 @@ class ArtgramCommentController {
     }
   };
 
-  //댓글 전체조회
+  /**
+   * 댓글 전체조회
+   */
   allComment = async (req, res, next) => {
     try {
       const { artgramId } = req.params;
@@ -46,8 +50,9 @@ class ArtgramCommentController {
       next(error);
     }
   };
-
-  //댓글 수정
+  /**
+   * 댓글 수정
+   */
   modifyComment = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
@@ -69,7 +74,9 @@ class ArtgramCommentController {
     }
   };
 
-  //댓글 삭제
+  /**
+   * 댓글 삭제
+   */
   removeComment = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;

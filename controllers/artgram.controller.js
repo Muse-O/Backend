@@ -7,7 +7,9 @@ class ArtgramController {
     this.artgramService = new ArtgramService();
   }
 
-  //아트그램 전체조회
+  /**
+   * 아트그램 전체조회
+   */
   allArtgrams = async (req, res, next) => {
     try {
       const limit = Number(req.query.limit);
@@ -22,8 +24,9 @@ class ArtgramController {
       next(error);
     }
   };
-
-  //아트그램 작성
+  /**
+   * 아트그램 작성
+   */
   postArtgram = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
@@ -45,8 +48,9 @@ class ArtgramController {
       next(error);
     }
   };
-
-  //아트그램 수정
+  /**
+   * 아트그램 수정
+   */
   modifyArtgram = async (req, res, next) => {
     try {
       const { artgramId } = req.params;
@@ -65,8 +69,9 @@ class ArtgramController {
       next(error);
     }
   };
-
-  //아트그램 삭제
+  /**
+   * 아트그램 삭제
+   */
   removeArtgram = async (req, res, next) => {
     try {
       const { artgramId } = req.params;
@@ -77,7 +82,9 @@ class ArtgramController {
     }
   };
 
-  //아트그램 좋아요등록/취소
+  /**
+   * 아트그램 좋아요등록/취소
+   */
   likeArtgram = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
@@ -96,7 +103,9 @@ class ArtgramController {
     }
   };
 
-  //아트그램 스크랩등록/취소
+  /**
+   * 아트그램 스크랩등록/취소
+   */
   scrapArtgram = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;

@@ -49,6 +49,7 @@ class ArtgramCommentRepository extends ArtgramsComment {
         },
       },
       attributes: ["comment", "createdAt"],
+      order: [["createdAt", "DESC"]],
     });
 
     const findArtgramComment = findComment.map((comment) => ({
