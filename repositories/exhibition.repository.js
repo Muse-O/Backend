@@ -4,6 +4,8 @@ const {
   ExhibitionCategory,
   ExhibitionAuthor,
   ExhibitionAddress,
+  ExhibitionLike,
+  ExhibitionScrap
 } = require("../models");
 const { Op } = require("sequelize");
 const Boom = require("boom");
@@ -47,7 +49,7 @@ class ExhibitionRepository extends Exhibitions {
 
   getExhibitionInfo = async (exhibitionId) => {
     const exhibitionItem = await Exhibitions.findOne({
-      where: { exhibitionId },
+      where: { exhibitionId, exhibition_status: { [Op.ne]: ["ES04"] } },
       include: [
         {
           model: ExhibitionImg,
@@ -81,7 +83,7 @@ class ExhibitionRepository extends Exhibitions {
       ],
     });
 
-    return exhibitionItem.toJSON();
+    return exhibitionItem;
   };
 
   /**
@@ -309,7 +311,9 @@ class ExhibitionRepository extends Exhibitions {
       },
     })
 
-    console.log('\n',searchExhibitionCnt,'\n')
+    if(searchExhibitionCnt[0] === 0){
+      return searchExhibitionCnt;
+    }
 
     const removeExhibitionCnt = await Exhibitions.update(
       {
@@ -324,6 +328,77 @@ class ExhibitionRepository extends Exhibitions {
 
     return removeExhibitionCnt;
   };
+
+  /**
+   * 전시 게시글 스크랩
+   * @param {string} userEmail 
+   * @param {string} exhibitionId 
+   * @returns 스크랩 등록(create) or 취소(delete)
+   */
+  updateExhibitionScrap = async (userEmail, exhibitionId) => {
+    const scrapExhibition = await ExhibitionScrap.findOrCreate({
+      where: {
+        [Op.and]: [{ exhibitionId }, { userEmail }],
+      },
+      defaults: {
+        exhibitionId,
+        userEmail,
+      },
+    }).then(([data, created]) => {
+      if (!created) {
+        data.destroy();
+        return "delete";
+      }
+      return "create";
+    });
+
+    return scrapExhibition;
+  }
+
+  /**
+   * 전시 게시글 좋아요
+   * @param {string} userEmail 
+   * @param {string} exhibitionId 
+   * @returns 스크랩 좋아요(create) or 취소(delete)
+   */
+  updateExhibitionLike = async (userEmail, exhibitionId) => {
+    const likeExhibition = await ExhibitionLike.findOrCreate({
+      where: {
+        [Op.and]: [{ exhibitionId }, { userEmail }],
+      },
+      defaults: {
+        exhibitionId,
+        userEmail,
+      },
+    }).then(([data, created]) => {
+      if (!created) {
+        data.destroy();
+        return "delete";
+      }
+      return "create";
+    });
+    return likeExhibition;
+  }
+
+  /**
+   * 전시 게시글 카테고리별 검색
+   * @param {array[string]} categories 
+   * @returns 검색된 게시글 리스트
+   */
+  searchCategoryExhibition = async (categories) => {
+
+    const exhibitionList = await Exhibitions.findAll({
+      include: [{
+        model: ExhibitionCategory,
+        where: { categoryCode: { [Op.and]: [categories] } },
+        attributes: []
+      }],
+      order: [["createdAt", "DESC"]],
+    });
+
+    return exhibitionList;
+
+  }
 }
 
 module.exports = ExhibitionRepository;
