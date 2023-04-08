@@ -6,7 +6,12 @@ class ArtgramService {
     this.artgramRepository = new ArtgramRepository();
   }
 
-  //아트그램 전체조회
+  /**
+   * 아트그램 전체조회
+   * @param {number} limit 요청할 아트그램 게시글 수
+   * @param {number} offset 조회 아트그램 게시글 시작점
+   * @returns artgrams
+   */
   allArtgrams = async (limit, offset) => {
     const artgrams = await this.artgramRepository.allArtgrams(limit, offset);
     if (!artgrams.artgramList) {
@@ -16,7 +21,8 @@ class ArtgramService {
   };
 
   //아트그램 작성
-  postArtgram = async (userEmail, artgramTitle, artgramDesc, imgUrl) => {
+  postArtgram = async (userEmail, validatedData) => {
+    const { artgramTitle, artgramDesc, imgUrl } = validatedData;
     const postartgram = await this.artgramRepository.postArtgram(
       userEmail,
       artgramTitle,
@@ -27,18 +33,30 @@ class ArtgramService {
   };
 
   //아트그램 수정
-  modifyArtgram = async (artgramId, artgramTitle, artgramDesc) => {
+  modifyArtgram = async (artgramId, artgramReq) => {
+    const { artgramTitle, artgramDesc } = artgramReq;
+
     const patchartgram = await this.artgramRepository.modifyArtgram(
       artgramId,
       artgramTitle,
       artgramDesc
     );
+    if (patchartgram[0] === 0) {
+      throw Boom.notFound(
+        "게시글 삭제에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다."
+      );
+    }
     return patchartgram;
   };
 
   //아트그램 삭제
   removeArtgram = async (artgramId) => {
     const deleteartgram = await this.artgramRepository.removeArtgram(artgramId);
+    if (deleteartgram[0] === 0) {
+      throw Boom.notFound(
+        "게시글 삭제에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다."
+      );
+    }
     return deleteartgram;
   };
 
