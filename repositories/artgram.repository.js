@@ -118,7 +118,14 @@ class ArtgramRepository extends Artgrams {
     };
   };
 
-  //아트그램 작성
+  /**
+   * 아트그램 작성
+   * @param {string} userEmail
+   * @param {string} artgramTitle
+   * @param {string} artgramDesc
+   * @param {string} imgUrl
+   * @returns 아트그램 작성결과 createArtgram, artgramImgs
+   */
   postArtgram = async (userEmail, artgramTitle, artgramDesc, imgUrl) => {
     let artgramImgs = [];
     const createArtgram = await Artgrams.create({
@@ -151,7 +158,13 @@ class ArtgramRepository extends Artgrams {
     return [createArtgram, artgramImgs];
   };
 
-  //아트그램 수정
+  /**
+   * 아트그램 수정
+   * @param {string} artgramId
+   * @param {string} artgramTitle
+   * @param {string} artgramDesc
+   * @returns 수정결과반환 cngArtgram
+   */
   modifyArtgram = async (artgramId, artgramTitle, artgramDesc) => {
     const cngArtgram = await Artgrams.update(
       {
@@ -165,7 +178,11 @@ class ArtgramRepository extends Artgrams {
     return cngArtgram;
   };
 
-  //아트그램 삭제
+  /**
+   * 아트그램 삭제
+   * @param {string} artgramId
+   * @returns 아트그램 삭제결과반환 deleteArtgram
+   */
   removeArtgram = async (artgramId) => {
     const deleteArtgram = await Artgrams.update(
       { artgramStatus: "AS04" },
@@ -174,7 +191,12 @@ class ArtgramRepository extends Artgrams {
     return deleteArtgram;
   };
 
-  //아트그램 좋아요등록/취소
+  /**
+   * 아트그램 좋아요등록/취소
+   * @param {string} artgramId
+   * @param {string} userEmail
+   * @returns 좋아요등록/취소여부 반환 likeartgram
+   */
   likeArtgram = async (artgramId, userEmail) => {
     const likeartgram = await ArtgramLike.findOrCreate({
       where: {
@@ -194,7 +216,12 @@ class ArtgramRepository extends Artgrams {
     return likeartgram;
   };
 
-  //아트그램 스크랩등록/취소
+  /**
+   * 아트그램 스크랩등록/취소
+   * @param {string} artgramId
+   * @param {string} userEmail
+   * @returns 아트그램 스크랩등록/취소여부 반환 scrapArtgram
+   */
   scrapArtgram = async (artgramId, userEmail) => {
     const scrapArtgram = await ArtgramScrap.findOrCreate({
       where: {
