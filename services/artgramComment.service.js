@@ -7,12 +7,14 @@ class ArtgramCommentService {
   }
 
   //댓글 작성
-  commentCreate = async (userEmail, comment, artgramId) => {
+  commentCreate = async (userEmail, validatedData, artgramId) => {
+    const { comment } = validatedData;
     const artgramcomment = await this.artgramCommentRepository.commentCreate(
       userEmail,
       comment,
       artgramId
     );
+
     return artgramcomment;
   };
 
@@ -25,13 +27,19 @@ class ArtgramCommentService {
   };
 
   //댓글 수정
-  modifyComment = async (userEmail, comment, artgramId, commentId) => {
+  modifyComment = async (userEmail, validatedData, artgramId, commentId) => {
+    const { comment } = validatedData;
     const cngComment = await this.artgramCommentRepository.modifyComment(
       userEmail,
       comment,
       artgramId,
       commentId
     );
+    if (cngComment[0] === 0) {
+      throw Boom.notFound(
+        "게시글 삭제에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다."
+      );
+    }
     return cngComment;
   };
 
@@ -42,6 +50,11 @@ class ArtgramCommentService {
       artgramId,
       commentId
     );
+    if (deleteComment[0] === 0) {
+      throw Boom.notFound(
+        "게시글 삭제에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다."
+      );
+    }
     return deleteComment;
   };
 }

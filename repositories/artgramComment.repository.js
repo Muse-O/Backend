@@ -42,14 +42,13 @@ class ArtgramCommentRepository extends ArtgramsComment {
     const profileImg = user.UserProfile.dataValues.profileImg;
 
     const findComment = await ArtgramsComment.findAll({
-      where: { artgramId },
-      attributes: ["comment", "createdAt"],
       where: {
-        userEmail: userEmail,
+        artgramId,
         commentStatus: {
           [Op.ne]: "CS04",
         },
       },
+      attributes: ["comment", "createdAt"],
     });
 
     const findArtgramComment = findComment.map((comment) => ({

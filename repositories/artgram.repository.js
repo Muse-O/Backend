@@ -15,7 +15,12 @@ class ArtgramRepository extends Artgrams {
     super();
   }
 
-  //아트그램 전체조회
+  /**
+   * 아트그램 전체조회
+   * @param {number} limit 요청할 아트그램 게시글 수
+   * @param {number} offset 조회 아트그램 게시글 시작점
+   * @returns artgrams
+   */
   allArtgrams = async (limit, offset) => {
     const allEmailFind = await Artgrams.findAll({
       order: [["createdAt", "DESC"]],
@@ -162,14 +167,10 @@ class ArtgramRepository extends Artgrams {
 
   //아트그램 삭제
   removeArtgram = async (artgramId) => {
-    const deleteArtgram = await Artgrams.update({
-      where: [{ artgramId }],
-      attributes: [
-        {
-          artgramStatus: AS04,
-        },
-      ],
-    });
+    const deleteArtgram = await Artgrams.update(
+      { artgramStatus: "AS04" },
+      { where: { artgramId } }
+    );
     return deleteArtgram;
   };
 
