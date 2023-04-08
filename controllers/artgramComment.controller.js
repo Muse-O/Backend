@@ -91,6 +91,90 @@ class ArtgramCommentController {
       next(error);
     }
   };
+
+  /**
+   * 답글 조회
+   */
+  allReply = async (req, res, next) => {
+    try {
+      const { artgramId, commentId } = req.params;
+      const findReply = await this.artgramCommentService.allReply(
+        artgramId,
+        commentId
+      );
+      res.status(200).json({ Reply: findReply });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * 답글 작성
+   */
+  replyCreate = async (req, res, next) => {
+    try {
+      const { artgramId, commentId } = req.params;
+      const { userEmail } = res.locals.user;
+      const validatedData = await commentSchema
+        .validateAsync(req.body)
+        .catch((error) => {
+          res.status(400).json({ message: error.message });
+        });
+      const createReply = await this.artgramCommentService.replyCreate(
+        userEmail,
+        artgramId,
+        commentId,
+        validatedData
+      );
+      res.status(200).json({ message: "답글작성에 성공하였습니다." });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * 답글 수정
+   */
+  updateReply = async (req, res, next) => {
+    try {
+      const { artgramId, commentId, commentParent } = req.params;
+      const { userEmail } = res.locals.user;
+      const validatedData = await commentSchema
+        .validateAsync(req.body)
+        .catch((error) => {
+          res.status(400).json({ message: error.message });
+        });
+      const updatereply = await this.artgramCommentService.updateReply(
+        userEmail,
+        artgramId,
+        commentId,
+        commentParent,
+        validatedData
+      );
+      res.status(200).json({ message: "답글 수정에 성공하였습니다" });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * 답글 삭제
+   */
+  deleteReply = async (req, res, next) => {
+    try {
+      const { artgramId, commentId, commentParent } = req.params;
+      const { userEmail } = res.locals.user;
+      const deletereply = await this.artgramCommentService.deleteReply(
+        userEmail,
+        artgramId,
+        commentId,
+        commentParent
+      );
+      res.status(200).json({ message: "답글 삭제에 성공하였습니다." });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 module.exports = ArtgramCommentController;

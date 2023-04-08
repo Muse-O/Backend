@@ -80,5 +80,80 @@ class ArtgramCommentService {
     }
     return deleteComment;
   };
+
+  /**
+   * 답글 조회
+   * @param {string} artgramId
+   * @param {string} commentId
+   * @returns 답글조회 결과값반환
+   */
+  allReply = async (artgramId, commentId) => {
+    const findAllReply = await this.artgramCommentRepository.allReply(
+      artgramId,
+      commentId
+    );
+    return findAllReply;
+  };
+
+  /**
+   * 답글 작성
+   * @param {string} artgramId
+   * @param {string} commentId
+   * @param {commentSchema} validatedData
+   * @returns 답글작성 결과 반환
+   */
+  replyCreate = async (userEmail, artgramId, commentId, validatedData) => {
+    const { comment } = validatedData;
+    const createReply = await this.artgramCommentRepository.replyCreate(
+      userEmail,
+      artgramId,
+      commentId,
+      comment
+    );
+    return createReply;
+  };
+
+  /**
+   * 답글 수정
+   * @param {string} artgramId
+   * @param {string} commentId
+   * @param {string} commentParent
+   * @param {commentSchema} validatedData
+   * @returns 답글 수정결과 반환
+   */
+  updateReply = async (
+    userEmail,
+    artgramId,
+    commentId,
+    commentParent,
+    validatedData
+  ) => {
+    const { comment } = validatedData;
+    const replyUpdate = await this.artgramCommentRepository.updateReply(
+      userEmail,
+      artgramId,
+      commentId,
+      commentParent,
+      comment
+    );
+    return replyUpdate;
+  };
+
+  /**
+   * 답글 삭제
+   * @param {string} artgramId
+   * @param {string} commentId
+   * @param {string} commentParent
+   * @returns 답글 삭제결과 반환
+   */
+  deleteReply = async (userEmail, artgramId, commentId, commentParent) => {
+    const replyDelete = await this.artgramCommentRepository.deleteReply(
+      userEmail,
+      artgramId,
+      commentId,
+      commentParent
+    );
+    return replyDelete;
+  };
 }
 module.exports = ArtgramCommentService;
