@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const passport = require('passport')
+const passport = require("passport");
 
 const authLoginMiddleware = require("../middlewares/authLoginMiddleware");
 const UserController = require("../controllers/user.controller");
@@ -9,7 +9,7 @@ const userController = new UserController();
 
 /**
  * @swagger
- * /user/emailconfirm:
+ * /auth/emailconfirm:
  *   post:
  *     tags:
  *       - User
@@ -27,7 +27,7 @@ const userController = new UserController();
  *       "200":
  *         description: "회원가입이 가능한 이메일입니다."
  *
- * /user/emailvalidate:
+ * /auth/emailvalidate:
  *   post:
  *     tags:
  *       - User
@@ -49,7 +49,7 @@ const userController = new UserController();
  *     security:
  *       - jwt: []
  *
- * /user/emailcodecheck:
+ * /auth/emailcodecheck:
  *   post:
  *     tags:
  *       - User
@@ -72,7 +72,7 @@ const userController = new UserController();
  *       "200":
  *         description: "인증번호가 일치합니다."
  *
- * /user/signup:
+ * /auth/signup:
  *   post:
  *     tags:
  *       - User
@@ -99,7 +99,7 @@ const userController = new UserController();
  *       "200":
  *         description: "회원가입이 완료되었습니다."
  *
- * /user/login:
+ * /auth/login:
  *   post:
  *     tags:
  *       - User
@@ -128,8 +128,7 @@ router.post("/emailconfirm", userController.emailConfirm);
 router.post("/emailvalidate", userController.emailValidate);
 
 // 인증번호 검증
-router.get('/emailcodecheck', userController.emailValidateNumCheck);
-
+router.get("/emailcodecheck", userController.emailValidateNumCheck);
 
 // 회원가입
 router.post("/signup", userController.userSignup);
@@ -138,33 +137,48 @@ router.post("/signup", userController.userSignup);
 router.post("/login", authLoginMiddleware, userController.localLogin);
 
 // 카카오 로그인 auth/kakao
-router.get("/kakao", passport.authenticate('kakao'));
+router.get("/kakao", passport.authenticate("kakao"));
 
 // 카카오 콜백 auth/kakao/callback
-router.get("/kakao/callback", passport.authenticate('kakao',{
-    failureRedirect: '/',
+router.get(
+  "/kakao/callback",
+  passport.authenticate("kakao", {
+    failureRedirect: "/",
     failureFlash: true,
     session: false,
-    }), userController.socialCallback)
+  }),
+  userController.socialCallback
+);
 
 // 구글 로그인 auth/google
-router.get("/google", passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
 // 구글 콜백 auth/google/callback
-router.get("/google/callback", passport.authenticate('google', {
-        failureRedirect: '/',
-        failureFlash: true,
-        session: false,
-    }), userController.socialCallback);
-
-// 네이버 로그인 auth/naver
-router.get('/naver', passport.authenticate('naver', { authType: 'reprompt' }));
-
-// 구글 콜백 auth/google/callback
-router.get("/naver/callback", passport.authenticate('naver', {
-    failureRedirect: '/',
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/",
     failureFlash: true,
     session: false,
-}), userController.socialCallback);
+  }),
+  userController.socialCallback
+);
+
+// 네이버 로그인 auth/naver
+router.get("/naver", passport.authenticate("naver", { authType: "reprompt" }));
+
+// 구글 콜백 auth/google/callback
+router.get(
+  "/naver/callback",
+  passport.authenticate("naver", {
+    failureRedirect: "/",
+    failureFlash: true,
+    session: false,
+  }),
+  userController.socialCallback
+);
 
 module.exports = router;

@@ -4,11 +4,15 @@ const {
   ExhibitionCategory,
   ExhibitionAuthor,
   ExhibitionAddress,
+  ExhibitionLike,
+  ExhibitionScrap
 } = require("../models");
 const { Op } = require("sequelize");
 const Boom = require("boom");
 const _ = require("lodash");
-const {convertArrayToString} = require("../modules/convertArrayToString")
+const {
+  convertIncludeDataToArray,
+} = require("../modules/convertIncludeDataToArray");
 
 class ExhibitionRepository extends Exhibitions {
   constructor() {
@@ -25,6 +29,7 @@ class ExhibitionRepository extends Exhibitions {
     const exhibitionList = await Exhibitions.findAndCountAll({
       limit: limit,
       offset: offset,
+      where: { exhibition_status: { [Op.ne]: ["ES04"] } },
       order: [["createdAt", "DESC"]],
     });
 
@@ -44,17 +49,17 @@ class ExhibitionRepository extends Exhibitions {
 
   getExhibitionInfo = async (exhibitionId) => {
     const exhibitionItem = await Exhibitions.findOne({
-      where: { exhibitionId },
+      where: { exhibitionId, exhibition_status: { [Op.ne]: ["ES04"] } },
       include: [
         {
           model: ExhibitionImg,
-          attributes: ["img_url"],
+          attributes: ["img_url", "img_caption"],
           order: [["img_order", "ASC"]],
         },
         {
           model: ExhibitionAuthor,
           attributes: ["author_name"],
-          order: [["created_at", "ASC"]],
+          order: [["author_id", "ASC"]],
         },
         { model: ExhibitionCategory, attributes: ["exhibition_code"] },
         {
@@ -78,7 +83,7 @@ class ExhibitionRepository extends Exhibitions {
       ],
     });
 
-    return convertArrayToString(exhibitionItem.toJSON());
+    return exhibitionItem;
   };
 
   /**
@@ -100,13 +105,19 @@ class ExhibitionRepository extends Exhibitions {
       });
     } else if (mode === "U") {
       // 수정
+
       updateExhibition = await Exhibitions.update(
         {
           userEmail,
           ...exhibitionObj,
         },
         {
-          where: { exhibitionId: exhibitionObj.exhibitionId },
+          where: {
+            [Op.and]: [
+              { exhibitionId: exhibitionObj.exhibitionId },
+              { userEmail },
+            ],
+          },
         }
       );
 
@@ -285,6 +296,109 @@ class ExhibitionRepository extends Exhibitions {
     }
     return updateLocationStatus;
   };
+
+  /**
+   * 전시 게시글 삭제
+   * @param {string} userEmail
+   * @param {string} exhibitionId
+   * @returns 삭제 게시글 갯수
+   */
+  deleteExhibition = async (userEmail, exhibitionId) => {
+
+    const searchExhibitionCnt = await Exhibitions.findOne({
+      where: {
+        [Op.and]: [{ userEmail }, { exhibitionId }],
+      },
+    })
+
+    if(searchExhibitionCnt[0] === 0){
+      return searchExhibitionCnt;
+    }
+
+    const removeExhibitionCnt = await Exhibitions.update(
+      {
+        exhibitionStatus: "ES04",
+      },
+      {
+        where: {
+          [Op.and]: [{ userEmail }, { exhibitionId }],
+        },
+      }
+    );
+
+    return removeExhibitionCnt;
+  };
+
+  /**
+   * 전시 게시글 스크랩
+   * @param {string} userEmail 
+   * @param {string} exhibitionId 
+   * @returns 스크랩 등록(create) or 취소(delete)
+   */
+  updateExhibitionScrap = async (userEmail, exhibitionId) => {
+    const scrapExhibition = await ExhibitionScrap.findOrCreate({
+      where: {
+        [Op.and]: [{ exhibitionId }, { userEmail }],
+      },
+      defaults: {
+        exhibitionId,
+        userEmail,
+      },
+    }).then(([data, created]) => {
+      if (!created) {
+        data.destroy();
+        return "delete";
+      }
+      return "create";
+    });
+
+    return scrapExhibition;
+  }
+
+  /**
+   * 전시 게시글 좋아요
+   * @param {string} userEmail 
+   * @param {string} exhibitionId 
+   * @returns 스크랩 좋아요(create) or 취소(delete)
+   */
+  updateExhibitionLike = async (userEmail, exhibitionId) => {
+    const likeExhibition = await ExhibitionLike.findOrCreate({
+      where: {
+        [Op.and]: [{ exhibitionId }, { userEmail }],
+      },
+      defaults: {
+        exhibitionId,
+        userEmail,
+      },
+    }).then(([data, created]) => {
+      if (!created) {
+        data.destroy();
+        return "delete";
+      }
+      return "create";
+    });
+    return likeExhibition;
+  }
+
+  /**
+   * 전시 게시글 카테고리별 검색
+   * @param {array[string]} categories 
+   * @returns 검색된 게시글 리스트
+   */
+  searchCategoryExhibition = async (categories) => {
+
+    const exhibitionList = await Exhibitions.findAll({
+      include: [{
+        model: ExhibitionCategory,
+        where: { categoryCode: { [Op.and]: [categories] } },
+        attributes: []
+      }],
+      order: [["createdAt", "DESC"]],
+    });
+
+    return exhibitionList;
+
+  }
 }
 
 module.exports = ExhibitionRepository;

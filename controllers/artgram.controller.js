@@ -1,4 +1,6 @@
 const ArtgramService = require("../services/artgram.service");
+const artgramSchema = require("../schemas/artgramReqSchema");
+const Boom = require("boom");
 
 class ArtgramController {
   constructor() {
@@ -8,12 +10,14 @@ class ArtgramController {
   //아트그램 전체조회
   allArtgrams = async (req, res, next) => {
     try {
-      const { limit = 10, offset = 0 } = req.query;
-      const artgrams = await this.artgramService.allArtgrams(
-        Number(limit),
-        Number(offset)
-      );
-      res.status(200).json({ allArtgram: artgrams });
+      const limit = Number(req.query.limit);
+      const offset = Number(req.query.offset);
+
+      console.log("limit=", limit, "offset=", offset);
+      const artgrams = await this.artgramService.allArtgrams(limit, offset);
+      res
+        .status(200)
+        .json({ ...artgrams, message: "아트그램을 정상적으로 가져왔습니다." });
     } catch (error) {
       next(error);
     }
@@ -23,20 +27,15 @@ class ArtgramController {
   postArtgram = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
-      const { artgramTitle, artgramDesc, imgUrl } = req.body;
-      console.log(
-        "artgramTitle:",
-        artgramTitle,
-        "artgramDesc:",
-        artgramDesc,
-        "imgUrl:",
-        imgUrl
-      );
+      const validatedData = await artgramSchema
+        .validateAsync(req.body)
+        .catch((err) => {
+          res.status(402).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const createArtgram = await this.artgramService.postArtgram(
         userEmail,
-        artgramTitle,
-        artgramDesc,
-        imgUrl
+        validatedData
       );
       res.status(200).json({
         artgram: createArtgram,
@@ -51,15 +50,17 @@ class ArtgramController {
   modifyArtgram = async (req, res, next) => {
     try {
       const { artgramId } = req.params;
-      const { artgramTitle, artgramDesc } = req.body;
+      const validatedData = await artgramSchema
+        .validateAsync(req.body)
+        .catch((err) => {
+          res.status(402).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const cngArtgram = await this.artgramService.modifyArtgram(
         artgramId,
-        artgramTitle,
-        artgramDesc
+        validatedData
       );
-      res
-        .status(200)
-        .json({ cngArtgram, message: "아트그램이 수정되었습니다." });
+      res.status(200).json({ message: "아트그램이 수정되었습니다." });
     } catch (error) {
       next(error);
     }

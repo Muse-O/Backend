@@ -9,7 +9,7 @@ const artgramController = new ArtgramController();
 
 /**
  * @swagger
- * /artgram:
+ * /artgram?limit=20&offset=0:
  *   get:
  *     tags:
  *       - artgram
@@ -17,6 +17,7 @@ const artgramController = new ArtgramController();
  *     responses:
  *       "200":
  *         description: "아트그램의 전체목록을 조회합니다"
+ * /artgram:
  *   post:
  *     tags:
  *       - artgram
@@ -76,6 +77,8 @@ const artgramController = new ArtgramController();
  *     responses:
  *       "200":
  *         description: "아트그램을 수정했습니다."
+ *     security:
+ *       - jwt: []
  * /artgram/{artgramId}/remove:
  *   patch:
  *     tags:
@@ -91,6 +94,8 @@ const artgramController = new ArtgramController();
  *     responses:
  *       "200":
  *         description: "아트그램이 삭제되었습니다."
+ *     security:
+ *       - jwt: []
 
  * /artgram/{artgramId}/likes:
  *   patch:
@@ -107,6 +112,8 @@ const artgramController = new ArtgramController();
  *     responses:
  *       "200":
  *         description: "아트그램의 좋아요 등록/취소 되었습니다."
+ *     security:
+ *       - jwt: []
  * /artgram/{artgramId}/scrap:
  *   patch:
  *     tags:
@@ -122,6 +129,8 @@ const artgramController = new ArtgramController();
  *     responses:
  *       "200":
  *         description: "아트그램의 스크랩 등록/취소 되었습니다."
+ *     security:
+ *       - jwt: []
  */
 
 //아트그램 전체조회

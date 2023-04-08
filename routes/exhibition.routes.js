@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const authLoginMiddleware = require('../middlewares/authMiddleware');
+const authMiddleware = require('../middlewares/authMiddleware');
 const ExhibitionController = require("../controllers/exhibition.controller");
 const CommonAPIController = require("../controllers/commonAPI.controller")
 
@@ -13,20 +13,18 @@ router.get("/", exhibitionController.getExhibitionList);
 // 전시회 상세 조회
 router.get("/view/:exhibitionId", exhibitionController.getExhibitionDetail);
 // 전시회 등록
-router.post("/write", authLoginMiddleware, exhibitionController.writeExhibition);
+router.post("/write", authMiddleware, exhibitionController.writeExhibition);
 // 전시회 수정
-router.patch("/update/:exhibitionId", authLoginMiddleware, exhibitionController.updateExhibition);
-// // 전시회 삭제
-// router.delete("/delete/:exhibitionId", exhibitionController.deleteExhibition);
-// // 전시회 스크랩
-// router.patch("/scrap/:exhibitionId", exhibitionController.scrapExhibition);
-// // 전시회 좋아요
-// router.patch("/like/:exhibitionId", exhibitionController.likeExhibition);
-// // 전시회 검색 -> Redis 리펙토링 예정
-// router.get("/search", exhibitionController.searchExhibition);
+router.patch("/update/:exhibitionId", authMiddleware, exhibitionController.updateExhibition);
+// 전시회 삭제
+router.delete("/delete/:exhibitionId", authMiddleware, exhibitionController.deleteExhibition);
+// 전시회 스크랩
+router.patch("/scrap/:exhibitionId", authMiddleware, exhibitionController.scrapExhibition);
+// 전시회 좋아요
+router.patch("/like/:exhibitionId", authMiddleware, exhibitionController.likeExhibition);
 // 전시회 카테고리 조회
 router.get("/category", commonAPIController.getCategory);
-// // 전시회 카테고리 검색
-// router.get("/category/search", exhibitionController.searchCategoryExhibition);
+// 전시회 카테고리 검색
+router.get("/category/search", exhibitionController.searchCategoryExhibition);
 
 module.exports = router;
