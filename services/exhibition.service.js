@@ -138,8 +138,6 @@ class ExhibitionService {
       exhibitionId
     );
 
-    console.log('\n\n\n',deleteExhibitionCnt,'\n\n\n')
-
     if(deleteExhibitionCnt[0] === 0){
       throw Boom.notFound("게시글 삭제에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다.");
     }
@@ -147,12 +145,64 @@ class ExhibitionService {
     return deleteExhibitionCnt;
   };
 
-  scrapExhibition = async (mode) => {};
+  /**
+   * 전시 게시글 스크랩
+   * @param {string} userEmail 
+   * @param {string} exhibitionId 
+   * @returns 스크랩 등록(create) or 취소(delete)
+   */
+  updateExhibitionScrap = async (userEmail, exhibitionId) => {
 
-  likeExhibition = async (mode) => {};
+    const updateExhibitionScrap = await this.exhibitionRepository.updateExhibitionScrap(
+      userEmail,
+      exhibitionId
+    )
 
-  searchExhibition = async (mode) => {};
+    if(!updateExhibitionScrap === 'create' || !updateExhibitionScrap === 'delete'){
+      throw Boom.notFound("스크랩 등록/취소에 실패했습니다. 해당 게시글이 존재하지 않거나 요청에 실패했습니다.");
+    }
 
-  searchCategoryExhibition = async (mode) => {};
+    return updateExhibitionScrap;
+
+  };
+
+  /**
+   * 전시 게시글 좋아요
+   * @param {string} userEmail 
+   * @param {string} exhibitionId 
+   * @returns 스크랩 좋아요(create) or 취소(delete)
+   */
+  updateExhibitionLike = async (userEmail, exhibitionId) => {
+
+    const updateExhibitionLike = await this.exhibitionRepository.updateExhibitionLike(
+      userEmail,
+      exhibitionId
+    )
+
+    if(!updateExhibitionLike === 'create' || !updateExhibitionLike === 'delete'){
+      throw Boom.notFound("좋아요 등록/취소에 실패했습니다. 해당 게시글이 존재하지 않거나 요청에 실패했습니다.");
+    }
+
+    return updateExhibitionLike;
+  }
+
+  /**
+   * 전시 게시글 카테고리별 검색
+   * @param {array[string]} categories 
+   * @returns 검색된 게시글 리스트
+   */
+  searchCategoryExhibition = async (categories) => {
+
+    const searchExhibition = await this.exhibitionRepository.searchCategoryExhibition(
+      categories
+    )
+
+    if(!searchExhibition.length > 0){
+      throw Boom.notFound("해당 카테고리의 전시회가 없습니다.");
+    }
+
+    return searchExhibition;
+
+  };
 }
 module.exports = ExhibitionService;
