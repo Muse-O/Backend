@@ -15,7 +15,13 @@ class ArtgramCommentRepository extends ArtgramsComment {
     super();
   }
 
-  //댓글작성
+  /**
+   * 댓글작성
+   * @param {string} userEmail
+   * @param {string} comment
+   * @param {string} artgramId
+   * @returns 댓글작성결과 반환 createComments
+   */
   commentCreate = async (userEmail, comment, artgramId) => {
     const createComments = await ArtgramsComment.create({
       userEmail,
@@ -25,7 +31,11 @@ class ArtgramCommentRepository extends ArtgramsComment {
     return createComments;
   };
 
-  //댓글 전체조회
+  /**
+   * 댓글 전체조회
+   * @param {string} artgramId
+   * @returns artgramId에 해당하는 댓글전체반환 findArtgramComment
+   */
   allComment = async (artgramId) => {
     const allEmail = await Artgrams.findAll({
       order: [["createdAt", "DESC"]],
@@ -61,7 +71,14 @@ class ArtgramCommentRepository extends ArtgramsComment {
     return findArtgramComment;
   };
 
-  //댓글 수정
+  /**
+   * 댓글 수정
+   * @param {string} userEmail
+   * @param {string} comment
+   * @param {string} artgramId
+   * @param {string} commentId
+   * @returns 댓글 수정결과반환 cngComment
+   */
   modifyComment = async (userEmail, comment, artgramId, commentId) => {
     const cngComment = await ArtgramsComment.update(
       { comment },
@@ -77,7 +94,13 @@ class ArtgramCommentRepository extends ArtgramsComment {
     return cngComment;
   };
 
-  //댓글 삭제
+  /**
+   * 댓글 삭제
+   * @param {string} userEmail
+   * @param {string} artgramId
+   * @param {string} commentId
+   * @returns 댓글 삭제결과 반환 deleteComment
+   */
   removeComment = async (userEmail, artgramId, commentId) => {
     const deleteComment = await ArtgramsComment.update(
       { commentStatus: "CS04" },

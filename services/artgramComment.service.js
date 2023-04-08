@@ -6,7 +6,13 @@ class ArtgramCommentService {
     this.artgramCommentRepository = new ArtgramCommentRepository();
   }
 
-  //댓글 작성
+  /**
+   * 댓글 작성
+   * @param {string} userEmail
+   * @param {commentSchema} validatedData 검증된 댓글객체{ comment }
+   * @param {string} artgramId
+   * @returns 댓글작성결과
+   */
   commentCreate = async (userEmail, validatedData, artgramId) => {
     const { comment } = validatedData;
     const artgramcomment = await this.artgramCommentRepository.commentCreate(
@@ -18,7 +24,11 @@ class ArtgramCommentService {
     return artgramcomment;
   };
 
-  //댓글 전체조회
+  /**
+   * 댓글 전체조회
+   * @param {string} artgramId
+   * @returns artgramId에 해당하는 댓글 전체조회목록
+   */
   allComment = async (artgramId) => {
     const findComment = await this.artgramCommentRepository.allComment(
       artgramId
@@ -26,7 +36,14 @@ class ArtgramCommentService {
     return findComment;
   };
 
-  //댓글 수정
+  /**
+   * 댓글 수정
+   * @param {string} userEmail
+   * @param {commentSchema} validatedData
+   * @param {string} artgramId
+   * @param {string} commentId
+   * @returns 댓글수정결과
+   */
   modifyComment = async (userEmail, validatedData, artgramId, commentId) => {
     const { comment } = validatedData;
     const cngComment = await this.artgramCommentRepository.modifyComment(
@@ -43,7 +60,13 @@ class ArtgramCommentService {
     return cngComment;
   };
 
-  //댓글 삭제
+  /**
+   * 댓글 삭제
+   * @param {string} userEmail
+   * @param {string} artgramId
+   * @param {string} commentId
+   * @returns 댓글 삭제결과
+   */
   removeComment = async (userEmail, artgramId, commentId) => {
     const deleteComment = await this.artgramCommentRepository.removeComment(
       userEmail,
