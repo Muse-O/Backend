@@ -26,39 +26,21 @@ class ArtgramRepository extends Artgrams {
     const userEmail = allEmailFind.map(
       (artgram) => artgram.dataValues.userEmail
     );
-    const user = await Users.findOne({
+
+    const users = await Users.findAll({
       where: { userEmail: userEmail },
       include: [{ model: UserProfile }],
     });
 
-    const profileNickname = user.UserProfile.profileNickname;
-    const profileImg = user.UserProfile.profileImg;
+    const profileData = users.reduce((acc, user) => {
+      acc[user.userEmail] = {
+        profileNickname: user.UserProfile.profileNickname,
+        profileImg: user.UserProfile.profileImg,
+      };
+      return acc;
+    }, {});
+
     const artgrams = await Artgrams.findAll({
-      raw: true,
-      include: [
-        {
-          model: ArtgramImg,
-          attributes: ["imgUrl"],
-        },
-        {
-          model: ArtgramLike,
-          attributes: [
-            [
-              sequelize.fn("count", sequelize.col("artgram_like_id")),
-              "likecount",
-            ],
-          ],
-        },
-        {
-          model: ArtgramScrap,
-          attributes: [
-            [
-              sequelize.fn("count", sequelize.col("artgram_scrap_id")),
-              "scrapcount",
-            ],
-          ],
-        },
-      ],
       attributes: [
         "artgramId",
         "userEmail",
@@ -73,25 +55,44 @@ class ArtgramRepository extends Artgrams {
           [Op.ne]: "AS04",
         },
       },
+      include: [{ model: ArtgramImg, attributes: ["imgUrl", "imgOrder"] }],
       group: ["Artgrams.artgram_id"],
+      order: [["createdAt", "DESC"]],
+      distinct: true,
+      limit: limit,
+      offset: offset,
     });
 
-    const findArtgrams = artgrams.map((artgram) => ({
-      ...artgram,
-      profileImg,
-      profileNickname,
-    }));
+    const getArtgramImages = async (artgramId) => {
+      const artgramImages = await ArtgramImg.findAll({
+        attributes: ["imgUrl", "imgOrder"],
+        where: { artgramId: artgramId },
+        order: [["imgOrder", "ASC"]],
+        distinct: true,
+      });
+
+      return artgramImages;
+    };
+
+    const findArtgrams = await Promise.all(
+      artgrams.map(async (artgram) => {
+        const artgramId = artgram.artgramId;
+        const ArtgramImgs = await getArtgramImages(artgramId);
+
+        return {
+          ...artgram.toJSON(),
+          ...profileData[artgram.userEmail],
+          ArtgramImgs,
+        };
+      })
+    );
+    console.log("findArtgrams", findArtgrams);
 
     const artgramList = await Artgrams.findAndCountAll({
       limit: limit,
       offset: offset,
       order: [["createdAt", "DESC"]],
     });
-    const findArtgramsList = findArtgrams.map((findArtgram) => ({
-      ...findArtgram,
-      profileImg,
-      profileNickname,
-    }));
 
     const artgramCnt = await Artgrams.count();
     const hasNextPage = offset + limit < artgramCnt;
@@ -106,7 +107,7 @@ class ArtgramRepository extends Artgrams {
     return {
       artgramList: {
         count: artgramList.count,
-        rows: [...artgramList.rows, ...findArtgramsList],
+        rows: findArtgrams,
       },
       paginationInfo,
     };

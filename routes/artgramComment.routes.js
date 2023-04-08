@@ -33,10 +33,17 @@ const artgramCommentController = new ArtgramCommentController();
  *         required: true
  *         schema:
  *           type: string
- *       - name: comment
- *         in: formData
- *         description: "댓글을 입력하는곳입니다."
- *         type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               comment:
+ *                 type: string
+ *                 description: "댓글을 입력하는 곳입니다"
+ *             required:
+ *               - comment
  *     responses:
  *       "200":
  *         description: "댓글을 생성하였습니다."
@@ -61,12 +68,17 @@ const artgramCommentController = new ArtgramCommentController();
  *         description: "0427c29e-b23e-4543-b16c-a483cced6264"
  *         required: true
  *         schema:
- *            type: string
- *       - name: comment
- *         in: formData
- *         description: "댓글을 적는 곳입니다."
- *         required: true
- *         type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               comment:
+ *                 type: string
+ *                 description: "댓글을 입력하는 곳입니다"
+ *             required:
+ *               - comment
  *     responses:
  *       "200":
  *         description: "댓글을 수정했습니다."
