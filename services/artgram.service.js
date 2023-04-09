@@ -28,12 +28,13 @@ class ArtgramService {
    */
 
   postArtgram = async (userEmail, validatedData) => {
-    const { artgramTitle, artgramDesc, imgUrl } = validatedData;
+    const { artgramTitle, artgramDesc, imgUrl, hashtag } = validatedData;
     const postartgram = await this.artgramRepository.postArtgram(
       userEmail,
       artgramTitle,
       artgramDesc,
-      imgUrl
+      imgUrl,
+      hashtag
     );
     return postartgram;
   };

@@ -5,9 +5,8 @@ const {
   UserProfile,
   ArtgramLike,
   ArtgramScrap,
-  sequelize,
+  ArtgramHashtag,
 } = require("../models");
-const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 
 class ArtgramRepository extends Artgrams {
@@ -68,6 +67,11 @@ class ArtgramRepository extends Artgrams {
       offset: offset,
     });
 
+    // const hashtag = await ArtgramHashtag.findAll({
+    //   attributes: ["tagname"],
+    //   where: { artgramId: artgrams.artgramId },
+    // });
+    // console.log(hashtag);
     const getArtgramImages = async (artgramId) => {
       const artgramImages = await ArtgramImg.findAll({
         attributes: ["imgUrl", "imgOrder"],
@@ -83,15 +87,23 @@ class ArtgramRepository extends Artgrams {
       artgrams.map(async (artgram) => {
         const artgramId = artgram.artgramId;
         const ArtgramImgs = await getArtgramImages(artgramId);
+        let tagNames = null;
+        const hasTag = await ArtgramHashtag.findAll({
+          attributes: ["tagName"],
+          where: { artgramId: artgramId },
+        });
+        if (hasTag && Array.isArray(hasTag)) {
+          tagNames = hasTag.map((tag) => tag.tagName);
+        }
 
         return {
           ...artgram.toJSON(),
           ...profileData[artgram.userEmail],
           ArtgramImgs,
+          hashtag: tagNames,
         };
       })
     );
-    console.log("findArtgrams", findArtgrams);
 
     const artgramList = await Artgrams.findAndCountAll({
       limit: limit,
@@ -126,13 +138,34 @@ class ArtgramRepository extends Artgrams {
    * @param {string} imgUrl
    * @returns 아트그램 작성결과 createArtgram, artgramImgs
    */
-  postArtgram = async (userEmail, artgramTitle, artgramDesc, imgUrl) => {
+  postArtgram = async (
+    userEmail,
+    artgramTitle,
+    artgramDesc,
+    imgUrl,
+    hashtag
+  ) => {
     let artgramImgs = [];
+    let hashTag = [];
     const createArtgram = await Artgrams.create({
       userEmail,
       artgramTitle,
       artgramDesc,
     });
+    if (hashtag) {
+      const tags = hashtag
+        .split(/[\[\],]+/)
+        .filter((tag) => tag.trim().length > 0);
+      for (let i = 0; i < tags.length; i++) {
+        if (tags.length > 0) {
+          const tagname = await ArtgramHashtag.create({
+            artgramId: createArtgram.artgramId,
+            tagName: tags[i].trim(),
+          });
+          hashTag.push(tagname);
+        }
+      }
+    }
 
     if (!imgUrl || imgUrl.length === 0) {
       return createArtgram;
@@ -141,6 +174,7 @@ class ArtgramRepository extends Artgrams {
         artgramId: createArtgram.artgramId,
         imgUrl: imgUrl[0],
         imgOrder: 1,
+        hashtag: hashTag.tagName,
       });
       artgramImgs.push(artgramImg);
     } else {
@@ -155,7 +189,7 @@ class ArtgramRepository extends Artgrams {
       }
     }
 
-    return [createArtgram, artgramImgs];
+    return [createArtgram, artgramImgs, hashTag];
   };
 
   /**
