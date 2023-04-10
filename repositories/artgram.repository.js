@@ -175,7 +175,7 @@ class ArtgramRepository extends Artgrams {
   ) => {
     let artgramImgs = [];
     let hashTag = [];
-    let splitImg = imgUrl.split(",");
+    let splitImg = imgUrl.replace(/\[|\]/g, "").split(",");
     const createArtgram = await Artgrams.create({
       userEmail,
       artgramTitle,
