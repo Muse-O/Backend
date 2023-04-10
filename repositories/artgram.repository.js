@@ -5,16 +5,15 @@ const {
   UserProfile,
   ArtgramLike,
   ArtgramScrap,
-  sequelize,
+  ArtgramHashtag,
+  ArtgramComment,
 } = require("../models");
-const Sequelize = require("sequelize");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 
 class ArtgramRepository extends Artgrams {
   constructor() {
     super();
   }
-
   /**
    * 아트그램 전체조회
    * @param {number} limit 요청할 아트그램 게시글 수
@@ -54,6 +53,33 @@ class ArtgramRepository extends Artgrams {
         "createdAt",
         "updatedAt",
       ],
+      include: [
+        {
+          model: ArtgramImg,
+          attributes: ["imgUrl", "imgOrder"],
+        },
+        {
+          model: ArtgramLike,
+          attributes: [
+            [Sequelize.fn("COUNT", Sequelize.col("likeId")), "likeCount"],
+          ],
+          duplicating: false,
+        },
+        {
+          model: ArtgramScrap,
+          attributes: [
+            [Sequelize.fn("COUNT", Sequelize.col("scrapId")), "scrapCount"],
+          ],
+          duplicating: false,
+        },
+        {
+          model: ArtgramComment,
+          attributes: [
+            [Sequelize.fn("COUNT", Sequelize.col("commentId")), "commentCount"],
+          ],
+          duplicating: false,
+        },
+      ],
       where: {
         userEmail: userEmail,
         artgram_status: {
@@ -83,16 +109,30 @@ class ArtgramRepository extends Artgrams {
       artgrams.map(async (artgram) => {
         const artgramId = artgram.artgramId;
         const ArtgramImgs = await getArtgramImages(artgramId);
+        let tagNames = null;
+        const hasTag = await ArtgramHashtag.findAll({
+          attributes: ["tagName"],
+          where: { artgramId: artgramId },
+        });
+        if (hasTag && Array.isArray(hasTag)) {
+          tagNames = hasTag.map((tag) => tag.tagName);
+        }
 
+        const likeCount = artgram.likeCount ?? [];
+        const scrapCount = artgram.scrapCount ?? [];
+        const commentCount = artgram.commentCount ?? [];
         return {
           ...artgram.toJSON(),
           ...profileData[artgram.userEmail],
           ArtgramImgs,
+          hashtag: tagNames,
+          likeCount,
+          scrapCount,
+          commentCount,
         };
       })
     );
-    console.log("findArtgrams", findArtgrams);
-
+    console.log(findArtgrams);
     const artgramList = await Artgrams.findAndCountAll({
       limit: limit,
       offset: offset,
@@ -126,25 +166,47 @@ class ArtgramRepository extends Artgrams {
    * @param {string} imgUrl
    * @returns 아트그램 작성결과 createArtgram, artgramImgs
    */
-  postArtgram = async (userEmail, artgramTitle, artgramDesc, imgUrl) => {
+  postArtgram = async (
+    userEmail,
+    artgramTitle,
+    artgramDesc,
+    imgUrl,
+    hashtag
+  ) => {
     let artgramImgs = [];
+    let hashTag = [];
+    let splitImg = imgUrl.split(",");
     const createArtgram = await Artgrams.create({
       userEmail,
       artgramTitle,
       artgramDesc,
     });
+    if (hashtag) {
+      const tags = hashtag
+        .split(/[\[\],]+/)
+        .filter((tag) => tag.trim().length > 0);
+      for (let i = 0; i < tags.length; i++) {
+        if (tags.length > 0) {
+          const tagname = await ArtgramHashtag.create({
+            artgramId: createArtgram.artgramId,
+            tagName: tags[i].trim(),
+          });
+          hashTag.push(tagname);
+        }
+      }
+    }
 
     if (!imgUrl || imgUrl.length === 0) {
       return createArtgram;
-    } else if (imgUrl.length === 1) {
+    } else if (splitImg === 1) {
       const artgramImg = await ArtgramImg.create({
         artgramId: createArtgram.artgramId,
-        imgUrl: imgUrl[0],
+        imgUrl: imgUrl,
         imgOrder: 1,
+        hashtag: hashTag.tagName,
       });
       artgramImgs.push(artgramImg);
     } else {
-      let splitImg = imgUrl.join(",").split(",");
       for (let i = 0; splitImg.length > i; i++) {
         const artgramImg = await ArtgramImg.create({
           artgramId: createArtgram.artgramId,
@@ -155,7 +217,7 @@ class ArtgramRepository extends Artgrams {
       }
     }
 
-    return [createArtgram, artgramImgs];
+    return [createArtgram, artgramImgs, hashTag];
   };
 
   /**
