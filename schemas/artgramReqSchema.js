@@ -13,6 +13,9 @@ const artgramSchema = Joi.object({
   hashtag: Joi.string().messages({
     "string.empty": "hashtag(태그)를 문자열로 입력해주세요",
   }),
+  imgUrl: Joi.string().messages({
+    "string.empty": "imgUrl(이미지)를 문자열로 입력해주세요",
+  }),
 });
 
 module.exports = artgramSchema;

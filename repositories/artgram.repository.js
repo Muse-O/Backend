@@ -67,11 +67,6 @@ class ArtgramRepository extends Artgrams {
       offset: offset,
     });
 
-    // const hashtag = await ArtgramHashtag.findAll({
-    //   attributes: ["tagname"],
-    //   where: { artgramId: artgrams.artgramId },
-    // });
-    // console.log(hashtag);
     const getArtgramImages = async (artgramId) => {
       const artgramImages = await ArtgramImg.findAll({
         attributes: ["imgUrl", "imgOrder"],
@@ -147,6 +142,7 @@ class ArtgramRepository extends Artgrams {
   ) => {
     let artgramImgs = [];
     let hashTag = [];
+    let splitImg = imgUrl.split(",");
     const createArtgram = await Artgrams.create({
       userEmail,
       artgramTitle,
@@ -169,16 +165,15 @@ class ArtgramRepository extends Artgrams {
 
     if (!imgUrl || imgUrl.length === 0) {
       return createArtgram;
-    } else if (imgUrl.length === 1) {
+    } else if (splitImg === 1) {
       const artgramImg = await ArtgramImg.create({
         artgramId: createArtgram.artgramId,
-        imgUrl: imgUrl[0],
+        imgUrl: imgUrl,
         imgOrder: 1,
         hashtag: hashTag.tagName,
       });
       artgramImgs.push(artgramImg);
     } else {
-      let splitImg = imgUrl.join(",").split(",");
       for (let i = 0; splitImg.length > i; i++) {
         const artgramImg = await ArtgramImg.create({
           artgramId: createArtgram.artgramId,
