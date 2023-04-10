@@ -1,15 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
-const multer = require("multer");
 
-const { upload } = require("../middlewares/multer");
 const ArtgramController = require("../controllers/artgram.controller");
 const artgramController = new ArtgramController();
 
 /**
  * @swagger
- * /artgram?limit=20&offset=0:
+ * /artgram?limit=10&offset=0:
  *   get:
  *     tags:
  *       - artgram
@@ -136,7 +134,6 @@ const artgramController = new ArtgramController();
 //아트그램 전체조회
 router.get("/", artgramController.allArtgrams);
 
-//제한하지않고
 //아트그램 작성
 router.post("/", authMiddleware, artgramController.postArtgram);
 //아트그램 수정

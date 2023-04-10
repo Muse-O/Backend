@@ -236,7 +236,12 @@ class ExhibitionController {
           Object.values(item)
         );
 
-      return res.status(200).json({searchExhibition, message: "전시회 정보를 정상적으로 가져왔습니다." });
+      return res
+        .status(200)
+        .json({
+          searchExhibition,
+          message: "전시회 정보를 정상적으로 가져왔습니다.",
+        });
     } catch (error) {
       next(error);
     }
