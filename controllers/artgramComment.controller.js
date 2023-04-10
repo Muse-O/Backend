@@ -1,4 +1,5 @@
 const ArtgramCommentService = require("../services/artgramComment.service");
+const pkIdParamSchema = require("../schemas/pkIdParamSchema");
 const Joi = require("joi");
 
 const commentSchema = Joi.object({
@@ -23,7 +24,12 @@ class ArtgramCommentController {
         .catch((error) => {
           res.status(400).json({ message: error.message });
         });
-      const { artgramId } = req.params;
+      const { artgramId } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
 
       const artgramcomment = await this.artgramCommentService.commentCreate(
         userEmail,
@@ -41,7 +47,12 @@ class ArtgramCommentController {
    */
   allComment = async (req, res, next) => {
     try {
-      const { artgramId } = req.params;
+      const { artgramId } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const createArtgram = await this.artgramCommentService.allComment(
         artgramId
       );
@@ -61,7 +72,12 @@ class ArtgramCommentController {
         .catch((error) => {
           res.status(400).json({ message: error.message });
         });
-      const { artgramId, commentId } = req.params;
+      const { artgramId, commentId } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const createArtgram = await this.artgramCommentService.modifyComment(
         userEmail,
         validatedData,
@@ -80,7 +96,12 @@ class ArtgramCommentController {
   removeComment = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
-      const { artgramId, commentId } = req.params;
+      const { artgramId, commentId } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const createArtgram = await this.artgramCommentService.removeComment(
         userEmail,
         artgramId,
@@ -90,7 +111,6 @@ class ArtgramCommentController {
     } catch (error) {
       next(error);
     }
-
   };
 
   /**
@@ -98,7 +118,12 @@ class ArtgramCommentController {
    */
   allReply = async (req, res, next) => {
     try {
-      const { artgramId, commentId } = req.params;
+      const { artgramId, commentId } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const findReply = await this.artgramCommentService.allReply(
         artgramId,
         commentId
@@ -114,7 +139,12 @@ class ArtgramCommentController {
    */
   replyCreate = async (req, res, next) => {
     try {
-      const { artgramId, commentId } = req.params;
+      const { artgramId, commentId } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const { userEmail } = res.locals.user;
       const validatedData = await commentSchema
         .validateAsync(req.body)
@@ -138,7 +168,12 @@ class ArtgramCommentController {
    */
   updateReply = async (req, res, next) => {
     try {
-      const { artgramId, commentId, commentParent } = req.params;
+      const { artgramId, commentId, commentParent } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const { userEmail } = res.locals.user;
       const validatedData = await commentSchema
         .validateAsync(req.body)
@@ -163,7 +198,12 @@ class ArtgramCommentController {
    */
   deleteReply = async (req, res, next) => {
     try {
-      const { artgramId, commentId, commentParent } = req.params;
+      const { artgramId, commentId, commentParent } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const { userEmail } = res.locals.user;
       const deletereply = await this.artgramCommentService.deleteReply(
         userEmail,
