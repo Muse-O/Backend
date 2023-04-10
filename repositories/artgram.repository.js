@@ -118,7 +118,7 @@ class ArtgramRepository extends Artgrams {
           artgramLikeCount,
           artgramScrapCount,
           artgramCommentCount,
-          commentIds,
+          commentId: commentIds,
         };
       })
     );
