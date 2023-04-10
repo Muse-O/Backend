@@ -1,24 +1,8 @@
 const UserService = require("../services/user.service");
 const logger = require("../middlewares/logger.js");
 const Boom = require("boom");
-const Joi = require("joi")
+const userSchema = require("../schemas/userReqSchema");
 
-const re_email = /^[a-zA-Z0-9+\-\_.]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-.]+$/;
-const re_password = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{6,15}$/;
-
-
-const userSchema = Joi.object({
-  email: Joi.string().pattern(re_email).required().messages({
-    'string.pattern.base': '이메일 주소 형식이 올바르지 않습니다.',
-    'any.required': '이메일 주소를 입력해주세요.',
-    'string.empty': '이메일 주소를 입력해주세요.'
-  }),
-  password: Joi.string().pattern(re_password).required().messages({
-    'string.pattern.base': '비밀번호 형식이 올바르지 않습니다.',
-    'any.required': '비밀번호를 입력해주세요.',
-    'string.empty': '비밀번호를 입력해주세요.'
-  })
-});
 
 class UserController {
   userService = new UserService();
@@ -52,7 +36,7 @@ class UserController {
     console.log("strategy 성공시", email)
     // res.redirect("http://localhost:4000");
     res.setHeader('Set-Cookie', 'authorization='+`Bearer ${token}`+'; Path=/; HttpOnly');
-    return res.redirect('http://localhost:4000',301);
+    return res.redirect(301, 'http://localhost:4000');
     } catch (error){
     logger.error(error.message);
     next(error);
