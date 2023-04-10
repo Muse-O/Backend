@@ -20,22 +20,32 @@ class ArtgramService {
     return artgrams;
   };
 
-  //아트그램 작성
+  /**
+   * 아트그램 작성
+   * @param {string} userEmail 유저이메일
+   * @param {artgramSchema} validatedData 검증된 아트그램객체{ artgramTitle, artgramDesc, imgUrl }
+   * @returns 작성 결과
+   */
+
   postArtgram = async (userEmail, validatedData) => {
-    const { artgramTitle, artgramDesc, imgUrl } = validatedData;
+    const { artgramTitle, artgramDesc, hashtag, imgUrl } = validatedData;
     const postartgram = await this.artgramRepository.postArtgram(
       userEmail,
       artgramTitle,
       artgramDesc,
-      imgUrl
+      imgUrl,
+      hashtag
     );
     return postartgram;
   };
-
-  //아트그램 수정
+  /**
+   * 아트그램 수정
+   * @param {string} artgramId
+   * @param {artgramSchema} artgramReq
+   * @returns 수정결과반환
+   */
   modifyArtgram = async (artgramId, artgramReq) => {
     const { artgramTitle, artgramDesc } = artgramReq;
-
     const patchartgram = await this.artgramRepository.modifyArtgram(
       artgramId,
       artgramTitle,
@@ -49,7 +59,11 @@ class ArtgramService {
     return patchartgram;
   };
 
-  //아트그램 삭제
+  /**
+   * 아트그램 삭제
+   * @param {string} artgramId
+   * @returns 삭제결과반환
+   */
   removeArtgram = async (artgramId) => {
     const deleteartgram = await this.artgramRepository.removeArtgram(artgramId);
     if (deleteartgram[0] === 0) {
@@ -60,7 +74,12 @@ class ArtgramService {
     return deleteartgram;
   };
 
-  //아트그램 좋아요등록/취소
+  /**
+   * 아트그램 좋아요등록/취소
+   * @param {string} artgramId
+   * @param {string} userEmail
+   * @returns 좋아요등록/취소결과
+   */
   likeArtgram = async (artgramId, userEmail) => {
     const likeartgram = await this.artgramRepository.likeArtgram(
       artgramId,
@@ -69,7 +88,12 @@ class ArtgramService {
     return likeartgram;
   };
 
-  //아트그램 스크랩등록/취소
+  /**
+   * 아트그램 스크랩등록/취소
+   * @param {string} artgramId
+   * @param {string} userEmail
+   * @returns
+   */
   scrapArtgram = async (artgramId, userEmail) => {
     const scrapartgram = await this.artgramRepository.scrapArtgram(
       artgramId,

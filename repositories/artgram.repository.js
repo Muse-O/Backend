@@ -5,16 +5,15 @@ const {
   UserProfile,
   ArtgramLike,
   ArtgramScrap,
-  sequelize,
+  ArtgramHashtag,
+  ArtgramComment,
 } = require("../models");
-const Sequelize = require("sequelize");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 
 class ArtgramRepository extends Artgrams {
   constructor() {
     super();
   }
-
   /**
    * 아트그램 전체조회
    * @param {number} limit 요청할 아트그램 게시글 수
@@ -54,6 +53,33 @@ class ArtgramRepository extends Artgrams {
         "createdAt",
         "updatedAt",
       ],
+      include: [
+        {
+          model: ArtgramImg,
+          attributes: ["imgUrl", "imgOrder"],
+        },
+        {
+          model: ArtgramLike,
+          attributes: [
+            [Sequelize.fn("COUNT", Sequelize.col("likeId")), "likeCount"],
+          ],
+          duplicating: false,
+        },
+        {
+          model: ArtgramScrap,
+          attributes: [
+            [Sequelize.fn("COUNT", Sequelize.col("scrapId")), "scrapCount"],
+          ],
+          duplicating: false,
+        },
+        {
+          model: ArtgramComment,
+          attributes: [
+            [Sequelize.fn("COUNT", Sequelize.col("commentId")), "commentCount"],
+          ],
+          duplicating: false,
+        },
+      ],
       where: {
         userEmail: userEmail,
         artgram_status: {
@@ -83,16 +109,30 @@ class ArtgramRepository extends Artgrams {
       artgrams.map(async (artgram) => {
         const artgramId = artgram.artgramId;
         const ArtgramImgs = await getArtgramImages(artgramId);
+        let tagNames = null;
+        const hasTag = await ArtgramHashtag.findAll({
+          attributes: ["tagName"],
+          where: { artgramId: artgramId },
+        });
+        if (hasTag && Array.isArray(hasTag)) {
+          tagNames = hasTag.map((tag) => tag.tagName);
+        }
 
+        const likeCount = artgram.likeCount ?? [];
+        const scrapCount = artgram.scrapCount ?? [];
+        const commentCount = artgram.commentCount ?? [];
         return {
           ...artgram.toJSON(),
           ...profileData[artgram.userEmail],
           ArtgramImgs,
+          hashtag: tagNames,
+          likeCount,
+          scrapCount,
+          commentCount,
         };
       })
     );
-    console.log("findArtgrams", findArtgrams);
-
+    console.log(findArtgrams);
     const artgramList = await Artgrams.findAndCountAll({
       limit: limit,
       offset: offset,
@@ -118,40 +158,78 @@ class ArtgramRepository extends Artgrams {
     };
   };
 
-  //아트그램 작성
-  postArtgram = async (userEmail, artgramTitle, artgramDesc, imgUrl) => {
+  /**
+   * 아트그램 작성
+   * @param {string} userEmail
+   * @param {string} artgramTitle
+   * @param {string} artgramDesc
+   * @param {string} imgUrl
+   * @returns 아트그램 작성결과 createArtgram, artgramImgs
+   */
+  postArtgram = async (
+    userEmail,
+    artgramTitle,
+    artgramDesc,
+    imgUrl,
+    hashtag
+  ) => {
     let artgramImgs = [];
+    let hashTag = [];
     const createArtgram = await Artgrams.create({
       userEmail,
       artgramTitle,
       artgramDesc,
     });
+    if (hashtag) {
+      const tags = hashtag
+        .split(/[\[\],]+/)
+        .filter((tag) => tag.trim().length > 0);
+      for (let i = 0; i < tags.length; i++) {
+        if (tags.length > 0) {
+          const tagname = await ArtgramHashtag.create({
+            artgramId: createArtgram.artgramId,
+            tagName: tags[i].trim(),
+          });
+          hashTag.push(tagname);
+        }
+      }
+    }
 
     if (!imgUrl || imgUrl.length === 0) {
       return createArtgram;
-    } else if (imgUrl.length === 1) {
-      const artgramImg = await ArtgramImg.create({
-        artgramId: createArtgram.artgramId,
-        imgUrl: imgUrl[0],
-        imgOrder: 1,
-      });
-      artgramImgs.push(artgramImg);
-    } else {
-      let splitImg = imgUrl.join(",").split(",");
-      for (let i = 0; splitImg.length > i; i++) {
+    } else if (Array.isArray(imgUrl)) {
+      for (let i = 0; i < imgUrl.length; i++) {
         const artgramImg = await ArtgramImg.create({
           artgramId: createArtgram.artgramId,
-          imgUrl: splitImg[i],
+          imgUrl: imgUrl[i].trim(),
           imgOrder: i + 1,
+          hashtag: hashTag.tagName,
+        });
+        artgramImgs.push(artgramImg);
+      }
+    } else {
+      let splitImg = imgUrl.split(",");
+      for (let i = 0; i < splitImg.length; i++) {
+        const artgramImg = await ArtgramImg.create({
+          artgramId: createArtgram.artgramId,
+          imgUrl: splitImg[i].trim(),
+          imgOrder: i + 1,
+          hashtag: hashTag.tagName,
         });
         artgramImgs.push(artgramImg);
       }
     }
 
-    return [createArtgram, artgramImgs];
+    return [createArtgram, artgramImgs, hashTag];
   };
 
-  //아트그램 수정
+  /**
+   * 아트그램 수정
+   * @param {string} artgramId
+   * @param {string} artgramTitle
+   * @param {string} artgramDesc
+   * @returns 수정결과반환 cngArtgram
+   */
   modifyArtgram = async (artgramId, artgramTitle, artgramDesc) => {
     const cngArtgram = await Artgrams.update(
       {
@@ -165,7 +243,11 @@ class ArtgramRepository extends Artgrams {
     return cngArtgram;
   };
 
-  //아트그램 삭제
+  /**
+   * 아트그램 삭제
+   * @param {string} artgramId
+   * @returns 아트그램 삭제결과반환 deleteArtgram
+   */
   removeArtgram = async (artgramId) => {
     const deleteArtgram = await Artgrams.update(
       { artgramStatus: "AS04" },
@@ -174,7 +256,12 @@ class ArtgramRepository extends Artgrams {
     return deleteArtgram;
   };
 
-  //아트그램 좋아요등록/취소
+  /**
+   * 아트그램 좋아요등록/취소
+   * @param {string} artgramId
+   * @param {string} userEmail
+   * @returns 좋아요등록/취소여부 반환 likeartgram
+   */
   likeArtgram = async (artgramId, userEmail) => {
     const likeartgram = await ArtgramLike.findOrCreate({
       where: {
@@ -194,7 +281,12 @@ class ArtgramRepository extends Artgrams {
     return likeartgram;
   };
 
-  //아트그램 스크랩등록/취소
+  /**
+   * 아트그램 스크랩등록/취소
+   * @param {string} artgramId
+   * @param {string} userEmail
+   * @returns 아트그램 스크랩등록/취소여부 반환 scrapArtgram
+   */
   scrapArtgram = async (artgramId, userEmail) => {
     const scrapArtgram = await ArtgramScrap.findOrCreate({
       where: {

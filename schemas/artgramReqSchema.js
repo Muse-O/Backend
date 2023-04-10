@@ -10,6 +10,10 @@ const artgramSchema = Joi.object({
     "string.empty": "artgramDesc(설명)을 문자열로 입력해주세요",
     "any.required": "artgramDesc(설명)값이 요청 파라미터로 전달되지않았습니다.",
   }),
+  hashtag: Joi.string().messages({
+    "string.empty": "hashtag(태그)를 문자열로 입력해주세요",
+  }),
+  imgUrl: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())),
 });
 
 module.exports = artgramSchema;
