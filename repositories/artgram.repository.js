@@ -6,14 +6,14 @@ const {
   ArtgramLike,
   ArtgramScrap,
   ArtgramHashtag,
+  ArtgramComment,
 } = require("../models");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 
 class ArtgramRepository extends Artgrams {
   constructor() {
     super();
   }
-
   /**
    * 아트그램 전체조회
    * @param {number} limit 요청할 아트그램 게시글 수
@@ -53,6 +53,33 @@ class ArtgramRepository extends Artgrams {
         "createdAt",
         "updatedAt",
       ],
+      include: [
+        {
+          model: ArtgramImg,
+          attributes: ["imgUrl", "imgOrder"],
+        },
+        {
+          model: ArtgramLike,
+          attributes: [
+            [Sequelize.fn("COUNT", Sequelize.col("likeId")), "likeCount"],
+          ],
+          duplicating: false,
+        },
+        {
+          model: ArtgramScrap,
+          attributes: [
+            [Sequelize.fn("COUNT", Sequelize.col("scrapId")), "scrapCount"],
+          ],
+          duplicating: false,
+        },
+        {
+          model: ArtgramComment,
+          attributes: [
+            [Sequelize.fn("COUNT", Sequelize.col("commentId")), "commentCount"],
+          ],
+          duplicating: false,
+        },
+      ],
       where: {
         userEmail: userEmail,
         artgram_status: {
@@ -91,15 +118,21 @@ class ArtgramRepository extends Artgrams {
           tagNames = hasTag.map((tag) => tag.tagName);
         }
 
+        const likeCount = artgram.likeCount ?? [];
+        const scrapCount = artgram.scrapCount ?? [];
+        const commentCount = artgram.commentCount ?? [];
         return {
           ...artgram.toJSON(),
           ...profileData[artgram.userEmail],
           ArtgramImgs,
           hashtag: tagNames,
+          likeCount,
+          scrapCount,
+          commentCount,
         };
       })
     );
-
+    console.log(findArtgrams);
     const artgramList = await Artgrams.findAndCountAll({
       limit: limit,
       offset: offset,
