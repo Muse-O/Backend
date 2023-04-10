@@ -1,19 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const RedisConnector = require("../config/redisConnector");
 
-const redisClient = RedisConnector.getClient();
+const SearchContorller = require("../controllers/search.controller");
+const searchController = new SearchContorller();
 
-redisClient.set("mykey", "myvalue", function (err, result) {
-  if (err) throw err;
-  console.log(result);
-});
-
-redisClient.get("mykey", function (err, result) {
-  if (err) throw err;
-  console.log(result);
-});
-
-redisClient.quit();
+router.get("/", searchController.search);
 
 module.exports = router;

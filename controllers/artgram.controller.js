@@ -1,5 +1,7 @@
 const ArtgramService = require("../services/artgram.service");
 const artgramSchema = require("../schemas/artgramReqSchema");
+const pkIdParamSchema = require("../schemas/pkIdParamSchema");
+const pageQuerySchema = require("../schemas/pageQuerySchema");
 const Boom = require("boom");
 
 class ArtgramController {
@@ -12,11 +14,16 @@ class ArtgramController {
    */
   allArtgrams = async (req, res, next) => {
     try {
-      const limit = Number(req.query.limit);
-      const offset = Number(req.query.offset);
-
-      console.log("limit=", limit, "offset=", offset);
-      const artgrams = await this.artgramService.allArtgrams(limit, offset);
+      const { limit, offset } = await pageQuerySchema
+        .validateAsync(req.query)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
+      const artgrams = await this.artgramService.allArtgrams(
+        Number(limit),
+        Number(offset)
+      );
       res
         .status(200)
         .json({ ...artgrams, message: "아트그램을 정상적으로 가져왔습니다." });
@@ -53,7 +60,12 @@ class ArtgramController {
    */
   modifyArtgram = async (req, res, next) => {
     try {
-      const { artgramId } = req.params;
+      const { artgramId } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const validatedData = await artgramSchema
         .validateAsync(req.body)
         .catch((err) => {
@@ -74,7 +86,12 @@ class ArtgramController {
    */
   removeArtgram = async (req, res, next) => {
     try {
-      const { artgramId } = req.params;
+      const { artgramId } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const deleteArtgram = await this.artgramService.removeArtgram(artgramId);
       res.status(200).json({ message: "아트그램이 삭제되었습니다." });
     } catch (error) {
@@ -88,7 +105,12 @@ class ArtgramController {
   likeArtgram = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
-      const { artgramId } = req.params;
+      const { artgramId } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
       const likeartgram = await this.artgramService.likeArtgram(
         artgramId,
         userEmail
@@ -109,7 +131,12 @@ class ArtgramController {
   scrapArtgram = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
-      const { artgramId } = req.params;
+      const { artgramId } = await pkIdParamSchema
+        .validateAsync(req.params)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
 
       const scrapartgram = await this.artgramService.scrapArtgram(
         artgramId,
