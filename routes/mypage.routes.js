@@ -13,9 +13,9 @@ router.patch("/", authMiddleware, mypageController.updateMyProfile);
 router.get("/exhibition", authMiddleware, mypageController.getMyExhibition);
 
 // 좋아요 한 전시회 조회
-router.get("/", authMiddleware, mypageController.getMyLikedExhibition);
+router.get("/exhibition/likes", authMiddleware, mypageController.getMyLikedExhibition);
 
 // 스크랩한 전시회 조회
-router.get("/", authMiddleware, mypageController.getMyScrappedExhibition);
+router.get("/exhibition/scraps", authMiddleware, mypageController.getMyScrappedExhibition);
 
 module.exports = router;

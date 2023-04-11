@@ -66,7 +66,7 @@ class MypageController {
 
             const result = await this.mypageService.getMyLikedExhibition(userEmail)
 
-            return res.status(200).json({message: "내가 좋아요한 전시회 조회에 성공했습니다.", result})
+            return res.status(200).json({ myLikedExhibitions:result })
         } catch (error) {
             logger.error(error.message);
             next(error);

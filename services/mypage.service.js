@@ -34,8 +34,13 @@ class MypageService {
     };
 
     getMyLikedExhibition = async (userEmail) =>{
-        const exhibitions = await this.mypageRepository.findMyLikedExhibition(userEmail);
-        return exhibitions
+        const myLikes = await this.mypageRepository.findAllMyLikedExhibitionId(userEmail);
+        const myLikedExhibitionIds = myLikes.map((elem)=>elem.exhibition_id);
+        console.log("myLikes",myLikes)
+        console.log("myLikedExhibitionIds", myLikedExhibitionIds)
+        const getMyLikedExhibitions = await this.mypageRepository.findMyLikedExhibition(myLikedExhibitionIds)
+        
+        return getMyLikedExhibitions
     }
 
     getMyScrappedExhibition= async (userEmail) => {
