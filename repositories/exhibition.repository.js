@@ -6,7 +6,8 @@ const {
   ExhibitionAddress,
   ExhibitionLike,
   ExhibitionScrap,
-  sequelize
+  UserProfile,
+  sequelize,
 } = require("../models");
 const { Op } = require("sequelize");
 
@@ -24,45 +25,66 @@ class ExhibitionRepository extends Exhibitions {
   getExhibitionList = async (limit, offset) => {
     const result = await sequelize.query(
       `
+      SELECT
+      e.exhibition_id AS exhibitionId,
+      e.user_email AS userEmail,
+      e.exhibition_title AS exhibitionTitle,
+      e.exhibition_desc AS exhibitionDesc,
+      e.start_date AS startDate,
+      e.end_date AS endDate,
+      e.entrance_fee AS entranceFee,
+      e.post_image AS postImage,
+      e.art_work_cnt AS artWorkCnt,
+      e.location,
+      e.contact,
+      e.location,
+      e.agency_and_sponsor AS agencyAndSponsor,
+      e.exhibition_status AS exhibitionStatus,
+      get_code_name(e.exhibition_status) AS exhibitionStatusName,
+      e.created_at AS createdAt,
+      e.updated_at AS updatedAt,
+      COALESCE(l.likeCnt, 0) AS likeCnt,
+      COALESCE(s.scrapCnt, 0) AS scrapCnt,
+      GROUP_CONCAT(ec.exhibition_code ORDER BY ec.created_at) AS categoryCode,
+      GROUP_CONCAT(get_code_name(ec.exhibition_code) ORDER BY ec.created_at) AS categoryCodeName,
+      p.profile_id AS authorProfileId,
+      p.profile_nickname AS authorNickName,
+      p.profile_img AS authorProfileImg,
+      p.profile_intro AS authorProfileIntro
+      FROM exhibitions e
+      LEFT JOIN (
         SELECT
-          e.exhibition_id AS exhibitionId,
-          e.user_email AS userEmail,
-          e.exhibition_title AS exhibitionTitle,
-          e.exhibition_desc AS exhibitionDesc,
-          e.start_date AS startDate,
-          e.end_date AS endDate,
-          e.entrance_fee AS entranceFee,
-          e.post_image AS postImage,
-          e.art_work_cnt AS artWorkCnt,
-          e.contact,
-          e.location,
-          e.exhibition_status AS exhibitionStatus,
-          e.created_at AS createdAt,
-          e.updated_at AS updatedAt,
-          COALESCE(l.likeCnt, 0) AS likeCnt,
-          COALESCE(s.scrapCnt, 0) AS scrapCnt
-        FROM exhibitions e
-        LEFT JOIN (
-            SELECT
-                exhibition_id,
-                COUNT(exhibition_like_id) AS likeCnt
-            FROM exhibition_like
-            GROUP BY exhibition_id
-        ) AS l ON e.exhibition_id = l.exhibition_id
-        LEFT JOIN (
-            SELECT
-                exhibition_id,
-                COUNT(exhibition_scrap_id) AS scrapCnt
-            FROM exhibition_scrap
-            GROUP BY exhibition_id
-        ) AS s ON e.exhibition_id = s.exhibition_id
-        WHERE e.exhibition_status != 'ES04'
-        ORDER BY e.created_at DESC
-        LIMIT ${limit}
-        OFFSET ${offset};
+            exhibition_id,
+            COUNT(exhibition_like_id) AS likeCnt
+        FROM exhibition_like
+        GROUP BY exhibition_id
+      ) AS l ON e.exhibition_id = l.exhibition_id
+      LEFT JOIN (
+        SELECT
+            exhibition_id,
+            COUNT(exhibition_scrap_id) AS scrapCnt
+        FROM exhibition_scrap
+        GROUP BY exhibition_id
+      ) AS s ON e.exhibition_id = s.exhibition_id
+      LEFT JOIN exhibition_category ec ON e.exhibition_id = ec.exhibition_id
+      LEFT JOIN (
+        SELECT
+            user_email,
+            profile_id,
+            profile_nickname,
+            profile_img,
+            profile_intro
+        FROM user_profile
+      ) AS p ON e.user_email = p.user_email
+      WHERE e.exhibition_status != 'ES04'
+      GROUP BY e.exhibition_id
+      ORDER BY e.created_at DESC
+      LIMIT ${limit}
+      OFFSET ${offset};
       `,
-      { type: sequelize.QueryTypes.SELECT }
-    );
+        { type: sequelize.QueryTypes.SELECT }
+      )
+      .catch((err) => console.log(err));
 
     const exhibitionList = {
       rows: result,
@@ -84,9 +106,13 @@ class ExhibitionRepository extends Exhibitions {
     return { exhibitionList, paginationInfo };
   };
 
+  /**
+   * 전시 상세 조회
+   * @param {string} exhibitionId 
+   * @returns exhibitionInfo
+   */
   getExhibitionInfo = async (exhibitionId) => {
     const exhibitionItem = await Exhibitions.findOne({
-      where: { exhibitionId, exhibition_status: { [Op.ne]: ["ES04"] } },
       include: [
         {
           model: ExhibitionImg,
@@ -98,7 +124,13 @@ class ExhibitionRepository extends Exhibitions {
           attributes: ["author_name"],
           order: [["author_id", "ASC"]],
         },
-        { model: ExhibitionCategory, attributes: ["exhibition_code"] },
+        {
+          model: ExhibitionCategory,
+          attributes: [
+            "categoryCode",
+            [sequelize.literal("get_code_name(exhibition_code)"), "categoryName"],
+          ],
+        },
         {
           model: ExhibitionAddress,
           attributes: [
@@ -118,9 +150,22 @@ class ExhibitionRepository extends Exhibitions {
           ],
         },
       ],
+      where: { exhibitionId, exhibition_status: { [Op.ne]: ["ES04"] } },
+    }).catch((err) => console.log(err));
+
+    const userProfile = await UserProfile.findOne({
+      where: { userEmail: exhibitionItem.userEmail },
     });
 
-    return exhibitionItem;
+    const exhibitionInfo = exhibitionItem.toJSON();
+
+    if(userProfile){
+      exhibitionInfo.authorProfile = userProfile.toJSON();
+    }else{
+      exhibitionInfo.authorProfile = {};
+    }
+
+    return exhibitionInfo;
   };
 
   /**
@@ -341,7 +386,6 @@ class ExhibitionRepository extends Exhibitions {
    * @returns 삭제 게시글 갯수
    */
   deleteExhibition = async (userEmail, exhibitionId) => {
-
     const removeExhibitionCnt = await Exhibitions.update(
       {
         exhibitionStatus: "ES04",

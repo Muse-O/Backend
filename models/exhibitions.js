@@ -105,6 +105,12 @@ module.exports = (sequelize, DataTypes) => {
       field: 'contact',
       defaultValue: 'not written contact'
     },
+    agencyAndSponsor: {
+      allowNull: true,
+      type: DataTypes.STRING,
+      field: 'agency_and_sponsor',
+      defaultValue: 'not written agencyAndSponsor'
+    },
     location: {
       allowNull: false,
       type: DataTypes.STRING,
