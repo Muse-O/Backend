@@ -5,14 +5,10 @@ const {
   ExhibitionAuthor,
   ExhibitionAddress,
   ExhibitionLike,
-  ExhibitionScrap
+  ExhibitionScrap,
+  sequelize
 } = require("../models");
 const { Op } = require("sequelize");
-const Boom = require("boom");
-const _ = require("lodash");
-const {
-  convertIncludeDataToArray,
-} = require("../modules/convertIncludeDataToArray");
 
 class ExhibitionRepository extends Exhibitions {
   constructor() {
@@ -26,14 +22,55 @@ class ExhibitionRepository extends Exhibitions {
    * @returns exhibitionItem
    */
   getExhibitionList = async (limit, offset) => {
-    const exhibitionList = await Exhibitions.findAndCountAll({
-      limit: limit,
-      offset: offset,
-      where: { exhibition_status: { [Op.ne]: ["ES04"] } },
-      order: [["createdAt", "DESC"]],
-    });
+    const result = await sequelize.query(
+      `
+        SELECT
+          e.exhibition_id AS exhibitionId,
+          e.user_email AS userEmail,
+          e.exhibition_title AS exhibitionTitle,
+          e.exhibition_desc AS exhibitionDesc,
+          e.start_date AS startDate,
+          e.end_date AS endDate,
+          e.entrance_fee AS entranceFee,
+          e.post_image AS postImage,
+          e.art_work_cnt AS artWorkCnt,
+          e.contact,
+          e.location,
+          e.exhibition_status AS exhibitionStatus,
+          e.created_at AS createdAt,
+          e.updated_at AS updatedAt,
+          COALESCE(l.likeCnt, 0) AS likeCnt,
+          COALESCE(s.scrapCnt, 0) AS scrapCnt
+        FROM exhibitions e
+        LEFT JOIN (
+            SELECT
+                exhibition_id,
+                COUNT(exhibition_like_id) AS likeCnt
+            FROM exhibition_like
+            GROUP BY exhibition_id
+        ) AS l ON e.exhibition_id = l.exhibition_id
+        LEFT JOIN (
+            SELECT
+                exhibition_id,
+                COUNT(exhibition_scrap_id) AS scrapCnt
+            FROM exhibition_scrap
+            GROUP BY exhibition_id
+        ) AS s ON e.exhibition_id = s.exhibition_id
+        WHERE e.exhibition_status != 'ES04'
+        ORDER BY e.created_at DESC
+        LIMIT ${limit}
+        OFFSET ${offset};
+      `,
+      { type: sequelize.QueryTypes.SELECT }
+    );
 
-    const exhibitionCnt = await Exhibitions.count();
+    const exhibitionList = {
+      rows: result,
+    };
+
+    const exhibitionCnt = await Exhibitions.count({
+      where: { exhibition_status: { [Op.ne]: ["ES04"] } },
+    });
 
     const hasNextPage = offset + limit < exhibitionCnt;
 
@@ -305,16 +342,6 @@ class ExhibitionRepository extends Exhibitions {
    */
   deleteExhibition = async (userEmail, exhibitionId) => {
 
-    const searchExhibitionCnt = await Exhibitions.findOne({
-      where: {
-        [Op.and]: [{ userEmail }, { exhibitionId }],
-      },
-    })
-
-    if(searchExhibitionCnt[0] === 0){
-      return searchExhibitionCnt;
-    }
-
     const removeExhibitionCnt = await Exhibitions.update(
       {
         exhibitionStatus: "ES04",
@@ -331,8 +358,8 @@ class ExhibitionRepository extends Exhibitions {
 
   /**
    * 전시 게시글 스크랩
-   * @param {string} userEmail 
-   * @param {string} exhibitionId 
+   * @param {string} userEmail
+   * @param {string} exhibitionId
    * @returns 스크랩 등록(create) or 취소(delete)
    */
   updateExhibitionScrap = async (userEmail, exhibitionId) => {
@@ -353,12 +380,12 @@ class ExhibitionRepository extends Exhibitions {
     });
 
     return scrapExhibition;
-  }
+  };
 
   /**
    * 전시 게시글 좋아요
-   * @param {string} userEmail 
-   * @param {string} exhibitionId 
+   * @param {string} userEmail
+   * @param {string} exhibitionId
    * @returns 스크랩 좋아요(create) or 취소(delete)
    */
   updateExhibitionLike = async (userEmail, exhibitionId) => {
@@ -378,27 +405,27 @@ class ExhibitionRepository extends Exhibitions {
       return "create";
     });
     return likeExhibition;
-  }
+  };
 
   /**
    * 전시 게시글 카테고리별 검색
-   * @param {array[string]} categories 
+   * @param {array[string]} categories
    * @returns 검색된 게시글 리스트
    */
   searchCategoryExhibition = async (categories) => {
-
     const exhibitionList = await Exhibitions.findAll({
-      include: [{
-        model: ExhibitionCategory,
-        where: { categoryCode: { [Op.and]: [categories] } },
-        attributes: []
-      }],
+      include: [
+        {
+          model: ExhibitionCategory,
+          where: { categoryCode: { [Op.and]: [categories] } },
+          attributes: [],
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
 
     return exhibitionList;
-
-  }
+  };
 }
 
 module.exports = ExhibitionRepository;

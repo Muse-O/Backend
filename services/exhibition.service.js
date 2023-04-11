@@ -18,7 +18,7 @@ class ExhibitionService {
       offset
     );
 
-    if (!exhibitionItem.exhibitionList) {
+    if (!exhibitionItem) {
       throw Boom.notFound("전시회 정보가 더 이상 없습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다.");
     }
 
