@@ -9,4 +9,13 @@ router.get("/", authMiddleware, mypageController.getMyProfile);
 
 router.patch("/", authMiddleware, mypageController.updateMyProfile);
 
+// 작성한 전시회 조회
+router.get("/exhibition", authMiddleware, mypageController.getMyExhibition);
+
+// 좋아요 한 전시회 조회
+router.get("/", authMiddleware, mypageController.getMyLikedExhibition);
+
+// 스크랩한 전시회 조회
+router.get("/", authMiddleware, mypageController.getMyScrappedExhibition);
+
 module.exports = router;

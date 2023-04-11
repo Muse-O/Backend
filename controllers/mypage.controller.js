@@ -46,6 +46,45 @@ class MypageController {
             next(error);
         }
     }
+
+    getMyExhibition = async (req, res, next) => {
+        try {
+            const { userEmail } = res.locals.user;
+
+            const exhibitions = await this.mypageService.getMyExhibition(userEmail)
+
+            return res.status(200).json({ myExhibitions:exhibitions })
+        } catch (error) {
+            logger.error(error.message);
+            next(error);
+        }
+    }
+
+    getMyLikedExhibition = async (req, res, next) => {
+        try {
+            const { userEmail } = res.locals.user;
+
+            const result = await this.mypageService.getMyLikedExhibition(userEmail)
+
+            return res.status(200).json({message: "내가 좋아요한 전시회 조회에 성공했습니다.", result})
+        } catch (error) {
+            logger.error(error.message);
+            next(error);
+        }
+    }
+
+    getMyScrappedExhibition = async (req, res, next) => {
+        try {
+            const { userEmail } = res.locals.user;
+
+            const result = await this.mypageService.getMyScrappedExhibition(userEmail)
+
+            return res.status(200).json({message: "내가 스크랩한 전시회 조회에 성공했습니다.", result})
+        } catch (error) {
+            logger.error(error.message);
+            next(error);
+        }
+    }
 }
 
 module.exports = MypageController;

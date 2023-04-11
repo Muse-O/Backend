@@ -20,6 +20,28 @@ class MypageService {
         const updatedProfile = await this.mypageRepository.updateMyProfile(profileImg, nickname, introduction, userEmail);
         return updatedProfile;
     }
+
+    getMyExhibition = async (userEmail) => {
+        const exhibitions = await this.mypageRepository.findMyExhibition(userEmail);
+        const result = exhibitions.map((elem)=>{
+            return {
+                exhibitionIdx: elem.exhibition_id,
+                title : elem.exhibition_title,
+                thumbUrl : elem.post_image
+            }
+        });
+        return result
+    };
+
+    getMyLikedExhibition = async (userEmail) =>{
+        const exhibitions = await this.mypageRepository.findMyLikedExhibition(userEmail);
+        return exhibitions
+    }
+
+    getMyScrappedExhibition= async (userEmail) => {
+        const exhibitions = await this.mypageRepository.findMyScrappedExhibition(userEmail);
+        return exhibitions
+    }
 }
 
 module.exports = MypageService;
