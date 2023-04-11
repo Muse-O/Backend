@@ -1,4 +1,4 @@
-const { UserProfile, Exhibitions, ExhibitionLike, sequelize } = require('../models');
+const { UserProfile, Exhibitions, ExhibitionLike, ExhibitionScrap, sequelize } = require('../models');
 const { parseModelToFlatObject } = require('../modules/parseModelToFlatObject')
 const { Op } = require('sequelize');
 
@@ -44,7 +44,7 @@ class MypageRepository{
         return myLikes
     }
 
-    findMyLikedExhibition = async (myLikedExhibitionIds) => {
+    findMyExhibition = async (myLikedExhibitionIds) => {
         const myLikedExhibitions = await Exhibitions.findAll({
             attributes: ['exhibition_id','exhibition_title', 'post_image'],
             raw: true,
@@ -61,8 +61,15 @@ class MypageRepository{
         return myLikedExhibitions
     }
 
-    findMyScrappedExhibition = async (userEmail) => {
+    findAllMyScrappedExhibitionId = async (userEmail) => {
+        const myScraps = await ExhibitionScrap.findAll({
+            attributes: ['exhibition_id'],
+            where:[{user_email: userEmail}],
+            order: [['created_at', 'DESC']],
+            raw: true,
+        }).then((models) => models.map(parseModelToFlatObject));
 
+        return myScraps
     }
 }
 

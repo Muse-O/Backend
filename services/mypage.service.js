@@ -36,16 +36,29 @@ class MypageService {
     getMyLikedExhibition = async (userEmail) =>{
         const myLikes = await this.mypageRepository.findAllMyLikedExhibitionId(userEmail);
         const myLikedExhibitionIds = myLikes.map((elem)=>elem.exhibition_id);
-        console.log("myLikes",myLikes)
-        console.log("myLikedExhibitionIds", myLikedExhibitionIds)
-        const getMyLikedExhibitions = await this.mypageRepository.findMyLikedExhibition(myLikedExhibitionIds)
-        
-        return getMyLikedExhibitions
+        const getMyLikedExhibitions = await this.mypageRepository.findMyExhibition(myLikedExhibitionIds)
+        const result = getMyLikedExhibitions.map((elem)=>{
+            return {
+                exhibitionIdx: elem.exhibition_id,
+                title : elem.exhibition_title,
+                thumbUrl : elem.post_image
+            }
+        });
+        return result
     }
 
     getMyScrappedExhibition= async (userEmail) => {
-        const exhibitions = await this.mypageRepository.findMyScrappedExhibition(userEmail);
-        return exhibitions
+        const myScraps = await this.mypageRepository.findAllMyScrappedExhibitionId(userEmail);
+        const myScrappedExhibitionIds = myScraps.map((elem)=>elem.exhibition_id);
+        const getMyScrappedExhibitions = await this.mypageRepository.findMyExhibition(myScrappedExhibitionIds);
+        const result = getMyScrappedExhibitions.map((elem)=>{
+            return {
+                exhibitionIdx: elem.exhibition_id,
+                title : elem.exhibition_title,
+                thumbUrl : elem.post_image
+            }
+        });
+        return result
     }
 }
 
