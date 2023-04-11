@@ -6,7 +6,7 @@ const {
   ArtgramLike,
   ArtgramScrap,
   ArtgramHashtag,
-  ArtgramComment,
+  ArtgramsComment,
 } = require("../models");
 const { Op, Sequelize } = require("sequelize");
 
@@ -58,27 +58,6 @@ class ArtgramRepository extends Artgrams {
           model: ArtgramImg,
           attributes: ["imgUrl", "imgOrder"],
         },
-        {
-          model: ArtgramLike,
-          attributes: [
-            [Sequelize.fn("COUNT", Sequelize.col("likeId")), "likeCount"],
-          ],
-          duplicating: false,
-        },
-        {
-          model: ArtgramScrap,
-          attributes: [
-            [Sequelize.fn("COUNT", Sequelize.col("scrapId")), "scrapCount"],
-          ],
-          duplicating: false,
-        },
-        {
-          model: ArtgramComment,
-          attributes: [
-            [Sequelize.fn("COUNT", Sequelize.col("commentId")), "commentCount"],
-          ],
-          duplicating: false,
-        },
       ],
       where: {
         userEmail: userEmail,
@@ -118,21 +97,32 @@ class ArtgramRepository extends Artgrams {
           tagNames = hasTag.map((tag) => tag.tagName);
         }
 
-        const likeCount = artgram.likeCount ?? [];
-        const scrapCount = artgram.scrapCount ?? [];
-        const commentCount = artgram.commentCount ?? [];
+        const artgramLikeCount = await ArtgramLike.count({
+          where: { artgramId: artgramId },
+        });
+        const artgramScrapCount = await ArtgramScrap.count({
+          where: { artgramId: artgramId },
+        });
+        const artgramComments = await ArtgramsComment.findAll({
+          where: { artgramId: artgramId },
+          attributes: ["commentId"],
+        });
+        const artgramCommentCount = artgramComments.length;
+        const commentIds = artgramComments.map((comment) => comment.commentId);
+
         return {
           ...artgram.toJSON(),
           ...profileData[artgram.userEmail],
           ArtgramImgs,
           hashtag: tagNames,
-          likeCount,
-          scrapCount,
-          commentCount,
+          artgramLikeCount,
+          artgramScrapCount,
+          artgramCommentCount,
+          commentId: commentIds,
         };
       })
     );
-    console.log(findArtgrams);
+
     const artgramList = await Artgrams.findAndCountAll({
       limit: limit,
       offset: offset,
@@ -181,9 +171,10 @@ class ArtgramRepository extends Artgrams {
       artgramDesc,
     });
     if (hashtag) {
-      const tags = hashtag
-        .split(/[\[\],]+/)
-        .filter((tag) => tag.trim().length > 0);
+      const tags = Array.isArray(hashtag)
+        ? hashtag
+        : hashtag.split(/[\[\],]+/).filter((tag) => tag.trim().length > 0);
+
       for (let i = 0; i < tags.length; i++) {
         if (tags.length > 0) {
           const tagname = await ArtgramHashtag.create({
