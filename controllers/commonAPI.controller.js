@@ -21,9 +21,6 @@ class CommonAPIController {
 
       const searchItem = category.split(",");
 
-      console.log('\n\n\n',category,'\n\n\n')
-      console.log('\n\n\n',searchItem,'\n\n\n')
-
       const searchCategory = await this.commonAPIService.getCategory(searchItem);
 
       return res.status(200).json({ searchCategory, message: "카테고리 정보를 성공적으로 가져왔습니다." });
