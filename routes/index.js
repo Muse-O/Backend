@@ -12,6 +12,6 @@ router.use("/auth", userRouter);
 router.use("/artgram", [artgramRouter, artgramCommentRouter]);
 router.use("/exhibition", exhibitionRouter);
 router.use("/mypage", mypageRouter);
-// router.use("/search", searchRouter);
+router.use("/search", searchRouter);
 
 module.exports = router;

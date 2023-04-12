@@ -7,18 +7,53 @@ class ArtgramService {
   }
 
   /**
-   * 아트그램 전체조회
+   * 아트그램 전체조회(로그인X)
    * @param {number} limit 요청할 아트그램 게시글 수
    * @param {number} offset 조회 아트그램 게시글 시작점
    * @returns artgrams
    */
-  allArtgrams = async (limit, offset) => {
-    const artgrams = await this.artgramRepository.allArtgrams(limit, offset);
-    if (!artgrams.artgramList) {
-      throw Boom.notFound("아트그램 정보가 더이상 없습니다.");
+  allArtgrams = async (limit, offset, userEmail) => {
+    let findAllArtgrams;
+    if (userEmail !== "guest") {
+      // user 객체가 존재하고 userEmail 속성이 존재하는 경우
+      findAllArtgrams = await this.artgramRepository.allArtgrams(limit, offset);
+    } else {
+      // user 객체가 존재하지 않거나 userEmail 속성이 존재하지 않는 경우
+      findAllArtgrams = await this.artgramRepository.publicAllArtgrams(
+        limit,
+        offset
+      );
     }
-    return artgrams;
+    return findAllArtgrams;
   };
+
+  /**
+   * 아트그램 전체조회(로그인O)
+   * @param {number} limit 요청할 아트그램 게시글 수
+   * @param {number} offset 조회 아트그램 게시글 시작점
+   * @returns artgrams
+   */
+
+  /**
+   * 아트그램 전체조회(로그인X)
+   * @param {number} limit 요청할 아트그램 게시글 수
+   * @param {number} offset 조회 아트그램 게시글 시작점
+   * @returns artgrams
+   */
+
+  /**
+   * 아트그램 전체조회(로그인O)
+   * @param {number} limit 요청할 아트그램 게시글 수
+   * @param {number} offset 조회 아트그램 게시글 시작점
+   * @returns artgrams
+   */
+  // allArtgrams = async (limit, offset) => {
+  //   const artgrams = await this.artgramRepository.allArtgrams(limit, offset);
+  //   if (!artgrams.artgramList) {
+  //     throw Boom.notFound("아트그램 정보가 더이상 없습니다.");
+  //   }
+  //   return artgrams;
+  // };
 
   /**
    * 아트그램 작성
