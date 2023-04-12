@@ -1,22 +1,22 @@
-const { tablename, Artgrams, Exhibitions } = require("../models");
+const { searchHistory, Artgrams, Exhibitions } = require("../models");
 const { Sequelize, Op } = require("sequelize");
 
-class SearchRepositroy extends tablename {
+class SearchRepositroy extends searchHistory {
   constructor() {
     super();
   }
   /**
    * 아트그램 검색어 조회
-   * @param {query} searchText
+   * @param {query} keyWord
    * @returns
    */
-  searchArtgrams = async (searchText) => {
+  searchArtgrams = async (keyWord) => {
     const rows = await Artgrams.findAll({
       attributes: ["artgramTitle"],
       where: {
         [Sequelize.Op.or]: [
-          { artgramTitle: { [Sequelize.Op.like]: `%${searchText}%` } },
-          { artgramDesc: { [Sequelize.Op.like]: `%${searchText}%` } },
+          { artgramTitle: { [Sequelize.Op.like]: `%${keyWord}%` } },
+          { artgramDesc: { [Sequelize.Op.like]: `%${keyWord}%` } },
         ],
       },
     });
