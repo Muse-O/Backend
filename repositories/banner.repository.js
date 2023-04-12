@@ -8,13 +8,10 @@ const dayjs = require("dayjs");
 require("dayjs/locale/ko"); // 현재 지역에 해당하는 locale 로드 현재 국내 서비스이므로 한국 시간 설정
 
 class BannerRepository {
-  // 상단 배너 가져오기
-  //
-
   /**
    * 현재 날짜에(한국 시간) 전시중인 전시회 중 좋아요 순 전시글
    * @param {integer} reqCnt 요청할 게시글 수
-   *
+   * @returns exhibitionList
    */
   getOpenExhibitionsSortedByMostLike = async (reqCnt) => {
     const now = dayjs(); // 현재 지역별 시간 데이터를 가져옴
@@ -33,7 +30,7 @@ class BannerRepository {
         e.start_date AS startDate,
         e.end_date AS endDate,
         e.location AS location,
-        l.like_cnt AS likeCnt,
+        COALESCE(l.like_cnt,0) AS likeCnt,
         a.zonecode,
         a.address,
         a.address_english AS addressEnglish,
@@ -44,16 +41,15 @@ class BannerRepository {
         a.road_address_english AS roadAddressEnglish,
         a.auto_jibun_address AS autoJibunAddress,
         a.auto_jibun_address_english AS autoJibunAddressEnglish,
-        a.roadname ,
+        a.roadname,
         a.roadname_code AS roadnameCode,
         a.roadname_english AS roadnameEnglish,
         up.profile_id AS writerProfileId,
         up.profile_nickname AS writerNickName,
         up.profile_img AS writerProfileImg,
-        GROUP_CONCAT(ea.author_id) AS authorId,
-        GROUP_CONCAT(ea.exhibition_id) AS exhibitionId,
-        GROUP_CONCAT(ea.author_order) AS authorsOrder,
-        GROUP_CONCAT(ea.author_name) AS authors,
+        GROUP_CONCAT(ea.author_id ORDER BY ea.author_order ASC) AS authorId,
+        GROUP_CONCAT(ea.author_order ORDER BY ea.author_order ASC) AS authorsOrder,
+        GROUP_CONCAT(ea.author_name ORDER BY ea.author_order ASC) AS authors
       FROM exhibitions e
       LEFT JOIN (
         SELECT
@@ -95,34 +91,34 @@ class BannerRepository {
     exhibitionList.rows.forEach((row) => {
       row.exhibitionAddress = getKeyObjectFromRows(
         row,
-        'address',
-        'zonecode',
-        'address',
-        'addressEnglish',
-        'addressType',
-        'buildingName',
-        'buildingCode',
-        'roadAddress',
-        'roadAddressEnglish',
-        'autoJibunAddress',
-        'autoJibunAddressEnglish',
-        'roadname' ,
-        'roadnameCode',
-        'roadnameEnglish'
+        "address",
+        "zonecode",
+        "address",
+        "addressEnglish",
+        "addressType",
+        "buildingName",
+        "buildingCode",
+        "roadAddress",
+        "roadAddressEnglish",
+        "autoJibunAddress",
+        "autoJibunAddressEnglish",
+        "roadname",
+        "roadnameCode",
+        "roadnameEnglish"
       );
 
       row.authorInfo = getKeyObjectFromRows(
         row,
-        'authorId',
-        'authorName',
-        'authorsOrder'
+        "authorId",
+        "authors",
+        "authorsOrder"
       );
 
       row.writerInfo = getKeyObjectFromRows(
         row,
-        'writerProfileId',
-        'writerNickName',
-        'writerProfileImg'
+        "writerProfileId",
+        "writerNickName",
+        "writerProfileImg"
       );
     });
 
@@ -132,6 +128,7 @@ class BannerRepository {
   /**
    * 현재 날짜에(한국 시간) 전시중인 전시회 중 작성일 최근순 전시글
    * @param {integer} reqCnt 요청할 게시글 수
+   * @returns exhibitionList
    */
   getOpenExhibitionsSortedByDate = async (reqCnt) => {
     const now = dayjs(); // 현재 지역별 시간 데이터를 가져옴
@@ -151,7 +148,7 @@ class BannerRepository {
         e.end_date AS endDate,
         e.location AS location,
         e.created_at AS createdAt,
-        l.like_cnt AS likeCnt,
+        COALESCE(l.like_cnt,0) AS likeCnt,
         a.zonecode,
         a.address,
         a.address_english AS addressEnglish,
@@ -165,9 +162,9 @@ class BannerRepository {
         a.roadname ,
         a.roadname_code AS roadnameCode,
         a.roadname_english AS roadnameEnglish,
-        up.profile_id AS authorProfileId,
-        up.profile_nickname AS authorNickName,
-        up.profile_img AS authorProfileImg
+        up.profile_id AS writerProfileId,
+        up.profile_nickname AS writerNickName,
+        up.profile_img AS writerProfileImg
       FROM exhibitions e
       LEFT JOIN (
         SELECT
@@ -198,12 +195,40 @@ class BannerRepository {
       rows: result,
     };
 
+    exhibitionList.rows.forEach((row) => {
+      row.exhibitionAddress = getKeyObjectFromRows(
+        row,
+        "address",
+        "zonecode",
+        "address",
+        "addressEnglish",
+        "addressType",
+        "buildingName",
+        "buildingCode",
+        "roadAddress",
+        "roadAddressEnglish",
+        "autoJibunAddress",
+        "autoJibunAddressEnglish",
+        "roadname",
+        "roadnameCode",
+        "roadnameEnglish"
+      );
+
+      row.writerInfo = getKeyObjectFromRows(
+        row,
+        "writerProfileId",
+        "writerNickName",
+        "writerProfileImg"
+      );
+    });
+
     return exhibitionList;
   };
 
   /**
    * 예정 전시회 중 가장 가까운 날짜 전시 중 좋아요 순
    * @param {integer} reqCnt 요청할 게시글 수
+   * @returns exhibitionList
    */
   getFutureExhibitionsSortedByNearest = async (reqCnt) => {
     const now = dayjs(); // 현재 지역별 시간 데이터를 가져옴
@@ -236,12 +261,12 @@ class BannerRepository {
         a.roadname ,
         a.roadname_code AS roadnameCode,
         a.roadname_english AS roadnameEnglish,
-        up.profile_id AS authorProfileId,
-        up.profile_nickname AS authorNickName,
-        up.profile_img AS authorProfileImg,
-        GROUP_CONCAT(ea.author_id) AS authorId,
-        GROUP_CONCAT(ea.exhibition_id) AS exhibitionId,
-        GROUP_CONCAT(ea.author_name) AS authorName
+        up.profile_id AS writerProfileId,
+        up.profile_nickname AS writerNickName,
+        up.profile_img AS writerProfileImg,
+        GROUP_CONCAT(ea.author_id ORDER BY ea.author_order ASC) AS authorId,
+        GROUP_CONCAT(ea.author_order ORDER BY ea.author_order ASC) AS authorsOrder,
+        GROUP_CONCAT(ea.author_name ORDER BY ea.author_order ASC) AS authors
       FROM exhibitions e
       LEFT JOIN (
         SELECT
@@ -251,9 +276,10 @@ class BannerRepository {
         GROUP BY exhibition_id
       ) AS l ON e.exhibition_id = l.exhibition_id
       LEFT JOIN (
-        SELECT 
+        SELECT
           author_id,
           exhibition_id,
+          author_order,
           author_name
         FROM exhibition_author
       ) AS ea ON e.exhibition_id = ea.exhibition_id
@@ -268,16 +294,49 @@ class BannerRepository {
       LEFT JOIN exhibition_address AS a ON e.exhibition_id = a.exhibition_id
       WHERE '${formatted}' < e.start_date
       AND e.exhibition_status != 'ES04'
-      GROUP BY e.exhibition_id
       ORDER BY e.created_at DESC
       LIMIT ${reqCnt};
       `,
       { type: sequelize.QueryTypes.SELECT }
     );
-
+    
     const exhibitionList = {
       rows: result,
     };
+
+    exhibitionList.rows.forEach((row) => {
+      row.exhibitionAddress = getKeyObjectFromRows(
+        row,
+        "address",
+        "zonecode",
+        "address",
+        "addressEnglish",
+        "addressType",
+        "buildingName",
+        "buildingCode",
+        "roadAddress",
+        "roadAddressEnglish",
+        "autoJibunAddress",
+        "autoJibunAddressEnglish",
+        "roadname",
+        "roadnameCode",
+        "roadnameEnglish"
+      );
+
+      row.authorInfo = getKeyObjectFromRows(
+        row,
+        "authorId",
+        "authors",
+        "authorsOrder"
+      );
+
+      row.writerInfo = getKeyObjectFromRows(
+        row,
+        "writerProfileId",
+        "writerNickName",
+        "writerProfileImg"
+      );
+    });
 
     return exhibitionList;
   };
@@ -285,6 +344,7 @@ class BannerRepository {
   /**
    * 최근 작성된 아트그램
    * @param {integer} reqCnt 요청할 게시글 수
+   * @returns artgramList
    */
   getLatestArtgrams = async (reqCnt) => {
     const result = await sequelize.query(
