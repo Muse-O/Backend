@@ -34,6 +34,8 @@ class ExhibitionRepository {
       e.art_work_cnt AS artWorkCnt,
       e.location,
       e.contact,
+      e.exhibition_kind AS exhibitionKind,
+      e.exhibition_online_link AS exhibitionOnlineLink,
       e.location,
       e.agency_and_sponsor AS agencyAndSponsor,
       e.exhibition_status AS exhibitionStatus,
