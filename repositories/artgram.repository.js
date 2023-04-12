@@ -22,7 +22,6 @@ class ArtgramRepository extends Artgrams {
    */
 
   allArtgrams = async (limit, offset, userEmail) => {
-    console.log("limit", limit, "offset", offset);
     const artgrams = await Artgrams.findAll({
       raw: true,
       attributes: ["artgramId", "artgramTitle", "userEmail"],
@@ -75,11 +74,13 @@ class ArtgramRepository extends Artgrams {
           where: { artgramId: artgramId },
         });
 
+        const { "ArtgramImgs.imgUrl": _, ...rest } = artgram;
+
         return {
-          ...artgram,
+          ...rest,
           nickname: userProfile.profileNickname,
           profileImg: userProfile.profileImg,
-          imgUrl: ArtgramImg,
+          imgUrl: artgram["ArtgramImgs.imgUrl"],
           likeCount,
           imgCount,
           liked: !!likedByCurrentUser,
@@ -116,7 +117,6 @@ class ArtgramRepository extends Artgrams {
     console.log("limit", limit, "offset", offset);
     const artgrams = await Artgrams.findAll({
       raw: true,
-      attributes: ["artgramId", "artgramTitle", "userEmail"],
       include: [
         {
           model: ArtgramImg,
@@ -126,6 +126,7 @@ class ArtgramRepository extends Artgrams {
           },
         },
       ],
+      attributes: ["artgramId", "artgramTitle", "userEmail"],
       where: {
         artgram_status: {
           [Op.ne]: "AS04",
@@ -156,12 +157,14 @@ class ArtgramRepository extends Artgrams {
         const imgCount = await ArtgramImg.count({
           where: { artgramId: artgramId },
         });
+        //객체 구조분해를 사용해서 artgram행을 사용해서ArtgramImgs.imgUrl을 제거해줌
+        const { "ArtgramImgs.imgUrl": _, ...rest } = artgram;
 
         return {
-          ...artgram,
+          ...rest,
           profileNickname: userProfile.profileNickname,
           profileImg: userProfile.profileImg,
-          ArtgramImg,
+          imgUrl: artgram["ArtgramImgs.imgUrl"],
           likeCount,
           imgCount,
         };
@@ -193,133 +196,186 @@ class ArtgramRepository extends Artgrams {
     };
   };
 
-  // publicAllArtgrams = async (limit, offset) => {
-  //   const allEmailFind = await Artgrams.findAll({
-  //     order: [["createdAt", "DESC"]],
-  //     attributes: ["userEmail"],
-  //     group: ["userEmail"],
-  //   });
+  /**
+   * 상세조회
+   * @param {*} limit
+   * @param {*} offset
+   * @returns
+   */
+  detailArtgram = async (artgramId, userEmail) => {
+    const artgram = await Artgrams.findOne({
+      where: {
+        artgramId,
+        artgram_status: {
+          [Op.ne]: "AS04",
+        },
+      },
+      attributes: [
+        "artgramId",
+        "userEmail",
+        "artgramTitle",
+        "artgramDesc",
+        "createdAt",
+        "updatedAt",
+      ],
+      include: [
+        {
+          model: ArtgramImg,
+          attributes: ["imgUrl", "imgOrder"],
+        },
+      ],
 
-  //   const userEmail = allEmailFind.map(
-  //     (artgram) => artgram.dataValues.userEmail
-  //   );
+      group: ["Artgrams.artgram_id"],
+      order: [["createdAt", "DESC"]],
+    });
 
-  //   const users = await Users.findAll({
-  //     where: { userEmail: userEmail },
-  //     include: [{ model: UserProfile }],
-  //   });
+    const user = await Users.findOne({
+      where: { userEmail: artgram.userEmail },
+      include: [
+        { model: UserProfile, attributes: ["profileNickname", "profileImg"] },
+      ],
+    });
 
-  //   const profileData = users.reduce((acc, user) => {
-  //     acc[user.userEmail] = {
-  //       profileNickname: user.UserProfile.profileNickname,
-  //       profileImg: user.UserProfile.profileImg,
-  //     };
-  //     return acc;
-  //   }, {});
+    const getArtgramImages = async (artgramId) => {
+      const artgramImages = await ArtgramImg.findAll({
+        attributes: ["imgUrl", "imgOrder"],
+        where: { artgramId: artgramId },
+        order: [["imgOrder", "ASC"]],
+        distinct: true,
+      });
 
-  //   const artgrams = await Artgrams.findAll({
-  //     attributes: [
-  //       "artgramId",
-  //       "userEmail",
-  //       "artgramTitle",
-  //       "artgramDesc",
-  //       "createdAt",
-  //       "updatedAt",
-  //     ],
-  //     include: [
-  //       {
-  //         model: ArtgramImg,
-  //         attributes: ["imgUrl", "imgOrder"],
-  //       },
-  //     ],
-  //     where: {
-  //       userEmail: userEmail,
-  //       artgram_status: {
-  //         [Op.ne]: "AS04",
-  //       },
-  //     },
-  //     include: [{ model: ArtgramImg, attributes: ["imgUrl", "imgOrder"] }],
-  //     group: ["Artgrams.artgram_id"],
-  //     order: [["createdAt", "DESC"]],
-  //     distinct: true,
-  //     limit: limit,
-  //     offset: offset,
-  //   });
+      return artgramImages;
+    };
 
-  //   const getArtgramImages = async (artgramId) => {
-  //     const artgramImages = await ArtgramImg.findAll({
-  //       attributes: ["imgUrl", "imgOrder"],
-  //       where: { artgramId: artgramId },
-  //       order: [["imgOrder", "ASC"]],
-  //       distinct: true,
-  //     });
+    const ArtgramImgs = await getArtgramImages(artgramId);
+    let tagNames = null;
+    const hasTag = await ArtgramHashtag.findAll({
+      attributes: ["tagName"],
+      where: { artgramId: artgramId },
+    });
+    if (hasTag && Array.isArray(hasTag)) {
+      tagNames = hasTag.map((tag) => tag.tagName);
+    }
 
-  //     return artgramImages;
-  //   };
+    const artgramLikeCount = await ArtgramLike.count({
+      where: { artgramId: artgramId },
+    });
+    const artgramScrapCount = await ArtgramScrap.count({
+      where: { artgramId: artgramId },
+    });
+    const artgramComments = await ArtgramsComment.findAll({
+      where: { artgramId: artgramId },
+      attributes: ["commentId"],
+    });
+    const artgramCommentCount = artgramComments.length;
+    const commentIds = artgramComments.map((comment) => comment.commentId);
 
-  //   const findArtgrams = await Promise.all(
-  //     artgrams.map(async (artgram) => {
-  //       const artgramId = artgram.artgramId;
-  //       const ArtgramImgs = await getArtgramImages(artgramId);
-  //       let tagNames = null;
-  //       const hasTag = await ArtgramHashtag.findAll({
-  //         attributes: ["tagName"],
-  //         where: { artgramId: artgramId },
-  //       });
-  //       if (hasTag && Array.isArray(hasTag)) {
-  //         tagNames = hasTag.map((tag) => tag.tagName);
-  //       }
+    // 현재 사용자가 좋아요를 누른 Artgram이 있는지 확인
+    const likedByCurrentUser = await ArtgramLike.findOne({
+      where: {
+        userEmail: artgram.userEmail,
+        artgramId: artgram.artgramId,
+      },
+    });
 
-  //       const artgramLikeCount = await ArtgramLike.count({
-  //         where: { artgramId: artgramId },
-  //       });
-  //       const artgramScrapCount = await ArtgramScrap.count({
-  //         where: { artgramId: artgramId },
-  //       });
-  //       const artgramComments = await ArtgramsComment.findAll({
-  //         where: { artgramId: artgramId },
-  //         attributes: ["commentId"],
-  //       });
-  //       const artgramCommentCount = artgramComments.length;
-  //       const commentIds = artgramComments.map((comment) => comment.commentId);
+    const detailArtgram = {
+      ...artgram.toJSON(),
+      profileNickname: user.UserProfile.profileNickname,
+      profileImg: user.UserProfile.profileImg,
+      ArtgramImgs,
+      hashtag: tagNames,
+      artgramLikeCount,
+      artgramScrapCount,
+      artgramCommentCount,
+      commentId: commentIds,
+      liked: !!likedByCurrentUser,
+    };
 
-  //       return {
-  //         ...artgram.toJSON(),
-  //         ...profileData[artgram.userEmail],
-  //         ArtgramImgs,
-  //         hashtag: tagNames,
-  //         artgramLikeCount,
-  //         artgramScrapCount,
-  //         artgramCommentCount,
-  //         commentId: commentIds,
-  //       };
-  //     })
-  //   );
+    return { detailArtgram };
+  };
 
-  //   const artgramList = await Artgrams.findAndCountAll({
-  //     limit: limit,
-  //     offset: offset,
-  //     order: [["createdAt", "DESC"]],
-  //   });
+  publicDetailArtgram = async (artgramId) => {
+    const artgram = await Artgrams.findOne({
+      where: {
+        artgramId,
+        artgram_status: {
+          [Op.ne]: "AS04",
+        },
+      },
+      attributes: [
+        "artgramId",
+        "userEmail",
+        "artgramTitle",
+        "artgramDesc",
+        "createdAt",
+        "updatedAt",
+      ],
+      include: [
+        {
+          model: ArtgramImg,
+          attributes: ["imgUrl", "imgOrder"],
+        },
+      ],
 
-  //   const artgramCnt = await Artgrams.count();
-  //   const hasNextPage = offset + limit < artgramCnt;
+      group: ["Artgrams.artgram_id"],
+      order: [["createdAt", "DESC"]],
+    });
 
-  //   const paginationInfo = {
-  //     limit,
-  //     offset,
-  //     artgramCnt,
-  //     hasNextPage,
-  //   };
+    const user = await Users.findOne({
+      where: { userEmail: artgram.userEmail },
+      include: [
+        { model: UserProfile, attributes: ["profileNickname", "profileImg"] },
+      ],
+    });
 
-  //   return {
-  //     artgramList: {
-  //       count: artgramList.count,
-  //       rows: findArtgrams,
-  //     },
-  //     paginationInfo,
-  //   };
-  // };
+    const getArtgramImages = async (artgramId) => {
+      const artgramImages = await ArtgramImg.findAll({
+        attributes: ["imgUrl", "imgOrder"],
+        where: { artgramId: artgramId },
+        order: [["imgOrder", "ASC"]],
+        distinct: true,
+      });
+
+      return artgramImages;
+    };
+
+    const ArtgramImgs = await getArtgramImages(artgramId);
+    let tagNames = null;
+    const hasTag = await ArtgramHashtag.findAll({
+      attributes: ["tagName"],
+      where: { artgramId: artgramId },
+    });
+    if (hasTag && Array.isArray(hasTag)) {
+      tagNames = hasTag.map((tag) => tag.tagName);
+    }
+
+    const artgramLikeCount = await ArtgramLike.count({
+      where: { artgramId: artgramId },
+    });
+    const artgramScrapCount = await ArtgramScrap.count({
+      where: { artgramId: artgramId },
+    });
+    const artgramComments = await ArtgramsComment.findAll({
+      where: { artgramId: artgramId },
+      attributes: ["commentId"],
+    });
+    const artgramCommentCount = artgramComments.length;
+    const commentIds = artgramComments.map((comment) => comment.commentId);
+
+    const result = {
+      ...artgram.toJSON(),
+      profileNickname: user.UserProfile.profileNickname,
+      profileImg: user.UserProfile.profileImg,
+      ArtgramImgs,
+      hashtag: tagNames,
+      artgramLikeCount,
+      artgramScrapCount,
+      artgramCommentCount,
+      commentId: commentIds,
+    };
+
+    return { result };
+  };
 
   /**
    * 아트그램 작성

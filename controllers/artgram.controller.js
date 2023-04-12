@@ -13,78 +13,44 @@ class ArtgramController {
    * 아트그램 전체조회(로그인X)
    */
   allArtgrams = async (req, res, next) => {
-    // try {
-    const userEmail = res.locals.user || "guest";
-    const { limit, offset } = await pageQuerySchema
-      .validateAsync(req.query)
-      .catch((err) => {
-        res.status(400).json({ message: err.message });
-        throw Boom.badRequest(err.message);
-      });
-    const artgrams = await this.artgramService.allArtgrams(
-      Number(limit),
-      Number(offset),
-      userEmail
-    );
-    res.status(200).json({ artgramList: artgrams });
-    // } catch (error) {
-    //   next(error);
-    // }
-  };
-
-  /**
-   * 아트그램 전체조회(로그인O)
-   */
-  // allArtgrams = async (req, res, next) => {
-  //   try {
-  //     const { limit, offset } = await pageQuerySchema
-  //       .validateAsync(req.query)
-  //       .catch((err) => {
-  //         res.status(400).json({ message: err.message });
-  //         throw Boom.badRequest(err.message);
-  //       });
-  //     const { userEmail } = res.locals.user;
-  //     const artgrams = await this.artgramService.allArtgrams(
-  //       userEmail,
-  //       Number(limit),
-  //       Number(offset)
-  //     );
-  //     res.status(200).json({ artgramList: artgrams });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
-
-  /**
-   * 아트그램 상세조회(로그인X)
-   */
-  publicDatailArtgram = async (req, res, next) => {
     try {
-      const datailArtgram = await this.artgramService.allArtgram();
-      res.status(200).json({
-        datailArtgram,
-        message: "아트그램을 정상적으로 가져왔습니다.",
-      });
+      const userEmail = res.locals.user || "guest";
+      const { limit, offset } = await pageQuerySchema
+        .validateAsync(req.query)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
+      const artgrams = await this.artgramService.allArtgrams(
+        Number(limit),
+        Number(offset),
+        userEmail
+      );
+      res.status(200).json({ artgramList: artgrams });
     } catch (error) {
       next(error);
     }
   };
 
   /**
-   * 아트그램 상세조회(로그인O)
+   * 아트그램 상세조회(로그인X)
    */
-  // detailArtgram = async (req, res, next) => {
-  //   try {
-  //     const { userEmail } = res.locals.user;
-  //     const datailArtgram = await this.artgramService.detailArtgram(userEmail);
-  //     res.status(200).json({
-  //       datailArtgram,
-  //       message: "아트그램을 정상적으로 가져왔습니다.",
-  //     });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
+  detailArtgram = async (req, res, next) => {
+    // try {
+    const userEmail = res.locals.user || "guest";
+    const { artgramId } = req.params;
+    const datailArtgram = await this.artgramService.detailArtgram(
+      artgramId,
+      userEmail
+    );
+    res.status(200).json({
+      datailArtgram,
+      message: "아트그램을 정상적으로 가져왔습니다.",
+    });
+    // } catch (error) {
+    //   next(error);
+    // }
+  };
 
   /**
    * 아트그램 작성

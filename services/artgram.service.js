@@ -28,32 +28,24 @@ class ArtgramService {
   };
 
   /**
-   * 아트그램 전체조회(로그인O)
-   * @param {number} limit 요청할 아트그램 게시글 수
-   * @param {number} offset 조회 아트그램 게시글 시작점
+   * 아트그램 상세조회(로그인O)
    * @returns artgrams
    */
+  detailArtgram = async (artgramId, userEmail) => {
+    let detailartgram;
+    if (userEmail !== "guest") {
+      detailartgram = await this.artgramRepository.detailArtgram(
+        artgramId,
+        userEmail
+      );
+    } else {
+      detailartgram = await this.artgramRepository.publicDetailArtgram(
+        artgramId
+      );
+    }
 
-  /**
-   * 아트그램 전체조회(로그인X)
-   * @param {number} limit 요청할 아트그램 게시글 수
-   * @param {number} offset 조회 아트그램 게시글 시작점
-   * @returns artgrams
-   */
-
-  /**
-   * 아트그램 전체조회(로그인O)
-   * @param {number} limit 요청할 아트그램 게시글 수
-   * @param {number} offset 조회 아트그램 게시글 시작점
-   * @returns artgrams
-   */
-  // allArtgrams = async (limit, offset) => {
-  //   const artgrams = await this.artgramRepository.allArtgrams(limit, offset);
-  //   if (!artgrams.artgramList) {
-  //     throw Boom.notFound("아트그램 정보가 더이상 없습니다.");
-  //   }
-  //   return artgrams;
-  // };
+    return detailartgram;
+  };
 
   /**
    * 아트그램 작성
