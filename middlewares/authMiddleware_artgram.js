@@ -9,9 +9,7 @@ module.exports = async (req, res, next) => {
   const [authType, authToken] = (authorization ?? "").split(" ");
 
   if (authType !== "Bearer" || !authToken) {
-    return res.status(403).json({
-      errorMessage: "로그인 후에 이용할 수 있는 기능입니다.",
-    });
+    res.locals.user = "guest";
   }
 
   try {

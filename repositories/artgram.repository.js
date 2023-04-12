@@ -114,7 +114,6 @@ class ArtgramRepository extends Artgrams {
   };
 
   publicAllArtgrams = async (limit, offset) => {
-    console.log("limit", limit, "offset", offset);
     const artgrams = await Artgrams.findAll({
       raw: true,
       include: [
@@ -162,7 +161,7 @@ class ArtgramRepository extends Artgrams {
 
         return {
           ...rest,
-          profileNickname: userProfile.profileNickname,
+          nickname: userProfile.profileNickname,
           profileImg: userProfile.profileImg,
           imgUrl: artgram["ArtgramImgs.imgUrl"],
           likeCount,
@@ -280,7 +279,7 @@ class ArtgramRepository extends Artgrams {
 
     const detailArtgram = {
       ...artgram.toJSON(),
-      profileNickname: user.UserProfile.profileNickname,
+      nickname: user.UserProfile.profileNickname,
       profileImg: user.UserProfile.profileImg,
       ArtgramImgs,
       hashtag: tagNames,
@@ -335,10 +334,8 @@ class ArtgramRepository extends Artgrams {
         order: [["imgOrder", "ASC"]],
         distinct: true,
       });
-
       return artgramImages;
     };
-
     const ArtgramImgs = await getArtgramImages(artgramId);
     let tagNames = null;
     const hasTag = await ArtgramHashtag.findAll({
@@ -364,7 +361,7 @@ class ArtgramRepository extends Artgrams {
 
     const result = {
       ...artgram.toJSON(),
-      profileNickname: user.UserProfile.profileNickname,
+      nickname: user.UserProfile.profileNickname,
       profileImg: user.UserProfile.profileImg,
       ArtgramImgs,
       hashtag: tagNames,
