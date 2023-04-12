@@ -22,59 +22,68 @@ class MypageService {
         return updatedProfile;
     }
 
-    getMyExhibition = async (userEmail) => {
-        const exhibitions = await this.mypageRepository.findMyPostExhibition(userEmail);
-        const result = exhibitions.map((elem)=>{
-            return {
-                exhibitionIdx: elem.exhibition_id,
-                title : elem.exhibition_title,
-                thumbUrl : elem.post_image
-            }
-        });
-        return result
+    getMyExhibition = async (limit, offset, userEmail) => {
+        const exhibitions = await this.mypageRepository.findMyPostExhibition(limit, offset, userEmail);
+        
+        return exhibitions
     };
 
-    getMyLikedExhibition = async (userEmail) =>{
+    getMyLikedExhibition = async (limit, offset, userEmail) =>{
         const myLikes = await this.mypageRepository.findAllMyLikedExhibitionId(userEmail);
+        
+        if(!myLikes.length){
+            return {"message": "좋아요한 게시글이 없습니다."}
+        }
+
         const myLikedExhibitionIds = myLikes.map((elem)=>elem.exhibition_id);
-        const getMyLikedExhibitions = await this.mypageRepository.findMyExhibition(myLikedExhibitionIds)
-        const result = getMyLikedExhibitions.map((elem)=>{
-            return {
-                exhibitionIdx: elem.exhibition_id,
-                title : elem.exhibition_title,
-                thumbUrl : elem.post_image
-            }
-        });
-        return result
+        const getMyLikedExhibitions = await this.mypageRepository.findMyExhibition(limit, offset, myLikedExhibitionIds)
+        
+        return getMyLikedExhibitions
     }
 
-    getMyScrappedExhibition= async (userEmail) => {
+    getMyScrappedExhibition= async (limit, offset, userEmail) => {
         const myScraps = await this.mypageRepository.findAllMyScrappedExhibitionId(userEmail);
+
+        if(!myScraps.length){
+            return {"message": "스크랩한 게시글이 없습니다."}
+        }
+
         const myScrappedExhibitionIds = myScraps.map((elem)=>elem.exhibition_id);
 
-        const getMyScrappedExhibitions = await this.mypageRepository.findMyExhibition(myScrappedExhibitionIds);
-
-        const result = getMyScrappedExhibitions.map((elem)=>{
-            return {
-                exhibitionIdx: elem.exhibition_id,
-                title : elem.exhibition_title,
-                thumbUrl : elem.post_image
-            }
-        });
-        return result
+        const getMyScrappedExhibitions = await this.mypageRepository.findMyExhibition(limit, offset, myScrappedExhibitionIds);
+        return getMyScrappedExhibitions
     }
 
-    getMyArtgram = async ( limit, offset, userEmail) => {
+    getMyArtgram = async (limit, offset, userEmail) => {
         const artgrams = await this.mypageRepository.findMyPostArtgram(limit, offset, userEmail);
-        // const result = artgrams.map((elem)=>{
-        //     return {
-        //         artgramIdx: elem.artgram_id,
-        //         title : elem.artgram_title,
-        //         thumbUrl : elem.imgUrl
-        //     }
-        // });
+        
         return artgrams
-        // return result
+    }
+
+    getMyLikedArtgram = async (limit, offset, userEmail) => {
+        const myLikes = await this.mypageRepository.findAllMyLikedArtgramId(userEmail);
+        
+        if(!myLikes.length){
+            return {"message": "좋아요한 게시글이 없습니다."}
+        }
+
+        const myLikedArtgramIds = myLikes.map((elem)=>elem.artgram_id);
+        const getMyLikedExhibitions = await this.mypageRepository.findMyArtgram(limit, offset, myLikedArtgramIds)
+        
+        return getMyLikedExhibitions
+    }
+
+    getMyScrappedArtgram = async (limit, offset, userEmail) => {
+        const myScraps = await this.mypageRepository.findAllMyScrappedArtgramId(userEmail);
+        
+        if(!myScraps.length){
+            return {"message": "스크랩한 게시글이 없습니다."}
+        }
+
+        const myScrappedArtgramIds = myScraps.map((elem)=>elem.artgram_id);
+        const getMyScrappedArtgrams = await this.mypageRepository.findMyArtgram(limit, offset, myScrappedArtgramIds)
+        
+        return getMyScrappedArtgrams
     }
 }
 
