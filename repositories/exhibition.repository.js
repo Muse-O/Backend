@@ -34,6 +34,8 @@ class ExhibitionRepository {
       e.art_work_cnt AS artWorkCnt,
       e.location,
       e.contact,
+      e.exhibition_kind AS exhibitionKind,
+      e.exhibition_online_link AS exhibitionOnlineLink,
       e.location,
       e.agency_and_sponsor AS agencyAndSponsor,
       e.exhibition_status AS exhibitionStatus,
@@ -223,7 +225,7 @@ class ExhibitionRepository {
 
     const rowToArtImg = artImage.map(({ order, imgUrl, imgCaption }) => ({
       exhibitionId,
-      imgOrder: parseInt(order),
+      imgOrder: order,
       imgUrl,
       imgCaption,
     }));
@@ -308,9 +310,9 @@ class ExhibitionRepository {
     // order가 작은순대로 정렬
     authors.sort((a, b) => parseInt(a.order) - parseInt(b.order));
 
-    const rowToAuthor = authors.map(({ author }) => ({
+    const rowToAuthor = authors.map(({ order, author }) => ({
       exhibitionId,
-      authorOrder: parseInt(order),
+      authorOrder: order,
       authorName: author,
     }));
 

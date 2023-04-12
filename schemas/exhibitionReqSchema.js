@@ -23,6 +23,11 @@ const exhibitionSchema = Joi.object({
     'string.empty': 'exhibitionCode(전시 종류)를 입력해주세요',
     'any.required': 'exhibitionCode(전시 종류)값이 요청 파라미터로 전달되지 않았습니다.'
   }),
+  exhibitionKind: Joi.string().required().messages({
+    'string.empty': 'exhibitionKind(전시 온라인(EK0002)/오프라인(EK0001) 종류)를 입력해주세요',
+    'any.required': 'exhibitionKind(전시 온라인(EK0002)/오프라인(EK0001) 종류)값이 요청 파라미터로 전달되지 않았습니다.'
+  }),
+  exhibitionOnlineLink: Joi.string().messages().default('작성자님이 온라인 전시 링크를 첨부하지 않았습니다.'),
   entranceFee: Joi.string().allow(null).default('작성자님이 입장료를 입력하지 않았습니다.'),
   artWorkCnt: Joi.string().allow(null).default('작성자님이 작품수를 입력하지 않았습니다.'),
   agencyAndSponsor: Joi.string().allow(null).default('작성자님이 주최/스폰서 정보를 입력하지 않았습니다.'),
@@ -34,7 +39,7 @@ const exhibitionSchema = Joi.object({
   exhibitionCategoty: Joi.array().items(Joi.string()).allow(null, '').default([]),
   artImage: Joi.array().items(Joi.object(
     {
-      order: Joi.string().required().messages({
+      order: Joi.number().required().messages({
         'string.empty': 'order(이미지 순서) 값을 입력해주세요.',
         'any.required': 'order(이미지 순서)값이 요청 파라미터로 전달되지 않았습니다.',
       }),
@@ -47,7 +52,7 @@ const exhibitionSchema = Joi.object({
   )).default([]),
   authors: Joi.array().items(Joi.object(
     {
-      order: Joi.string().required().messages({
+      order: Joi.number().required().messages({
         'string.empty': 'order(작가 순서) 값을 입력해주세요.',
         'any.required': 'order(작가 순서)값이 요청 파라미터로 전달되지 않았습니다.',
       }),
