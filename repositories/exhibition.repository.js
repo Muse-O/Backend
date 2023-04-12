@@ -113,12 +113,12 @@ class ExhibitionRepository {
       include: [
         {
           model: ExhibitionImg,
-          attributes: ["img_order", "img_url", "img_caption"],
+          attributes: [[sequelize.literal('img_order'), 'order'], "imgUrl", "imgCaption"],
           order: [["img_order", "ASC"]],
         },
         {
           model: ExhibitionAuthor,
-          attributes: ["author_name"],
+          attributes: [[sequelize.literal('author_order'), 'order'],[sequelize.literal('author_name'), 'author']],
           order: [["author_id", "ASC"]],
         },
         {
@@ -310,6 +310,7 @@ class ExhibitionRepository {
 
     const rowToAuthor = authors.map(({ author }) => ({
       exhibitionId,
+      authorOrder: parseInt(order),
       authorName: author,
     }));
 

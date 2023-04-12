@@ -31,6 +31,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       field: 'exhibition_id'
     },
+    authorOrder: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      field: 'author_order',
+      defaultValue: 1
+    },
     authorName: {
       allowNull: true,
       type: DataTypes.STRING,
