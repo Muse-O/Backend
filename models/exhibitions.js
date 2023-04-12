@@ -72,6 +72,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       field: 'exhibition_desc'
     },
+    exhibitionKind: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      field: 'exhibition_kind'
+    },
+    exhibitionOnlineLink: {
+      allowNull: true,
+      type: DataTypes.STRING,
+      field: 'exhibition_online_link'
+    },
     startDate: {
       allowNull: false,
       type: DataTypes.DATE,
