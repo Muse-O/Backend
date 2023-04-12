@@ -359,7 +359,7 @@ class ArtgramRepository extends Artgrams {
     const artgramCommentCount = artgramComments.length;
     const commentIds = artgramComments.map((comment) => comment.commentId);
 
-    const result = {
+    const detailArtgram = {
       ...artgram.toJSON(),
       nickname: user.UserProfile.profileNickname,
       profileImg: user.UserProfile.profileImg,
@@ -371,7 +371,7 @@ class ArtgramRepository extends Artgrams {
       commentId: commentIds,
     };
 
-    return { result };
+    return { detailArtgram };
   };
 
   /**
