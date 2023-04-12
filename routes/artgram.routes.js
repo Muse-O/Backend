@@ -133,16 +133,14 @@ const artgramController = new ArtgramController();
  */
 
 //아트그램 전체조회
-//로그인이 되어있지않은경우
 router.get("/", artgramAuthMiddleware, artgramController.allArtgrams);
-//로그인이 되어있는경우
-// router.get("/", authMiddleware, artgramController.allArtgrams);
 
 //아트그램 상세조회
-//로그인이 되어있지않은경우
-// router.get("/artgramId", artgramAuthMiddleware, artgramController.DatailArtgram);
-//로그인이 되어있는경우
-// router.get("/artgramId", artgramController.detailArtgram);
+router.get(
+  "/:artgramId",
+  artgramAuthMiddleware,
+  artgramController.detailArtgram
+);
 
 //아트그램 작성
 router.post("/", authMiddleware, artgramController.postArtgram);
