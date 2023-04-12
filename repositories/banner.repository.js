@@ -47,12 +47,13 @@ class BannerRepository {
         a.roadname ,
         a.roadname_code AS roadnameCode,
         a.roadname_english AS roadnameEnglish,
-        up.profile_id AS authorProfileId,
-        up.profile_nickname AS authorNickName,
-        up.profile_img AS authorProfileImg,
+        up.profile_id AS writerProfileId,
+        up.profile_nickname AS writerNickName,
+        up.profile_img AS writerProfileImg,
         GROUP_CONCAT(ea.author_id) AS authorId,
         GROUP_CONCAT(ea.exhibition_id) AS exhibitionId,
-        GROUP_CONCAT(ea.author_name) AS authorName
+        GROUP_CONCAT(ea.author_order) AS authorsOrder,
+        GROUP_CONCAT(ea.author_name) AS authors,
       FROM exhibitions e
       LEFT JOIN (
         SELECT
@@ -62,9 +63,10 @@ class BannerRepository {
         GROUP BY exhibition_id
       ) AS l ON e.exhibition_id = l.exhibition_id
       LEFT JOIN (
-        SELECT 
+        SELECT
           author_id,
           exhibition_id,
+          author_order,
           author_name
         FROM exhibition_author
       ) AS ea ON e.exhibition_id = ea.exhibition_id
@@ -107,6 +109,20 @@ class BannerRepository {
         'roadname' ,
         'roadnameCode',
         'roadnameEnglish'
+      );
+
+      row.authorInfo = getKeyObjectFromRows(
+        row,
+        'authorId',
+        'authorName',
+        'authorsOrder'
+      );
+
+      row.writerInfo = getKeyObjectFromRows(
+        row,
+        'writerProfileId',
+        'writerNickName',
+        'writerProfileImg'
       );
     });
 
