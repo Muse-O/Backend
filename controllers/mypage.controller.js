@@ -2,6 +2,7 @@ const MypageService = require("../services/mypage.service");
 const logger = require("../middlewares/logger.js");
 const Boom = require("boom");
 const mypageSchema = require("../schemas/mypageReqSchema");
+const pageQuerySchema = require("../schemas/pageQuerySchema")
 
 class MypageController {
     mypageService = new MypageService();
@@ -88,10 +89,17 @@ class MypageController {
 
     getMyArtgram = async (req, res, next) => {
         try {
-            const { userEmail } = res.locals.user;
-            const artgrams = await this.mypageService.getMyArtgram(userEmail)
+            const { limit = 4, offset = 0 } = await pageQuerySchema
+            .validateAsync(req.query)
+            .catch((err) => {
+              res.status(400).json({ message: err.message });
+              throw Boom.badRequest(err.message);
+            });
 
-            return res.status(200).json({ myArtgrams:artgrams })
+            const { userEmail } = res.locals.user;
+            const artgrams = await this.mypageService.getMyArtgram(Number(limit), Number(offset), userEmail)
+
+            return res.status(200).json(artgrams)
 
         } catch (error) {
             logger.error(error.message);

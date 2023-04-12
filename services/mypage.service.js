@@ -64,16 +64,17 @@ class MypageService {
         return result
     }
 
-    getMyArtgram = async (userEmail) => {
-        const artgrams = await this.mypageRepository.findMyPostArtgram(userEmail);
-        const result = artgrams.map((elem)=>{
-            return {
-                artgramIdx: elem.artgram_id,
-                title : elem.artgram_title,
-                thumbUrl : elem.imgUrl
-            }
-        });
-        return result
+    getMyArtgram = async ( limit, offset, userEmail) => {
+        const artgrams = await this.mypageRepository.findMyPostArtgram(limit, offset, userEmail);
+        // const result = artgrams.map((elem)=>{
+        //     return {
+        //         artgramIdx: elem.artgram_id,
+        //         title : elem.artgram_title,
+        //         thumbUrl : elem.imgUrl
+        //     }
+        // });
+        return artgrams
+        // return result
     }
 }
 

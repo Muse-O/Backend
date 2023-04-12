@@ -73,17 +73,18 @@ class MypageRepository{
     }
 
 
-    findMyPostArtgram = async (userEmail) => {
+    findMyPostArtgram = async (limit,offset,userEmail) => {
         const myArtgram = await Artgrams.findAll({
             attributes: ['artgram_id','artgram_title'],
             include: [
                 {
                   model: ArtgramImg,
                   attributes: ["imgUrl"],
-                  where: {"imgOrder":1}
+                  where: {"imgOrder":1},
+                  seperate: true
                 },
               ],
-            group: ["Artgrams.artgram_id"],
+            // group: ["Artgrams.artgram_id"],
             where: {
                 userEmail: userEmail,
                 artgram_status: {
@@ -91,10 +92,35 @@ class MypageRepository{
                 },
               },
             order: [["createdAt", "DESC"]], 
-            raw: true     
+            raw: true,
+            limit: limit,
+            offset: offset,
+            subQuery: false
         }).then((models) => models.map(parseModelToFlatObject))
 
-        return myArtgram;
+        const myArtgramList = {
+            result: myArtgram
+        }
+
+        const myArtgramCnt = await Artgrams.count({
+            where:{
+                artgram_status: {
+                    [Op.ne]: "AS04",
+                  },
+            }
+        })
+
+        const hasNextPage = offset + limit < myArtgramCnt;
+
+        const paginationInfo = {
+            limit,
+            offset,
+            myArtgramCnt,
+            hasNextPage
+        }
+
+        return {myArtgramList, paginationInfo}
+
     }
 
 }
