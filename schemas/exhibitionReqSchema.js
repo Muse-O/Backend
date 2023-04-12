@@ -18,9 +18,7 @@ const exhibitionSchema = Joi.object({
     'date.empty': 'endDate(종료일)을 문자열로 입력해주세요.',
     'any.required': 'endDate(종료일)값이 요청 파라미터로 전달되지 않았습니다.'
   }),
-  postImage: Joi.string().allow(null).default('https://woog-s3-bucket.s3.ap-northeast-2.amazonaws.com/exhibition/noPost.jpg').messages({
-    'string.empty': 'postImage(포스트 이미지)을 문자열로 입력해주세요.',
-  }),
+  postImage: Joi.string().default('https://woog-s3-bucket.s3.ap-northeast-2.amazonaws.com/exhibition/noPost.jpg'),
   exhibitionCode: Joi.string().required().messages({
     'string.empty': 'exhibitionCode(전시 종류)를 입력해주세요',
     'any.required': 'exhibitionCode(전시 종류)값이 요청 파라미터로 전달되지 않았습니다.'
@@ -46,7 +44,7 @@ const exhibitionSchema = Joi.object({
       }),
       imgCaption: Joi.string().default(null)
     }
-  )).allow(null).default([]),
+  )).default([]),
   authors: Joi.array().items(Joi.object(
     {
       order: Joi.string().required().messages({

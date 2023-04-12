@@ -11,10 +11,7 @@ const {
 } = require("../models");
 const { Op } = require("sequelize");
 
-class ExhibitionRepository extends Exhibitions {
-  constructor() {
-    super();
-  }
+class ExhibitionRepository {
 
   /**
    * 전시 게시글 목록 조회
@@ -116,7 +113,7 @@ class ExhibitionRepository extends Exhibitions {
       include: [
         {
           model: ExhibitionImg,
-          attributes: ["img_url", "img_caption"],
+          attributes: ["img_order", "img_url", "img_caption"],
           order: [["img_order", "ASC"]],
         },
         {
