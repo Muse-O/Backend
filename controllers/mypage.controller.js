@@ -46,6 +46,74 @@ class MypageController {
             next(error);
         }
     }
+
+    getMyExhibition = async (req, res, next) => {
+        try {
+            const { userEmail } = res.locals.user;
+
+            const exhibitions = await this.mypageService.getMyExhibition(userEmail)
+
+            return res.status(200).json({ myExhibitions:exhibitions })
+        } catch (error) {
+            logger.error(error.message);
+            next(error);
+        }
+    }
+
+    getMyLikedExhibition = async (req, res, next) => {
+        try {
+            const { userEmail } = res.locals.user;
+
+            const result = await this.mypageService.getMyLikedExhibition(userEmail)
+
+            return res.status(200).json({ myLikedExhibitions:result })
+        } catch (error) {
+            logger.error(error.message);
+            next(error);
+        }
+    }
+
+    getMyScrappedExhibition = async (req, res, next) => {
+        try {
+            const { userEmail } = res.locals.user;
+
+            const result = await this.mypageService.getMyScrappedExhibition(userEmail)
+
+            return res.status(200).json({ myScrappedExhibitions: result})
+        } catch (error) {
+            logger.error(error.message);
+            next(error);
+        }
+    }
+
+    getMyArtgram = async (req, res, next) => {
+        try {
+            const { userEmail } = res.locals.user;
+            const artgrams = await this.mypageService.getMyArtgram(userEmail)
+
+            return res.status(200).json({ myArtgrams:artgrams })
+
+        } catch (error) {
+            logger.error(error.message);
+            next(error);
+        }
+    }
+
+    getMyLikedArtgram = async (req, res, next) => {
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
+
+    getMyScrappedArtgram = async (req, res, next) => {
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
 }
 
 module.exports = MypageController;

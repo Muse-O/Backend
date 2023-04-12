@@ -6,23 +6,23 @@ class SearchContorller {
   }
   /**
    * 검색
-   * @param {query} searchText
+   * @param {query} keyWord
    * @return
    */
   search = async (req, res, next) => {
-    const { searchText } = req.query;
-    const searchtext = await this.searchService.search(searchText);
-    res.status(200).json({ searchtext });
+    const { keyWord } = req.query;
+    const searchText = await this.searchService.search(keyWord);
+    res.status(200).json({ keyWord: searchText });
   };
 
   /**
    * 자동완성
-   * @param {query} searchText
+   * @param {query} keyWord
    * @return
    */
   autocomplete = async (req, res, next) => {
-    const { searchText } = req.query;
-    const autoSearch = await this.searchService.autocomplete(searchText);
+    const { keyWord } = req.query;
+    const autoSearch = await this.searchService.autocomplete(keyWord);
     res.status(200).json({ autoSearch });
   };
 }

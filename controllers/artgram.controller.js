@@ -10,27 +10,82 @@ class ArtgramController {
   }
 
   /**
-   * 아트그램 전체조회
+   * 아트그램 전체조회(로그인X)
    */
   allArtgrams = async (req, res, next) => {
+    // try {
+    const userEmail = res.locals.user || "guest";
+    const { limit, offset } = await pageQuerySchema
+      .validateAsync(req.query)
+      .catch((err) => {
+        res.status(400).json({ message: err.message });
+        throw Boom.badRequest(err.message);
+      });
+    const artgrams = await this.artgramService.allArtgrams(
+      Number(limit),
+      Number(offset),
+      userEmail
+    );
+    res.status(200).json({ artgramList: artgrams });
+    // } catch (error) {
+    //   next(error);
+    // }
+  };
+
+  /**
+   * 아트그램 전체조회(로그인O)
+   */
+  // allArtgrams = async (req, res, next) => {
+  //   try {
+  //     const { limit, offset } = await pageQuerySchema
+  //       .validateAsync(req.query)
+  //       .catch((err) => {
+  //         res.status(400).json({ message: err.message });
+  //         throw Boom.badRequest(err.message);
+  //       });
+  //     const { userEmail } = res.locals.user;
+  //     const artgrams = await this.artgramService.allArtgrams(
+  //       userEmail,
+  //       Number(limit),
+  //       Number(offset)
+  //     );
+  //     res.status(200).json({ artgramList: artgrams });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
+
+  /**
+   * 아트그램 상세조회(로그인X)
+   */
+  publicDatailArtgram = async (req, res, next) => {
     try {
-      const { limit, offset } = await pageQuerySchema
-        .validateAsync(req.query)
-        .catch((err) => {
-          res.status(400).json({ message: err.message });
-          throw Boom.badRequest(err.message);
-        });
-      const artgrams = await this.artgramService.allArtgrams(
-        Number(limit),
-        Number(offset)
-      );
-      res
-        .status(200)
-        .json({ ...artgrams, message: "아트그램을 정상적으로 가져왔습니다." });
+      const datailArtgram = await this.artgramService.allArtgram();
+      res.status(200).json({
+        datailArtgram,
+        message: "아트그램을 정상적으로 가져왔습니다.",
+      });
     } catch (error) {
       next(error);
     }
   };
+
+  /**
+   * 아트그램 상세조회(로그인O)
+   */
+  // detailArtgram = async (req, res, next) => {
+  //   try {
+  //     const { userEmail } = res.locals.user;
+  //     const datailArtgram = await this.artgramService.detailArtgram(userEmail);
+  //     res.status(200).json({
+  //       datailArtgram,
+  //       message: "아트그램을 정상적으로 가져왔습니다.",
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
+
   /**
    * 아트그램 작성
    */
@@ -116,9 +171,13 @@ class ArtgramController {
         userEmail
       );
       if (likeartgram === "create") {
-        res.status(200).json({ message: "좋아요가 등록되었습니다." });
+        res
+          .status(200)
+          .json({ likeartgram, message: "좋아요가 등록되었습니다." });
       } else {
-        res.status(200).json({ message: "좋아요가 취소되었습니다." });
+        res
+          .status(200)
+          .json({ likeartgram, message: "좋아요가 취소되었습니다." });
       }
     } catch (error) {
       next(error);
@@ -143,9 +202,13 @@ class ArtgramController {
         userEmail
       );
       if (scrapartgram === "create") {
-        res.status(200).json({ message: "아트그램을 스크랩했습니다." });
+        res
+          .status(200)
+          .json({ scrapartgram, message: "아트그램을 스크랩했습니다." });
       } else {
-        res.status(200).json({ message: "스크랩을 취소했습니다." });
+        res
+          .status(200)
+          .json({ scrapartgram, message: "스크랩을 취소했습니다." });
       }
     } catch (error) {
       next(error);
