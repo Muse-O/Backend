@@ -85,6 +85,35 @@ class MypageController {
             next(error);
         }
     }
+
+    getMyArtgram = async (req, res, next) => {
+        try {
+            const { userEmail } = res.locals.user;
+            const artgrams = await this.mypageService.getMyArtgram(userEmail)
+
+            return res.status(200).json({ myArtgrams:artgrams })
+
+        } catch (error) {
+            logger.error(error.message);
+            next(error);
+        }
+    }
+
+    getMyLikedArtgram = async (req, res, next) => {
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
+
+    getMyScrappedArtgram = async (req, res, next) => {
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
 }
 
 module.exports = MypageController;

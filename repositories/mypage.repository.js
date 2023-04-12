@@ -1,4 +1,4 @@
-const { UserProfile, Exhibitions, ExhibitionLike, ExhibitionScrap, sequelize } = require('../models');
+const { UserProfile, Exhibitions, ExhibitionLike, ExhibitionScrap, Artgrams, ArtgramImg, Users, ArtgramHashtag, ArtgramLike, ArtgramScrap, ArtgramsComment, sequelize } = require('../models');
 const { parseModelToFlatObject } = require('../modules/parseModelToFlatObject')
 const { Op } = require('sequelize');
 
@@ -22,7 +22,7 @@ class MypageRepository{
         return updatedProfile;
     };
 
-    findMyExhibition = async (userEmail) => {
+    findMyPostExhibition = async (userEmail) => {
         const myExhibition = await Exhibitions.findAll({
             attributes: ['exhibition_id','exhibition_title', 'post_image'],
             where: [{user_email: userEmail}],
@@ -71,6 +71,32 @@ class MypageRepository{
 
         return myScraps
     }
+
+
+    findMyPostArtgram = async (userEmail) => {
+        const myArtgram = await Artgrams.findAll({
+            attributes: ['artgram_id','artgram_title'],
+            include: [
+                {
+                  model: ArtgramImg,
+                  attributes: ["imgUrl"],
+                  where: {"imgOrder":1}
+                },
+              ],
+            group: ["Artgrams.artgram_id"],
+            where: {
+                userEmail: userEmail,
+                artgram_status: {
+                  [Op.ne]: "AS04",
+                },
+              },
+            order: [["createdAt", "DESC"]], 
+            raw: true     
+        }).then((models) => models.map(parseModelToFlatObject))
+
+        return myArtgram;
+    }
+
 }
 
 module.exports = MypageRepository;
