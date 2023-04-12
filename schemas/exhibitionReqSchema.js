@@ -34,7 +34,7 @@ const exhibitionSchema = Joi.object({
   exhibitionCategoty: Joi.array().items(Joi.string()).allow(null, '').default([]),
   artImage: Joi.array().items(Joi.object(
     {
-      order: Joi.string().required().messages({
+      order: Joi.number().required().messages({
         'string.empty': 'order(이미지 순서) 값을 입력해주세요.',
         'any.required': 'order(이미지 순서)값이 요청 파라미터로 전달되지 않았습니다.',
       }),
@@ -47,7 +47,7 @@ const exhibitionSchema = Joi.object({
   )).default([]),
   authors: Joi.array().items(Joi.object(
     {
-      order: Joi.string().required().messages({
+      order: Joi.number().required().messages({
         'string.empty': 'order(작가 순서) 값을 입력해주세요.',
         'any.required': 'order(작가 순서)값이 요청 파라미터로 전달되지 않았습니다.',
       }),

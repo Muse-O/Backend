@@ -223,7 +223,7 @@ class ExhibitionRepository {
 
     const rowToArtImg = artImage.map(({ order, imgUrl, imgCaption }) => ({
       exhibitionId,
-      imgOrder: parseInt(order),
+      imgOrder: order,
       imgUrl,
       imgCaption,
     }));
@@ -308,9 +308,9 @@ class ExhibitionRepository {
     // order가 작은순대로 정렬
     authors.sort((a, b) => parseInt(a.order) - parseInt(b.order));
 
-    const rowToAuthor = authors.map(({ author }) => ({
+    const rowToAuthor = authors.map(({ order, author }) => ({
       exhibitionId,
-      authorOrder: parseInt(order),
+      authorOrder: order,
       authorName: author,
     }));
 
