@@ -15,7 +15,7 @@ class ArtgramRepository extends Artgrams {
     super();
   }
   /**
-   * 아트그램 전체조회
+   * 로그인시 아트그램 전체조회
    * @param {number} limit 요청할 아트그램 게시글 수
    * @param {number} offset 조회 아트그램 게시글 시작점
    * @returns artgrams
@@ -62,9 +62,18 @@ class ArtgramRepository extends Artgrams {
         const likeCount = await ArtgramLike.count({
           where: { artgramId: artgramId },
         });
+        const scrapCount = await ArtgramScrap.count({
+          where: { artgramId: artgramId },
+        });
 
         // 현재 사용자가 좋아요를 누른 Artgram이 있는지 확인
         const likedByCurrentUser = await ArtgramLike.findOne({
+          where: {
+            userEmail: myuserEmail,
+            artgramId: artgramId,
+          },
+        });
+        const scrapByCurrentUser = await ArtgramScrap.findOne({
           where: {
             userEmail: myuserEmail,
             artgramId: artgramId,
@@ -84,7 +93,9 @@ class ArtgramRepository extends Artgrams {
           imgUrl: artgram["ArtgramImgs.imgUrl"],
           likeCount,
           imgCount,
+          scrapCount,
           liked: !!likedByCurrentUser,
+          scrap: !!scrapByCurrentUser,
         };
       })
     );
@@ -114,6 +125,12 @@ class ArtgramRepository extends Artgrams {
     };
   };
 
+  /**
+   * 비로그인시 전체조회
+   * @param {*} limit
+   * @param {*} offset
+   * @returns
+   */
   publicAllArtgrams = async (limit, offset) => {
     const artgrams = await Artgrams.findAll({
       raw: true,
@@ -157,6 +174,9 @@ class ArtgramRepository extends Artgrams {
         const imgCount = await ArtgramImg.count({
           where: { artgramId: artgramId },
         });
+        const scrapCount = await ArtgramScrap.count({
+          where: { artgramId: artgramId },
+        });
         //객체 구조분해를 사용해서 artgram행을 사용해서ArtgramImgs.imgUrl을 제거해줌
         const { "ArtgramImgs.imgUrl": _, ...rest } = artgram;
 
@@ -167,6 +187,7 @@ class ArtgramRepository extends Artgrams {
           imgUrl: artgram["ArtgramImgs.imgUrl"],
           likeCount,
           imgCount,
+          scrapCount,
         };
       })
     );
@@ -282,6 +303,12 @@ class ArtgramRepository extends Artgrams {
         artgramId: thisArtgram.dataValues.artgramId,
       },
     });
+    const scrapByCurrentUser = await ArtgramScrap.findOne({
+      where: {
+        userEmail: myuserEmail,
+        artgramId: thisArtgram.dataValues.artgramId,
+      },
+    });
 
     const detailArtgram = {
       ...thisArtgram.toJSON(),
@@ -293,6 +320,7 @@ class ArtgramRepository extends Artgrams {
       artgramScrapCount,
       artgramCommentCount,
       liked: !!likedByCurrentUser,
+      scrap: !!scrapByCurrentUser,
     };
 
     return { detailArtgram };
