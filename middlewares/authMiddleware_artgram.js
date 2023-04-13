@@ -24,8 +24,8 @@ module.exports = async (req, res, next) => {
     next();
   } catch (err) {
     // 사용자 인증에 실패한 이유
-    console.error(err);
-
+    // console.error(err);
+    res.locals.user = "guest";
     next();
   }
 };
