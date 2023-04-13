@@ -14,7 +14,7 @@ class ArtgramController {
    */
   allArtgrams = async (req, res, next) => {
     try {
-      const userEmail = res.locals.user || "guest";
+      const { userEmail } = res.locals.user || "guest";
       const { limit, offset } = await pageQuerySchema
         .validateAsync(req.query)
         .catch((err) => {
