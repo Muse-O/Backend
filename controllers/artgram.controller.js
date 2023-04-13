@@ -37,7 +37,7 @@ class ArtgramController {
    */
   detailArtgram = async (req, res, next) => {
     // try {
-    const userEmail = res.locals.user || "guest";
+    const { userEmail } = res.locals.user || "guest";
     const { artgramId } = req.params;
     const datailArtgram = await this.artgramService.detailArtgram(
       artgramId,

@@ -197,14 +197,12 @@ class ArtgramRepository extends Artgrams {
   };
 
   /**
-   * 상세조회
-   * @param {*} limit
-   * @param {*} offset
+   * 로그인시 상세조회
    * @returns
    */
   detailArtgram = async (artgramId, userEmail) => {
     const myuserEmail = userEmail;
-    const artgram = await Artgrams.findOne({
+    const thisArtgram = await Artgrams.findOne({
       where: {
         artgramId,
         artgram_status: {
@@ -212,8 +210,8 @@ class ArtgramRepository extends Artgrams {
         },
       },
       attributes: [
-        "artgramId",
         "userEmail",
+        "artgramId",
         "artgramTitle",
         "artgramDesc",
         "createdAt",
@@ -229,12 +227,19 @@ class ArtgramRepository extends Artgrams {
       group: ["Artgrams.artgram_id"],
       order: [["createdAt", "DESC"]],
     });
+    console.log("myuserEmail:", myuserEmail);
+    console.log(
+      "thisArtgram.dataValues.artgramId:",
+      thisArtgram.dataValues.artgramId
+    );
 
     const user = await Users.findOne({
-      where: { userEmail: artgram.userEmail },
-      include: [
-        { model: UserProfile, attributes: ["profileNickname", "profileImg"] },
-      ],
+      where: { userEmail: thisArtgram.dataValues.userEmail },
+    });
+
+    const userProfile = await UserProfile.findOne({
+      where: { userEmail: user.dataValues.userEmail },
+      attributes: ["profileNickname", "profileImg"],
     });
 
     const getArtgramImages = async (artgramId) => {
@@ -269,20 +274,19 @@ class ArtgramRepository extends Artgrams {
       attributes: ["commentId"],
     });
     const artgramCommentCount = artgramComments.length;
-    const commentIds = artgramComments.map((comment) => comment.commentId);
 
     // 현재 사용자가 좋아요를 누른 Artgram이 있는지 확인
     const likedByCurrentUser = await ArtgramLike.findOne({
       where: {
         userEmail: myuserEmail,
-        artgramId: artgram.artgramId,
+        artgramId: thisArtgram.dataValues.artgramId,
       },
     });
 
     const detailArtgram = {
-      ...artgram.toJSON(),
-      nickname: user.UserProfile.profileNickname,
-      profileImg: user.UserProfile.profileImg,
+      ...thisArtgram.toJSON(),
+      nickname: userProfile.profileNickname,
+      profileImg: userProfile.profileImg,
       ArtgramImgs,
       hashtag: tagNames,
       artgramLikeCount,
@@ -294,6 +298,11 @@ class ArtgramRepository extends Artgrams {
     return { detailArtgram };
   };
 
+  /**
+   * 비로그인 상세정보
+   * @param {*} artgramId
+   * @returns
+   */
   publicDetailArtgram = async (artgramId) => {
     const artgram = await Artgrams.findOne({
       where: {
@@ -358,7 +367,6 @@ class ArtgramRepository extends Artgrams {
       attributes: ["commentId"],
     });
     const artgramCommentCount = artgramComments.length;
-    const commentIds = artgramComments.map((comment) => comment.commentId);
 
     const detailArtgram = {
       ...artgram.toJSON(),
