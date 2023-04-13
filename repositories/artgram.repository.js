@@ -9,6 +9,7 @@ const {
   ArtgramsComment,
 } = require("../models");
 const { Op, Sequelize } = require("sequelize");
+const moment = require("moment-timezone");
 
 class ArtgramRepository extends Artgrams {
   constructor() {
@@ -97,6 +98,9 @@ class ArtgramRepository extends Artgrams {
           scrapCount,
           liked: !!likedByCurrentUser,
           scrap: !!scrapByCurrentUser,
+          createdAt: (artgram.createdAt = moment(artgram.createdAt)
+            .tz("Asia/Seoul")
+            .format("YYYY-MM-DDTHH:mm:ss")),
         };
       })
     );
@@ -189,7 +193,9 @@ class ArtgramRepository extends Artgrams {
           likeCount,
           imgCount,
           scrapCount,
-          createdAt: artgram.createdAt,
+          createdAt: (artgram.createdAt = moment(artgram.createdAt)
+            .tz("Asia/Seoul")
+            .format("YYYY-MM-DDTHH:mm:ss")),
         };
       })
     );
@@ -247,11 +253,6 @@ class ArtgramRepository extends Artgrams {
       group: ["Artgrams.artgram_id"],
       order: [["createdAt", "DESC"]],
     });
-    console.log("myuserEmail:", myuserEmail);
-    console.log(
-      "thisArtgram.dataValues.artgramId:",
-      thisArtgram.dataValues.artgramId
-    );
 
     const user = await Users.findOne({
       where: { userEmail: thisArtgram.dataValues.userEmail },
@@ -320,6 +321,9 @@ class ArtgramRepository extends Artgrams {
       artgramCommentCount,
       liked: !!likedByCurrentUser,
       scrap: !!scrapByCurrentUser,
+      createdAt: (thisArtgram.createdAt = moment(thisArtgram.createdAt)
+        .tz("Asia/Seoul")
+        .format("YYYY-MM-DDTHH:mm:ss")),
     };
 
     return { detailArtgram };
@@ -404,6 +408,9 @@ class ArtgramRepository extends Artgrams {
       artgramLikeCount,
       artgramScrapCount,
       artgramCommentCount,
+      createdAt: (artgram.createdAt = moment(artgram.createdAt)
+        .tz("Asia/Seoul")
+        .format("YYYY-MM-DDTHH:mm:ss")),
     };
 
     return { detailArtgram };
