@@ -25,7 +25,7 @@ class ArtgramRepository extends Artgrams {
     const myuserEmail = userEmail;
     const artgrams = await Artgrams.findAll({
       raw: true,
-      attributes: ["artgramId", "artgramTitle", "userEmail"],
+      attributes: ["artgramId", "artgramTitle", "userEmail", "createdAt"],
       include: [
         {
           model: ArtgramImg,
@@ -42,6 +42,7 @@ class ArtgramRepository extends Artgrams {
       },
       limit: limit,
       offset: offset,
+      order: [["createdAt", "DESC"]],
     });
     const findArtgrmas = await Promise.all(
       artgrams.map(async (artgram) => {
@@ -100,10 +101,8 @@ class ArtgramRepository extends Artgrams {
       })
     );
 
-    const artgramList = await Artgrams.findAndCountAll({
-      limit: limit,
-      offset: offset,
-      order: [["createdAt", "DESC"]],
+    const sortedArtgramList = findArtgrmas.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
     const artgramCnt = await Artgrams.count();
@@ -117,8 +116,8 @@ class ArtgramRepository extends Artgrams {
     };
 
     return {
-      artgramList: {
-        count: artgramList.count,
+      sortedArtgramList: {
+        count: artgrams.count,
         findArtgrmas,
       },
       paginationInfo,
@@ -143,7 +142,7 @@ class ArtgramRepository extends Artgrams {
           },
         },
       ],
-      attributes: ["artgramId", "artgramTitle", "userEmail"],
+      attributes: ["artgramId", "artgramTitle", "userEmail", "createdAt"],
       where: {
         artgram_status: {
           [Op.ne]: "AS04",
@@ -151,7 +150,9 @@ class ArtgramRepository extends Artgrams {
       },
       limit: limit,
       offset: offset,
+      order: [["createdAt", "DESC"]],
     });
+
     const findArtgrmas = await Promise.all(
       artgrams.map(async (artgram) => {
         const userEmail = artgram.userEmail;
@@ -188,14 +189,12 @@ class ArtgramRepository extends Artgrams {
           likeCount,
           imgCount,
           scrapCount,
+          createdAt: artgram.createdAt,
         };
       })
     );
-
-    const artgramList = await Artgrams.findAndCountAll({
-      limit: limit,
-      offset: offset,
-      order: [["createdAt", "DESC"]],
+    const sortedArtgramList = findArtgrmas.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
     const artgramCnt = await Artgrams.count();
@@ -209,8 +208,8 @@ class ArtgramRepository extends Artgrams {
     };
 
     return {
-      artgramList: {
-        count: artgramList.count,
+      sortedArtgramList: {
+        count: artgrams.count,
         findArtgrmas,
       },
       paginationInfo,
