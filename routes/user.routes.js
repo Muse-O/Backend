@@ -128,7 +128,7 @@ router.post("/emailconfirm", userController.emailConfirm);
 router.post("/emailvalidate", userController.emailValidate);
 
 // 인증번호 검증
-router.get("/emailcodecheck", userController.emailValidateNumCheck);
+router.post("/emailcodecheck", userController.emailValidateNumCheck);
 
 // 회원가입
 router.post("/signup", userController.userSignup);
