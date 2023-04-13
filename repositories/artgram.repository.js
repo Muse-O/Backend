@@ -22,6 +22,7 @@ class ArtgramRepository extends Artgrams {
    */
 
   allArtgrams = async (limit, offset, userEmail) => {
+    const myuserEmail = userEmail;
     const artgrams = await Artgrams.findAll({
       raw: true,
       attributes: ["artgramId", "artgramTitle", "userEmail"],
@@ -65,7 +66,7 @@ class ArtgramRepository extends Artgrams {
         // 현재 사용자가 좋아요를 누른 Artgram이 있는지 확인
         const likedByCurrentUser = await ArtgramLike.findOne({
           where: {
-            userEmail: userEmail,
+            userEmail: myuserEmail,
             artgramId: artgramId,
           },
         });
@@ -202,6 +203,7 @@ class ArtgramRepository extends Artgrams {
    * @returns
    */
   detailArtgram = async (artgramId, userEmail) => {
+    const myuserEmail = userEmail;
     const artgram = await Artgrams.findOne({
       where: {
         artgramId,
@@ -272,7 +274,7 @@ class ArtgramRepository extends Artgrams {
     // 현재 사용자가 좋아요를 누른 Artgram이 있는지 확인
     const likedByCurrentUser = await ArtgramLike.findOne({
       where: {
-        userEmail: artgram.userEmail,
+        userEmail: myuserEmail,
         artgramId: artgram.artgramId,
       },
     });
@@ -286,7 +288,6 @@ class ArtgramRepository extends Artgrams {
       artgramLikeCount,
       artgramScrapCount,
       artgramCommentCount,
-      commentId: commentIds,
       liked: !!likedByCurrentUser,
     };
 
@@ -368,7 +369,6 @@ class ArtgramRepository extends Artgrams {
       artgramLikeCount,
       artgramScrapCount,
       artgramCommentCount,
-      commentId: commentIds,
     };
 
     return { detailArtgram };
