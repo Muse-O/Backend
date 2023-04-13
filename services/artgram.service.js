@@ -14,7 +14,7 @@ class ArtgramService {
    */
   allArtgrams = async (limit, offset, userEmail) => {
     let findAllArtgrams;
-    if (userEmail !== "guest") {
+    if (userEmail !== "guest" && userEmail !== undefined) {
       // user 객체가 존재하고 userEmail 속성이 존재하는 경우
       findAllArtgrams = await this.artgramRepository.allArtgrams(
         limit,
@@ -37,7 +37,7 @@ class ArtgramService {
    */
   detailArtgram = async (artgramId, userEmail) => {
     let detailartgram;
-    if (userEmail !== "guest") {
+    if (userEmail !== "guest" && userEmail !== undefined) {
       detailartgram = await this.artgramRepository.detailArtgram(
         artgramId,
         userEmail
