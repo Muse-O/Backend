@@ -16,6 +16,11 @@ class SearchContorller {
   };
 
   /**
+   * 전시회 검색기록저장
+   */
+  selectExhibition = async (req, res, next) => {};
+
+  /**
    * 자동완성
    * @param {query} keyWord
    * @return

@@ -14,9 +14,13 @@ class ArtgramService {
    */
   allArtgrams = async (limit, offset, userEmail) => {
     let findAllArtgrams;
-    if (userEmail !== "guest") {
+    if (userEmail !== "guest" && userEmail !== undefined) {
       // user 객체가 존재하고 userEmail 속성이 존재하는 경우
-      findAllArtgrams = await this.artgramRepository.allArtgrams(limit, offset);
+      findAllArtgrams = await this.artgramRepository.allArtgrams(
+        limit,
+        offset,
+        userEmail
+      );
     } else {
       // user 객체가 존재하지 않거나 userEmail 속성이 존재하지 않는 경우
       findAllArtgrams = await this.artgramRepository.publicAllArtgrams(
@@ -33,7 +37,7 @@ class ArtgramService {
    */
   detailArtgram = async (artgramId, userEmail) => {
     let detailartgram;
-    if (userEmail !== "guest") {
+    if (userEmail !== "guest" && userEmail !== undefined) {
       detailartgram = await this.artgramRepository.detailArtgram(
         artgramId,
         userEmail

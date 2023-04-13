@@ -2,6 +2,7 @@ const MypageService = require("../services/mypage.service");
 const logger = require("../middlewares/logger.js");
 const Boom = require("boom");
 const mypageSchema = require("../schemas/mypageReqSchema");
+const pageQuerySchema = require("../schemas/pageQuerySchema")
 
 class MypageController {
     mypageService = new MypageService();
@@ -49,24 +50,38 @@ class MypageController {
 
     getMyExhibition = async (req, res, next) => {
         try {
+            const { limit = 4, offset = 0 } = await pageQuerySchema
+            .validateAsync(req.query)
+            .catch((err) => {
+              res.status(400).json({ message: err.message });
+              throw Boom.badRequest(err.message);
+            });
+
             const { userEmail } = res.locals.user;
 
-            const exhibitions = await this.mypageService.getMyExhibition(userEmail)
+            const exhibitions = await this.mypageService.getMyExhibition(Number(limit), Number(offset), userEmail)
 
-            return res.status(200).json({ myExhibitions:exhibitions })
+            return res.status(200).json(exhibitions)
         } catch (error) {
             logger.error(error.message);
             next(error);
         }
     }
-
+    
     getMyLikedExhibition = async (req, res, next) => {
         try {
+            const { limit = 4, offset = 0 } = await pageQuerySchema
+            .validateAsync(req.query)
+            .catch((err) => {
+              res.status(400).json({ message: err.message });
+              throw Boom.badRequest(err.message);
+            });
+
             const { userEmail } = res.locals.user;
 
-            const result = await this.mypageService.getMyLikedExhibition(userEmail)
+            const result = await this.mypageService.getMyLikedExhibition(Number(limit),Number(offset),userEmail)
 
-            return res.status(200).json({ myLikedExhibitions:result })
+            return res.status(200).json(result)
         } catch (error) {
             logger.error(error.message);
             next(error);
@@ -75,11 +90,18 @@ class MypageController {
 
     getMyScrappedExhibition = async (req, res, next) => {
         try {
+            const { limit = 4, offset = 0 } = await pageQuerySchema
+            .validateAsync(req.query)
+            .catch((err) => {
+              res.status(400).json({ message: err.message });
+              throw Boom.badRequest(err.message);
+            });
+
             const { userEmail } = res.locals.user;
 
-            const result = await this.mypageService.getMyScrappedExhibition(userEmail)
+            const result = await this.mypageService.getMyScrappedExhibition(Number(limit),Number(offset),userEmail)
 
-            return res.status(200).json({ myScrappedExhibitions: result})
+            return res.status(200).json(result)
         } catch (error) {
             logger.error(error.message);
             next(error);
@@ -88,10 +110,17 @@ class MypageController {
 
     getMyArtgram = async (req, res, next) => {
         try {
-            const { userEmail } = res.locals.user;
-            const artgrams = await this.mypageService.getMyArtgram(userEmail)
+            const { limit = 4, offset = 0 } = await pageQuerySchema
+            .validateAsync(req.query)
+            .catch((err) => {
+              res.status(400).json({ message: err.message });
+              throw Boom.badRequest(err.message);
+            });
 
-            return res.status(200).json({ myArtgrams:artgrams })
+            const { userEmail } = res.locals.user;
+            const artgrams = await this.mypageService.getMyArtgram(Number(limit), Number(offset), userEmail)
+
+            return res.status(200).json(artgrams)
 
         } catch (error) {
             logger.error(error.message);
@@ -101,17 +130,39 @@ class MypageController {
 
     getMyLikedArtgram = async (req, res, next) => {
         try {
-            
+            const { limit = 4, offset = 0 } = await pageQuerySchema
+            .validateAsync(req.query)
+            .catch((err) => {
+              res.status(400).json({ message: err.message });
+              throw Boom.badRequest(err.message);
+            });
+
+            const { userEmail } = res.locals.user;
+            const result = await this.mypageService.getMyLikedArtgram(Number(limit), Number(offset),userEmail);
+
+            return res.status(200).json(result)
         } catch (error) {
-            
+            logger.error(error.message);
+            next(error);
         }
     }
 
     getMyScrappedArtgram = async (req, res, next) => {
         try {
-            
+            const { limit = 4, offset = 0 } = await pageQuerySchema
+            .validateAsync(req.query)
+            .catch((err) => {
+              res.status(400).json({ message: err.message });
+              throw Boom.badRequest(err.message);
+            });
+
+            const { userEmail } = res.locals.user;
+            const result = await this.mypageService.getMyScrappedArtgram(Number(limit), Number(offset),userEmail);
+
+            return res.status(200).json(result)
         } catch (error) {
-            
+            logger.error(error.message);
+            next(error);
         }
     }
 }
