@@ -74,7 +74,8 @@ module.exports = (sequelize, DataTypes) => {
     exhibitionEngTitle: {
       allowNull: false,
       type: DataTypes.STRING,
-      field: 'exhibition_eng_title'
+      field: 'exhibition_eng_title',
+      defaultValue: 'not exhibitionEngTitle'
     },
     exhibitionDesc: {
       allowNull: false,
@@ -109,12 +110,14 @@ module.exports = (sequelize, DataTypes) => {
     openTime: {
       type: DataTypes.TIME,
       allowNull: false,
-      field: 'open_time'
+      field: 'open_time',
+      defaultValue: '00:00:00'
     },
     closeTime: {
       type: DataTypes.TIME,
       allowNull: false,
-      field: 'close_time'
+      field: 'close_time',
+      defaultValue: '00:00:00'
     },
     openDay: {
       type: DataTypes.ENUM('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Weekdays'),
