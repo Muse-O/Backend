@@ -42,9 +42,13 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "exhibitionId", // 현재 모델의 exhibitionId 컬럼을
         foreignKey: "exhibitionId", // ExhibitionScrap 모델에 exhibitionId컬럼으로 연결합니다.
       });
-      this.hasMany(models.ArticleReport, {
+      this.hasMany(models.ExhibitionHashtag, {
         sourceKey: "exhibitionId", // 현재 모델의 exhibitionId 컬럼을
-        foreignKey: "exhibitionId", // ExhibitionReport 모델에 exhibitionId컬럼으로 연결합니다.
+        foreignKey: "exhibitionId", // ExhibitionHashtag 모델에 exhibitionId컬럼으로 연결합니다.
+      });
+      this.hasMany(models.ExhibitionReviews, {
+        sourceKey: "exhibitionId", // 현재 모델의 exhibitionId 컬럼을
+        foreignKey: "exhibitionId", // ExhibitionReview 모델에 exhibitionId컬럼으로 연결합니다.
       });
       
     }
@@ -67,6 +71,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       field: 'exhibition_title'
     },
+    exhibitionEngTitle: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      field: 'exhibition_eng_title'
+    },
     exhibitionDesc: {
       allowNull: false,
       type: DataTypes.STRING,
@@ -76,6 +85,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.STRING,
       field: 'exhibition_kind'
+    },
+    exhibitionLink: {
+      allowNull: true,
+      type: DataTypes.STRING,
+      field: 'exhibition_link'
     },
     exhibitionOnlineLink: {
       allowNull: true,
@@ -91,6 +105,28 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.DATE,
       field: 'end_date'
+    },
+    openTime: {
+      type: DataTypes.TIME,
+      allowNull: false,
+      field: 'open_time'
+    },
+    closeTime: {
+      type: DataTypes.TIME,
+      allowNull: false,
+      field: 'close_time'
+    },
+    openDay: {
+      type: DataTypes.ENUM('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Weekdays'),
+      allowNull: true,
+      field: 'oepn_day',
+      defaultValue: 'Weekdays'
+    },
+    closeDay: {
+      type: DataTypes.ENUM('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Weekdays'),
+      allowNull: true,
+      field: 'close_day',
+      defaultValue: 'Weekdays'
     },
     entranceFee: {
       allowNull: true,
