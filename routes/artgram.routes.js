@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
-const artgramAuthMiddleware = require("../middlewares/authMiddleware_artgram");
+const artgramAuthMiddleware = require("../middlewares/authMiddleware_public");
 
 const ArtgramController = require("../controllers/artgram.controller");
 const artgramController = new ArtgramController();
