@@ -1,3 +1,4 @@
+const { find } = require("lodash");
 const SearchService = require("../services/search.sevice");
 
 class SearchContorller {
@@ -10,15 +11,32 @@ class SearchContorller {
    * @return
    */
   search = async (req, res, next) => {
-    const { keyWord } = req.query;
-    const searchText = await this.searchService.search(keyWord);
-    res.status(200).json({ keyWord: searchText });
+    try {
+      const { keyWord } = req.query;
+      const searchText = await this.searchService.search(keyWord);
+      res.status(200).json({ keyWord: searchText });
+    } catch (err) {
+      next(err);
+    }
   };
 
   /**
    * 전시회 검색기록저장
    */
-  selectExhibition = async (req, res, next) => {};
+  selectResult = async (req, res, next) => {
+    try {
+      const { keyWord, type } = req.query;
+      const selectKeyword = await this.searchService.selectResult(
+        keyWord,
+        type
+      );
+      res
+        .status(200)
+        .json({ selectKeyword, message: "검색기록저장되었습니다" });
+    } catch (err) {
+      next(err);
+    }
+  };
 
   /**
    * 자동완성
@@ -26,9 +44,25 @@ class SearchContorller {
    * @return
    */
   autocomplete = async (req, res, next) => {
-    const { keyWord } = req.query;
-    const autoSearch = await this.searchService.autocomplete(keyWord);
-    res.status(200).json({ autoSearch });
+    try {
+      const { keyWord } = req.query;
+      const autoSearch = await this.searchService.autocomplete(keyWord);
+      res.status(200).json({ autoSearch });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  /**
+   * 최근검색기록
+   */
+  recentSearchHistory = async (req, res, next) => {
+    try {
+      const findHistory = await this.searchService.recentSearchHistory();
+      res.status(200).json({ recentHistory: findHistory });
+    } catch (err) {
+      next(err);
+    }
   };
 }
 

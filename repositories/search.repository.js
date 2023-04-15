@@ -40,6 +40,19 @@ class SearchRepositroy extends searchHistory {
     });
     return rows;
   };
+  /**
+   * 유저가 검색후 선택한 게시글저장
+   * @param {query} keyWord
+   * @param {query} type
+   * @returns
+   */
+  selectResult = async (keyWord, type) => {
+    const savedResult = await searchHistory.create({
+      keyWord: keyWord,
+      type: type,
+    });
+    return savedResult;
+  };
 
   /**
    * 아트그램 자동완성
@@ -68,6 +81,18 @@ class SearchRepositroy extends searchHistory {
     });
     return rows.map((row) => row.exhibitionTitle);
   }
+
+  /**
+   * 최근검색기록
+   */
+  recentSearchHistory = async () => {
+    const findRecentHistory = await searchHistory.findAll({
+      attributes: ["keyWord", "type"],
+      limit: 5,
+      order: [["createdAt", "DESC"]],
+    });
+    return findRecentHistory;
+  };
 }
 
 module.exports = SearchRepositroy;
