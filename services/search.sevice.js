@@ -1,15 +1,11 @@
 const SearchRepositroy = require("../repositories/search.repository");
-// const Redis = require("ioredis");
-// const redisClient = new Redis({
-//   host: "ec2-43-201-154-28.ap-northeast-2.compute.amazonaws.com",
-//   port: 6379,
-// });
-const RedisConnector = require("../config/redisConnector");
+const RedisElasticsearchConnector = require("../config/elasticSearch-redisConnector");
 
 class SearchService {
   constructor() {
     this.searchRepositroy = new SearchRepositroy();
-    this.redisClient = RedisConnector.getClient();
+    this.redisElasticsearchConnector = RedisElasticsearchConnector.getClient();
+    this.redisClient = this.redisElasticsearchConnector.redis;
   }
   /**
    * 검색기능
@@ -66,6 +62,15 @@ class SearchService {
   };
 
   /**
+   * 전시회 검색기록저장
+   * @param {query} keyWord
+   */
+  selectResult = async (keyWord, type) => {
+    const saveResult = this.searchRepositroy.selectResult(keyWord, type);
+    return saveResult;
+  };
+
+  /**
    * 검색어 자동완성
    * @param {query} keyWord
    * @returns
@@ -81,6 +86,15 @@ class SearchService {
       artgramTitles: artgramSuggestions,
       exhibitionTitles: exhibitionSuggestions,
     };
+  };
+
+  /**
+   * 최근검색기록
+   * @returns
+   */
+  recentSearchHistory = async () => {
+    const findHistory = await this.searchRepositroy.recentSearchHistory();
+    return findHistory;
   };
 }
 
