@@ -19,6 +19,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         field: "key-word",
       },
+      type: {
+        allowNull: false,
+        type: DataTypes.STRING,
+        field: "type",
+      },
       createdAt: {
         allowNull: true,
         type: DataTypes.DATE,

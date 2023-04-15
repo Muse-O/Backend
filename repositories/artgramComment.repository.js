@@ -139,12 +139,12 @@ class ArtgramCommentRepository extends ArtgramsComment {
     const findAllReply = await ArtgramsComment.findAll({
       where: {
         artgramId,
-        commentId,
         commentStatus: {
           [Op.ne]: "CS04",
         },
         commentParent: {
           [Op.ne]: null,
+          [Op.eq]: commentId, // commentParent와 commentId가 같은 경우에만 조회
         },
       },
       attributes: [
@@ -156,6 +156,7 @@ class ArtgramCommentRepository extends ArtgramsComment {
       ],
       order: [["createdAt", "DESC"]],
     });
+    console.log("findAllReply", findAllReply);
     const findReplyComment = findAllReply.map((reply) => ({
       commentId: reply.commentId,
       userEmail: reply.userEmail,
