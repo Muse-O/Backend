@@ -1,9 +1,13 @@
 const { searchHistory, Artgrams, Exhibitions } = require("../models");
 const { Sequelize, Op } = require("sequelize");
+// const {
+//   RedisElasticsearchConnector,
+// } = require("../config/elasticSearch-redisConnector");
+// const redisElasticsearchConnectorInstance = new RedisElasticsearchConnector();
 
-class SearchRepositroy extends searchHistory {
+class SearchRepositroy {
   constructor() {
-    super();
+    // this.connector = redisElasticsearchConnectorInstance;
   }
   /**
    * 아트그램 검색어 조회
@@ -93,6 +97,27 @@ class SearchRepositroy extends searchHistory {
     });
     return findRecentHistory;
   };
+
+  /**
+   * 연관 검색어 기능
+   */
+  // async searchTerms(searchTerm) {
+  //   const { body } = await this.connector.esClient.search({
+  //     index: "your-index-name",
+  //     body: {
+  //       query: {
+  //         match: {
+  //           fieldName: searchTerm,
+  //         },
+  //       },
+  //     },
+  //   });
+
+  //   const relatedSearchTerms = body.hits.hits.map(
+  //     (hit) => hit._source.fieldName
+  //   );
+  //   return relatedSearchTerms;
+  // }
 }
 
 module.exports = SearchRepositroy;

@@ -156,7 +156,6 @@ class ArtgramCommentRepository extends ArtgramsComment {
       ],
       order: [["createdAt", "DESC"]],
     });
-    console.log("findAllReply", findAllReply);
     const findReplyComment = findAllReply.map((reply) => ({
       commentId: reply.commentId,
       userEmail: reply.userEmail,
