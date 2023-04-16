@@ -96,6 +96,17 @@ class SearchService {
     const findHistory = await this.searchRepositroy.recentSearchHistory();
     return findHistory;
   };
+
+  /**
+   * 연관 검색어 기능
+   *
+   */
+  searchTerms = async (searchTerm) => {
+    const relatedSearchTerms = await this.searchRepositroy.searchTerms(
+      searchTerm
+    );
+    return relatedSearchTerms;
+  };
 }
 
 module.exports = SearchService;

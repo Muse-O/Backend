@@ -67,7 +67,7 @@ class RedisElasticsearchConnector {
   // Elasticsearch
   _setElasticsearch() {
     this.esClient = new Client({
-      node: "http://your-elasticsearch-endpoint:9200",
+      node: "http://127.0.0.1:9200",
     });
   }
 
