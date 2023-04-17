@@ -163,7 +163,7 @@ class ExhibitionReviewRepository {
     });
 
     const exhibitionReviewCnt = await ExhibitionReviews.count({
-      where: { reviewStatus: { [Op.ne]: ["RS04"] } },
+      where: { [Op.and]: [{ reviewStatus: { [Op.ne]: ["RS04"] } }, { exhibitionId }] },
     });
 
     const hasNextPage = offset + limit < exhibitionReviewCnt;
