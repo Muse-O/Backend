@@ -15,6 +15,34 @@ class BannerController {
   }
 
   /**
+   * 현재 날짜에(한국 시간) 전시중인 전시회 중 최근 작성 순 개인 전시글
+   */
+  getPersonalExhibitionsByRecent = async (req, res, next) => {
+    try {
+      const { reqCnt = 6 } = await reqQuerySchema
+        .validateAsync(req.query)
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+          throw Boom.badRequest(err.message);
+        });
+
+      const exhibitionList =
+        await this.bannerService.getPersonalExhibitionsByRecent(
+          Number(reqCnt)
+        );
+
+      return res
+        .status(200)
+        .json({
+          exhibitionList,
+          message: "전시회 게시글 정보를 성공적으로 조회했습니다.",
+        });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * 현재 날짜에(한국 시간) 전시중인 전시회 중 좋아요 순 전시글
    */
   getOpenExhibitionsSortedByMostLike = async (req, res, next) => {

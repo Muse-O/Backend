@@ -30,7 +30,7 @@ const exhibitionSchema = Joi.object({
     'string.empty': 'exhibitionKind(전시 온라인(EK0002)/오프라인(EK0001) 종류)를 입력해주세요',
     'any.required': 'exhibitionKind(전시 온라인(EK0002)/오프라인(EK0001) 종류)값이 요청 파라미터로 전달되지 않았습니다.'
   }),
-  exhibitionOnlineLink: Joi.string().messages().allow('').default('미지정'),
+  exhibitionOnlineLink: Joi.string().allow(null, '').default('미지정'),
   openDay: Joi.string().valid(...validDays).allow(null, '').empty('').default('미지정'),
   closeDay: Joi.string().valid(...validDays).allow(null, '').empty('').default('미지정'),
   openTime: Joi.date().required().messages({
