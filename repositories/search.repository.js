@@ -1,12 +1,15 @@
 const { searchHistory, Artgrams, Exhibitions } = require("../models");
 const { Sequelize, Op } = require("sequelize");
+const RedisClient = require("../config/redisConnector");
 // const {
 //   RedisElasticsearchConnector,
 // } = require("../config/elasticSearch-redisConnector");
 // const redisElasticsearchConnectorInstance = new RedisElasticsearchConnector();
 
-class SearchRepositroy {
+class SearchRepositroy extends searchHistory {
   constructor() {
+    super();
+    this.redisClient = RedisClient.getClient();
     // this.connector = redisElasticsearchConnectorInstance;
   }
   /**
@@ -15,6 +18,14 @@ class SearchRepositroy {
    * @returns
    */
   searchArtgrams = async (keyWord) => {
+    const cachedArtgramTitles = await this.redisClient.get(
+      `search:artgram:${keyWord}`
+    );
+
+    if (cachedArtgramTitles) {
+      return JSON.parse(cachedArtgramTitles);
+    }
+
     const rows = await Artgrams.findAll({
       attributes: ["artgramTitle"],
       where: {
@@ -24,7 +35,16 @@ class SearchRepositroy {
         ],
       },
     });
-    return rows;
+
+    const artgramTitles = rows.map((row) => row.artgramTitle);
+    await this.redisClient.set(
+      `search:artgram:${keyWord}`,
+      JSON.stringify(artgramTitles),
+      "EX",
+      3600
+    );
+
+    return artgramTitles;
   };
 
   /**
@@ -33,6 +53,14 @@ class SearchRepositroy {
    * @returns
    */
   searchExhibition = async (searchText) => {
+    const cachedExhibitionTitles = await this.redisClient.get(
+      `search:exhibition:${searchText}`
+    );
+
+    if (cachedExhibitionTitles) {
+      return JSON.parse(cachedExhibitionTitles);
+    }
+
     const rows = await Exhibitions.findAll({
       attributes: ["exhibitionTitle"],
       where: {
@@ -42,8 +70,18 @@ class SearchRepositroy {
         ],
       },
     });
-    return rows;
+
+    const exhibitionTitles = rows.map((row) => row.exhibitionTitle);
+    await this.redisClient.set(
+      `search:exhibition:${searchText}`,
+      JSON.stringify(exhibitionTitles),
+      "EX",
+      3600
+    );
+
+    return exhibitionTitles;
   };
+
   /**
    * 유저가 검색후 선택한 게시글저장
    * @param {query} keyWord
@@ -101,23 +139,23 @@ class SearchRepositroy {
   /**
    * 연관 검색어 기능
    */
-  // async searchTerms(searchTerm) {
-  //   const { body } = await this.connector.esClient.search({
-  //     index: "your-index-name",
-  //     body: {
-  //       query: {
-  //         match: {
-  //           fieldName: searchTerm,
-  //         },
-  //       },
-  //     },
-  //   });
+  async searchTerms(searchTerm) {
+    const { body } = await this.connector.esClient.search({
+      index: "your-index-name",
+      body: {
+        query: {
+          match: {
+            fieldName: searchTerm,
+          },
+        },
+      },
+    });
 
-  //   const relatedSearchTerms = body.hits.hits.map(
-  //     (hit) => hit._source.fieldName
-  //   );
-  //   return relatedSearchTerms;
-  // }
+    const relatedSearchTerms = body.hits.hits.map(
+      (hit) => hit._source.fieldName
+    );
+    return relatedSearchTerms;
+  }
 }
 
 module.exports = SearchRepositroy;

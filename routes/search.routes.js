@@ -25,13 +25,13 @@ router.get("/auto", searchController.autocomplete);
 router.get("/recent", searchController.recentSearchHistory);
 
 /**
- * 연관 검색어 기능
- */
-router.get("/related", searchController.searchTerms);
-
-/**
  * 메뉴별 검색 구분기능
  */
 router.get("/category", searchController.searchByType);
+
+/**
+ * 연관 검색어 기능
+ */
+// router.get("/related", searchController.searchTerms);
 
 module.exports = router;
