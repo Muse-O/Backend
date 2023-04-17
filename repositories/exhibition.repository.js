@@ -49,6 +49,7 @@ class ExhibitionRepository {
       get_code_name(e.exhibition_host) AS exhibitionHostName,
       e.exhibition_kind AS exhibitionKind,
       get_code_name(e.exhibition_kind) AS exhibitionKindName,
+      e.exhibition_link AS exhibitionLink,
       e.exhibition_online_link AS exhibitionOnlineLink,
       e.location,
       e.agency_and_sponsor AS agencyAndSponsor,
@@ -222,6 +223,43 @@ class ExhibitionRepository {
             "roadnameEnglish",
           ],
         },
+      ],
+      attributes: [
+        "exhibitionId",
+        "userEmail",
+        "exhibitionTitle",
+        "exhibitionEngTitle",
+        "exhibitionDesc",
+        "exhibitionKind",
+        [
+          sequelize.literal(
+            "get_code_name(Exhibitions.exhibition_kind)"
+          ),
+          "exhibitionKindName",
+        ],
+        "exhibitionHost",
+        [
+          sequelize.literal(
+            "get_code_name(Exhibitions.exhibition_host)"
+          ),
+          "exhibitionHostName",
+        ],
+        "exhibitionLink",
+        "exhibitionOnlineLink",
+        "startDate",
+        "endDate",
+        "openTime",
+        "closeTime",
+        "openDay",
+        "closeDay",
+        "entranceFee",
+        "postImage",
+        "artWorkCnt",
+        "contact",
+        "agencyAndSponsor",
+        "location",
+        "exhibitionStatus",
+        "createdAt",
       ],
       where: { exhibitionId, exhibition_status: { [Op.ne]: ["ES04"] } },
     }).catch(err => console.log(err));

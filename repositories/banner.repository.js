@@ -46,6 +46,7 @@ class BannerRepository {
       LEFT JOIN exhibition_address AS a ON e.exhibition_id = a.exhibition_id
       WHERE '${formatted}' BETWEEN e.start_date AND e.end_date
       AND e.exhibition_status != 'ES04'
+      AND e.exhibition_host = 'EH0001'
       GROUP BY e.exhibition_id
       ORDER BY l.like_cnt DESC
       LIMIT ${reqCnt};

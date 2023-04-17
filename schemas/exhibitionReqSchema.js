@@ -22,15 +22,16 @@ const exhibitionSchema = Joi.object({
     'any.required': 'endDate(종료일)값이 요청 파라미터로 전달되지 않았습니다.'
   }),
   postImage: Joi.string().default('https://woog-s3-bucket.s3.ap-northeast-2.amazonaws.com/exhibition/noPost.jpg'),
-  exhibitionCode: Joi.string().required().messages({
-    'string.empty': 'exhibitionCode(전시 종류)를 입력해주세요',
-    'any.required': 'exhibitionCode(전시 종류)값이 요청 파라미터로 전달되지 않았습니다.'
+  exhibitionHost: Joi.string().required().messages({
+    'string.empty': 'exhibitionHost(주최 종류 개인(EH0001) 기업(EH0002) 기관(EH0003))를 입력해주세요',
+    'any.required': 'exhibitionHost(주최 종류 개인(EH0001) 기업(EH0002) 기관(EH0003))값이 요청 파라미터로 전달되지 않았습니다.'
   }),
   exhibitionKind: Joi.string().required().messages({
     'string.empty': 'exhibitionKind(전시 온라인(EK0002)/오프라인(EK0001) 종류)를 입력해주세요',
     'any.required': 'exhibitionKind(전시 온라인(EK0002)/오프라인(EK0001) 종류)값이 요청 파라미터로 전달되지 않았습니다.'
   }),
   exhibitionOnlineLink: Joi.string().allow(null, '').default('미지정'),
+  exhibitionLink: Joi.string().allow(null, '').default('미지정'),
   openDay: Joi.string().valid(...validDays).allow(null, '').empty('').default('미지정'),
   closeDay: Joi.string().valid(...validDays).allow(null, '').empty('').default('미지정'),
   openTime: Joi.date().required().messages({
