@@ -73,8 +73,9 @@ class ExhibitionRepository {
       END) scraped,
       COALESCE(l.likeCnt, 0) AS likeCnt,
       COALESCE(s.scrapCnt, 0) AS scrapCnt,
-      GROUP_CONCAT(ec.exhibition_code ORDER BY ec.created_at) AS categoryCode,
-      GROUP_CONCAT(get_code_name(ec.exhibition_code) ORDER BY ec.created_at) AS categoryCodeName,
+      GROUP_CONCAT(DISTINCT h.tag_name ORDER BY h.tagRank DESC) AS tagName,
+      GROUP_CONCAT(DISTINCT ec.exhibition_code ORDER BY ec.created_at DESC) AS categoryCode,
+      GROUP_CONCAT(DISTINCT get_code_name(ec.exhibition_code) ORDER BY ec.created_at DESC) AS categoryCodeName,
       p.profile_id AS authorProfileId,
       p.profile_nickname AS authorNickName,
       p.profile_img AS authorProfileImg,
@@ -104,6 +105,12 @@ class ExhibitionRepository {
         FROM exhibition_review
         GROUP BY exhibition_id
       ) AS r ON e.exhibition_id = r.exhibition_id
+      LEFT JOIN (
+        SELECT exhibition_id, tag_name, COUNT(exhibition_tag_id) AS tagRank
+        FROM exhibition_hashtag
+        WHERE is_use = 'Y'
+        GROUP BY exhibition_id, tag_name
+      ) AS h ON e.exhibition_id = h.exhibition_id
       LEFT JOIN exhibition_category ec ON e.exhibition_id = ec.exhibition_id
       LEFT JOIN (
         SELECT
@@ -113,7 +120,7 @@ class ExhibitionRepository {
             profile_img,
             profile_intro
         FROM user_profile
-      ) AS p ON e.user_email = p.user_email
+      ) AS p ON e.user_email = p.user_email 
       WHERE e.exhibition_status != 'ES04'
       GROUP BY e.exhibition_id
       ORDER BY e.created_at DESC
