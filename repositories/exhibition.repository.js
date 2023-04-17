@@ -45,7 +45,10 @@ class ExhibitionRepository {
       e.art_work_cnt AS artWorkCnt,
       e.location,
       e.contact,
+      e.exhibition_host AS exhibitionHost,
+      get_code_name(e.exhibition_host) AS exhibitionHostName,
       e.exhibition_kind AS exhibitionKind,
+      get_code_name(e.exhibition_kind) AS exhibitionKindName,
       e.exhibition_online_link AS exhibitionOnlineLink,
       e.location,
       e.agency_and_sponsor AS agencyAndSponsor,
@@ -130,6 +133,18 @@ class ExhibitionRepository {
         { type: sequelize.QueryTypes.SELECT }
       );
 
+      result.forEach((row, idx) => {
+        const {tagName, categoryCode, categoryCodeName} = row;
+      
+        const tagNames = tagName ? tagName.split(',') : [];
+        const categoryCodes = categoryCode ? categoryCode.split(',') : [];
+        const categoryCodeNames = categoryCodeName ? categoryCodeName.split(',') : [];
+
+        result[idx].tagName = tagNames
+        result[idx].categoryCode = categoryCodes
+        result[idx].categoryCodeName = categoryCodeNames
+      });
+
     const exhibitionList = {
       rows: result,
     };
@@ -209,7 +224,7 @@ class ExhibitionRepository {
         },
       ],
       where: { exhibitionId, exhibition_status: { [Op.ne]: ["ES04"] } },
-    });
+    }).catch(err => console.log(err));
 
     const userProfile = await UserProfile.findOne({
       where: { userEmail: exhibitionItem.userEmail },

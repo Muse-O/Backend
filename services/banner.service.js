@@ -7,6 +7,19 @@ class BannerService {
   }
 
   /**
+   * 현재 날짜에(한국 시간) 전시중인 전시회 중 최근 작성 순 개인 전시글
+   * @param {integer} reqCnt 요청할 게시글 수
+   * @returns exhibitionList
+   */
+  getPersonalExhibitionsByRecent = async (reqCnt) => {
+    
+    const exhibitionList = this.bannerRepository.getPersonalExhibitionsByRecent(reqCnt);
+
+    return exhibitionList;
+
+  }
+
+  /**
    * 현재 날짜에(한국 시간) 전시중인 전시회 중 좋아요 순 전시글
    * @param {integer} reqCnt 요청할 게시글 수
    * @returns exhibitionList
