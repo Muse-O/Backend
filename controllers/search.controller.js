@@ -66,6 +66,22 @@ class SearchContorller {
   };
 
   /**
+   * 메뉴별 검색 구분기능
+   */
+  searchByType = async (req, res, next) => {
+    try {
+      const { category, keyWord } = req.query;
+      const categorySearch = await this.searchService.searchByType(
+        category,
+        keyWord
+      );
+      res.status(200).json({ categorySearch });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  /**
    * 연관 검색어 기능
    */
   searchTerms = async (req, res, next) => {
@@ -76,17 +92,6 @@ class SearchContorller {
     // } catch (err) {
     //   next(err);
     // }
-  };
-
-  /**
-   * 메뉴별 검색 구분기능
-   */
-  searchByType = async (req, res, next) => {
-    try {
-      const { category, keyWord } = req.query;
-    } catch (err) {
-      next(err);
-    }
   };
 }
 

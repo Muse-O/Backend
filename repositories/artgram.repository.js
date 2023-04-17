@@ -322,7 +322,7 @@ class ArtgramRepository extends Artgrams {
       liked: !!likedByCurrentUser,
       scrap: !!scrapByCurrentUser,
       createdAt: dayjs(thisArtgram.createdAt)
-        .locale("en")
+        // .locale("en")
         .format("YYYY-MM-DD HH:mm:ss"),
     };
 
@@ -409,7 +409,7 @@ class ArtgramRepository extends Artgrams {
       artgramScrapCount,
       artgramCommentCount,
       createdAt: dayjs(artgram.createdAt)
-        .locale("en")
+        // .locale("en")
         .format("YYYY-MM-DD HH:mm:ss"),
     };
 
