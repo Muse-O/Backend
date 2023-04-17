@@ -25,7 +25,7 @@ class SearchContorller {
    */
   selectResult = async (req, res, next) => {
     try {
-      const { keyWord, type } = req.query;
+      const { keyWord, type } = req.body;
       const selectKeyword = await this.searchService.selectResult(
         keyWord,
         type
@@ -60,6 +60,30 @@ class SearchContorller {
     try {
       const findHistory = await this.searchService.recentSearchHistory();
       res.status(200).json({ recentHistory: findHistory });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  /**
+   * 연관 검색어 기능
+   */
+  searchTerms = async (req, res, next) => {
+    // try {
+    const { searchTerm } = req.query;
+    const relatedSearchTerms = await this.searchService.searchTerms(searchTerm);
+    res.status(200).json({ relatedSearchTerms });
+    // } catch (err) {
+    //   next(err);
+    // }
+  };
+
+  /**
+   * 메뉴별 검색 구분기능
+   */
+  searchByType = async (req, res, next) => {
+    try {
+      const { category, keyWord } = req.query;
     } catch (err) {
       next(err);
     }
