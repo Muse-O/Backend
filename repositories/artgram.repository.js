@@ -321,9 +321,10 @@ class ArtgramRepository extends Artgrams {
       artgramCommentCount,
       liked: !!likedByCurrentUser,
       scrap: !!scrapByCurrentUser,
-      createdAt: dayjs(thisArtgram.createdAt)
-        .locale("en")
-        .format("YYYY-MM-DD HH:mm:ss"),
+      createdAt: thisArtgram.createdAt,
+      // : dayjs(thisArtgram.createdAt)
+      //   .locale("en")
+      //   .format("YYYY-MM-DD HH:mm:ss"),
     };
 
     return { detailArtgram };
@@ -408,9 +409,10 @@ class ArtgramRepository extends Artgrams {
       artgramLikeCount,
       artgramScrapCount,
       artgramCommentCount,
-      createdAt: dayjs(artgram.createdAt)
-        .locale("en")
-        .format("YYYY-MM-DD HH:mm:ss"),
+      createdAt: artgram.createdAt,
+      // : dayjs(artgram.createdAt)
+      //   .locale("en")
+      //   .format("YYYY-MM-DD HH:mm:ss"),
     };
 
     return { detailArtgram };
