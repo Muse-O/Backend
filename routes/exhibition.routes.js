@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const authMiddleware = require('../middlewares/authMiddleware');
+const publicAuthMiddleware = require("../middlewares/authMiddleware_public");
 const ExhibitionController = require("../controllers/exhibition.controller");
 const CommonAPIController = require("../controllers/commonAPI.controller")
 
@@ -9,9 +10,9 @@ const exhibitionController = new ExhibitionController();
 const commonAPIController = new CommonAPIController();
 
 // 전시회 목록 조회
-router.get("/", exhibitionController.getExhibitionList);
+router.get("/", publicAuthMiddleware, exhibitionController.getExhibitionList);
 // 전시회 상세 조회
-router.get("/view/:exhibitionId", exhibitionController.getExhibitionDetail);
+router.get("/view/:exhibitionId", publicAuthMiddleware, exhibitionController.getExhibitionDetail);
 // 전시회 등록
 router.post("/write", authMiddleware, exhibitionController.writeExhibition);
 // 전시회 수정
@@ -25,6 +26,6 @@ router.patch("/like/:exhibitionId", authMiddleware, exhibitionController.likeExh
 // 전시회 카테고리 조회
 router.get("/category", commonAPIController.getCategory);
 // 전시회 카테고리 검색
-router.get("/category/search", exhibitionController.searchCategoryExhibition);
+router.get("/category/search", publicAuthMiddleware, exhibitionController.searchCategoryExhibition);
 
 module.exports = router;
