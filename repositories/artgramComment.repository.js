@@ -54,7 +54,7 @@ class ArtgramCommentRepository extends ArtgramsComment {
     const findComment = await ArtgramsComment.findAll({
       where: {
         artgramId,
-        commentParent: null,
+        // [Sequelize.Op.or]: [{ commentParent: null }, { commentParent: 0 }],
         commentStatus: {
           [Op.ne]: "CS04",
         },
@@ -64,14 +64,27 @@ class ArtgramCommentRepository extends ArtgramsComment {
       order: [["createdAt", "DESC"]],
     });
 
-    const findArtgramComment = findComment.map((comment) => ({
-      commentId: comment.commentId,
-      userEmail: comment.userEmail,
-      profileImg,
-      profileNickname,
-      comment: comment.comment,
-      createdAt: comment.createdAt,
-    }));
+    const findArtgramComment = [];
+
+    for (const comment of findComment) {
+      const replyCount =
+        (await ArtgramsComment.count({
+          where: {
+            commentParent: comment.commentId,
+          },
+        })) || 0;
+
+      findArtgramComment.push({
+        commentId: comment.commentId,
+        userEmail: comment.userEmail,
+        profileImg,
+        profileNickname,
+        comment: comment.comment,
+        createdAt: comment.createdAt,
+        replyCount,
+      });
+    }
+
     return findArtgramComment;
   };
 
