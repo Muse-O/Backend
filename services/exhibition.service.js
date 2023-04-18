@@ -1,9 +1,11 @@
 const Boom = require("boom");
 const ExhibitionRepository = require("../repositories/exhibition.repository");
+const NotiRepository = require("../repositories/notification.repository")
 
 class ExhibitionService {
   constructor() {
     this.exhibitionRepository = new ExhibitionRepository();
+    this.notiRepository = new NotiRepository();
   }
 
   /**
@@ -181,6 +183,20 @@ class ExhibitionService {
 
     if(!updateExhibitionLike === 'create' || !updateExhibitionLike === 'delete'){
       throw Boom.notFound("좋아요 등록/취소에 실패했습니다. 해당 게시글이 존재하지 않거나 요청에 실패했습니다.");
+    }
+
+    if (updateExhibitionLike=="create"){
+      const noti_receiver = await this.exhibitionRepository.findNotiReceiver(exhibitionId);
+      const noti_sender = await this.notiRepository.findNotiSenderProfile(userEmail);
+      const notiData = {
+        noti_sender : userEmail,
+        noti_sender_nickname: noti_sender.profile_nickname,
+        noti_sender_profileImg: noti_sender.profile_img,
+        noti_type: 'like',
+        noti_content: 'exhibition',
+        noti_content_id: exhibitionId
+      };
+      await this.notiRepository.saveToStream(noti_receiver, notiData)
     }
 
     return updateExhibitionLike;
