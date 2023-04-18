@@ -25,11 +25,9 @@ class SearchContorller {
    */
   selectResult = async (req, res, next) => {
     try {
-      const { keyWord, type } = req.body;
-      const selectKeyword = await this.searchService.selectResult(
-        keyWord,
-        type
-      );
+      const { title, type } = req.body;
+      console.log(title);
+      const selectKeyword = await this.searchService.selectResult(title, type);
       res
         .status(200)
         .json({ selectKeyword, message: "검색기록저장되었습니다" });
@@ -44,13 +42,13 @@ class SearchContorller {
    * @return
    */
   autocomplete = async (req, res, next) => {
-    try {
-      const { keyWord } = req.query;
-      const autoSearch = await this.searchService.autocomplete(keyWord);
-      res.status(200).json({ autoSearch });
-    } catch (err) {
-      next(err);
-    }
+    // try {
+    const { searchText } = req.query;
+    const autoSearch = await this.searchService.autocomplete(searchText);
+    res.status(200).json({ autoSearch });
+    // } catch (err) {
+    //   next(err);
+    // }
   };
 
   /**
@@ -71,6 +69,7 @@ class SearchContorller {
   searchByType = async (req, res, next) => {
     try {
       const { category, keyWord } = req.query;
+      console.log(category);
       const categorySearch = await this.searchService.searchByType(
         category,
         keyWord

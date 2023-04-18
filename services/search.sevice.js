@@ -26,10 +26,11 @@ class SearchService {
 
   /**
    * 전시회 검색기록저장
-   * @param {query} keyWord
+   * @param {query} title
    */
-  selectResult = async (keyWord, type) => {
-    const saveResult = this.searchRepositroy.selectResult(keyWord, type);
+  selectResult = async (title, type) => {
+    console.log(title);
+    const saveResult = this.searchRepositroy.selectResult(title, type);
     return saveResult;
   };
 
@@ -38,12 +39,12 @@ class SearchService {
    * @param {query} keyWord
    * @returns
    */
-  autocomplete = async (keyWord) => {
+  autocomplete = async (searchText) => {
     const artgramSuggestions = await this.searchRepositroy.autocompleteArtgrams(
-      keyWord
+      searchText
     );
     const exhibitionSuggestions =
-      await this.searchRepositroy.autocompleteExhibition(keyWord);
+      await this.searchRepositroy.autocompleteExhibition(searchText);
 
     return {
       artgramTitles: artgramSuggestions,
@@ -67,10 +68,10 @@ class SearchService {
    */
   searchByType = async (category, keyWord) => {
     let findByCategory;
-    if (category === "exhibition") {
-      findByCategory = await this.searchRepositroy.searchExhibition(keyWord);
-    } else if (category === "artgram") {
+    if (category === "artgram") {
       findByCategory = await this.searchRepositroy.searchArtgrams(keyWord);
+    } else if (category === "exhibition") {
+      findByCategory = await this.searchRepositroy.searchExhibition(keyWord);
     }
 
     return findByCategory;
