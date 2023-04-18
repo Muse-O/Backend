@@ -619,6 +619,17 @@ class ExhibitionRepository {
   };
 
   /**
+   * 전시 게시글 좋아요 시 작성자에게 알림 발송하기 위해 작성자 조회
+   * @param {string} exhibitionId 
+   * @returns 전시회 게시글 작성자 이메일
+   */
+  findNotiReceiver = async (exhibitionId) => {
+    const author = await Exhibitions.findByPk(exhibitionId,{attributes:['user_email']})
+
+    return author.dataValues.user_email;
+  }
+
+  /**
    * 전시 게시글 카테고리별 검색
    * @param {array[string]} categories
    * @returns 검색된 게시글 리스트
