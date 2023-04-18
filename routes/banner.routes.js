@@ -4,6 +4,10 @@ const router = express.Router();
 const BannerController = require("../controllers/banner.controller");
 const bannerController = new BannerController();
 
+
+
+// 현재 날짜에(한국 시간) 전시중인 전시회 중 작성 시간 순 개인 전시글
+router.get("/getPersonalExhibitionsByRecent", bannerController.getPersonalExhibitionsByRecent);
 // 현재 날짜에(한국 시간) 전시중인 전시회 중 좋아요 순 전시글
 router.get("/getOpenExhibitionsSortedByMostLike", bannerController.getOpenExhibitionsSortedByMostLike);
 // 현재 날짜에(한국 시간) 전시중인 전시회 중 작성일 최근순 전시글

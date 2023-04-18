@@ -6,26 +6,37 @@ const {
   ExhibitionAddress,
   ExhibitionLike,
   ExhibitionScrap,
+  ExhibitionReviews,
   UserProfile,
   sequelize,
 } = require("../models");
 const { Op } = require("sequelize");
 
-class ExhibitionRepository {
+const { isNotNull } = require("../modules/isNotNull.js")
 
+const dayjs = require("dayjs");
+require("dayjs/locale/ko"); // 현재 지역에 해당하는 locale 로드 현재 국내 서비스이므로 한국 시간 설정
+
+class ExhibitionRepository {
   /**
    * 전시 게시글 목록 조회
    * @param {number} limit 요청할 전시 게시글 수
    * @param {number} offset 조회 전시 게시글 시작점
+   * @param {string} userEmail 유저 이메일
    * @returns exhibitionItem
    */
-  getExhibitionList = async (limit, offset) => {
-    const result = await sequelize.query(
-      `
+  getExhibitionList = async (limit, offset, userEmail) => {
+    const now = dayjs(); // 현재 지역별 시간 데이터를 가져옴
+    const formatted = now.locale("ko").format("YYYY-MM-DD HH:mm:ss");
+
+    const result = await sequelize
+      .query(
+        `
       SELECT
       e.exhibition_id AS exhibitionId,
       e.user_email AS userEmail,
       e.exhibition_title AS exhibitionTitle,
+      e.exhibition_eng_title AS exhibitionEngTitle,
       e.exhibition_desc AS exhibitionDesc,
       e.start_date AS startDate,
       e.end_date AS endDate,
@@ -34,18 +45,41 @@ class ExhibitionRepository {
       e.art_work_cnt AS artWorkCnt,
       e.location,
       e.contact,
+      e.exhibition_host AS exhibitionHost,
+      get_code_name(e.exhibition_host) AS exhibitionHostName,
       e.exhibition_kind AS exhibitionKind,
+      get_code_name(e.exhibition_kind) AS exhibitionKindName,
+      e.exhibition_link AS exhibitionLink,
       e.exhibition_online_link AS exhibitionOnlineLink,
       e.location,
       e.agency_and_sponsor AS agencyAndSponsor,
       e.exhibition_status AS exhibitionStatus,
       get_code_name(e.exhibition_status) AS exhibitionStatusName,
+      e.open_time AS openTime,
+      e.close_time AS closeTime,
+      e.open_day AS openDay,
+      e.close_day AS closeDay,
       e.created_at AS createdAt,
-      e.updated_at AS updatedAt,
+      (CASE
+          WHEN e.start_date > '${formatted}' THEN '전시 예정'
+          WHEN e.end_date < '${formatted}' THEN '전시 종료'
+          ELSE '전시 진행'
+      END) AS exhibitionStatus,
+      COALESCE(r.reviewAvgRating, 0) AS reviewAvgRating,
+      COALESCE(r.reviewCnt, 0) AS reviewCnt,
+      (CASE 
+          WHEN l.user_email = '${userEmail}' THEN 1
+          ELSE 0
+      END) liked,
+      (CASE 
+          WHEN s.user_email = '${userEmail}' THEN 1
+          ELSE 0
+      END) scraped,
       COALESCE(l.likeCnt, 0) AS likeCnt,
       COALESCE(s.scrapCnt, 0) AS scrapCnt,
-      GROUP_CONCAT(ec.exhibition_code ORDER BY ec.created_at) AS categoryCode,
-      GROUP_CONCAT(get_code_name(ec.exhibition_code) ORDER BY ec.created_at) AS categoryCodeName,
+      GROUP_CONCAT(DISTINCT h.tag_name ORDER BY h.tagRank DESC) AS tagName,
+      GROUP_CONCAT(DISTINCT ec.exhibition_code ORDER BY ec.created_at DESC) AS categoryCode,
+      GROUP_CONCAT(DISTINCT get_code_name(ec.exhibition_code) ORDER BY ec.created_at DESC) AS categoryCodeName,
       p.profile_id AS authorProfileId,
       p.profile_nickname AS authorNickName,
       p.profile_img AS authorProfileImg,
@@ -54,6 +88,7 @@ class ExhibitionRepository {
       LEFT JOIN (
         SELECT
             exhibition_id,
+            user_email,
             COUNT(exhibition_like_id) AS likeCnt
         FROM exhibition_like
         GROUP BY exhibition_id
@@ -61,10 +96,25 @@ class ExhibitionRepository {
       LEFT JOIN (
         SELECT
             exhibition_id,
+            user_email,
             COUNT(exhibition_scrap_id) AS scrapCnt
         FROM exhibition_scrap
         GROUP BY exhibition_id
       ) AS s ON e.exhibition_id = s.exhibition_id
+      LEFT JOIN (
+        SELECT
+            exhibition_id,
+            ROUND(AVG(review_rating),2) AS reviewAvgRating,
+            COUNT(exhibition_review_id) AS reviewCnt
+        FROM exhibition_review
+        GROUP BY exhibition_id
+      ) AS r ON e.exhibition_id = r.exhibition_id
+      LEFT JOIN (
+        SELECT exhibition_id, tag_name, COUNT(exhibition_tag_id) AS tagRank
+        FROM exhibition_hashtag
+        WHERE is_use = 'Y'
+        GROUP BY exhibition_id, tag_name
+      ) AS h ON e.exhibition_id = h.exhibition_id
       LEFT JOIN exhibition_category ec ON e.exhibition_id = ec.exhibition_id
       LEFT JOIN (
         SELECT
@@ -74,7 +124,7 @@ class ExhibitionRepository {
             profile_img,
             profile_intro
         FROM user_profile
-      ) AS p ON e.user_email = p.user_email
+      ) AS p ON e.user_email = p.user_email 
       WHERE e.exhibition_status != 'ES04'
       GROUP BY e.exhibition_id
       ORDER BY e.created_at DESC
@@ -82,8 +132,19 @@ class ExhibitionRepository {
       OFFSET ${offset};
       `,
         { type: sequelize.QueryTypes.SELECT }
-      )
-      .catch((err) => console.log(err));
+      );
+
+      result.forEach((row, idx) => {
+        const {tagName, categoryCode, categoryCodeName} = row;
+      
+        const tagNames = tagName ? tagName.split(',') : [];
+        const categoryCodes = categoryCode ? categoryCode.split(',') : [];
+        const categoryCodeNames = categoryCodeName ? categoryCodeName.split(',') : [];
+
+        result[idx].tagName = tagNames
+        result[idx].categoryCode = categoryCodes
+        result[idx].categoryCodeName = categoryCodeNames
+      });
 
     const exhibitionList = {
       rows: result,
@@ -107,27 +168,41 @@ class ExhibitionRepository {
 
   /**
    * 전시 상세 조회
-   * @param {string} exhibitionId 
+   * @param {string} exhibitionId
+   * @param {string} userEmail 유저 이메일
    * @returns exhibitionInfo
    */
-  getExhibitionInfo = async (exhibitionId) => {
+  getExhibitionInfo = async (exhibitionId, userEmail) => {
+    const now = dayjs(); // 현재 지역별 시간 데이터를 가져옴
+    const formatted = now.locale("ko").format("YYYY-MM-DD HH:mm:ss");
+    
     const exhibitionItem = await Exhibitions.findOne({
       include: [
         {
           model: ExhibitionImg,
-          attributes: [[sequelize.literal('img_order'), 'order'], "imgUrl", "imgCaption"],
+          attributes: [
+            [sequelize.literal("img_order"), "order"],
+            "imgUrl",
+            "imgCaption",
+          ],
           order: [["img_order", "ASC"]],
         },
         {
           model: ExhibitionAuthor,
-          attributes: [[sequelize.literal('author_order'), 'order'],[sequelize.literal('author_name'), 'author']],
+          attributes: [
+            [sequelize.literal("author_order"), "order"],
+            [sequelize.literal("author_name"), "author"],
+          ],
           order: [["author_id", "ASC"]],
         },
         {
           model: ExhibitionCategory,
           attributes: [
             "categoryCode",
-            [sequelize.literal("get_code_name(exhibition_code)"), "categoryName"],
+            [
+              sequelize.literal("get_code_name(exhibition_code)"),
+              "categoryName",
+            ],
           ],
         },
         {
@@ -149,18 +224,110 @@ class ExhibitionRepository {
           ],
         },
       ],
+      attributes: [
+        "exhibitionId",
+        "userEmail",
+        "exhibitionTitle",
+        "exhibitionEngTitle",
+        "exhibitionDesc",
+        "exhibitionKind",
+        [
+          sequelize.literal(
+            "get_code_name(Exhibitions.exhibition_kind)"
+          ),
+          "exhibitionKindName",
+        ],
+        "exhibitionHost",
+        [
+          sequelize.literal(
+            "get_code_name(Exhibitions.exhibition_host)"
+          ),
+          "exhibitionHostName",
+        ],
+        "exhibitionLink",
+        "exhibitionOnlineLink",
+        "startDate",
+        "endDate",
+        "openTime",
+        "closeTime",
+        "openDay",
+        "closeDay",
+        "entranceFee",
+        "postImage",
+        "artWorkCnt",
+        "contact",
+        "agencyAndSponsor",
+        "location",
+        "exhibitionStatus",
+        "createdAt",
+      ],
       where: { exhibitionId, exhibition_status: { [Op.ne]: ["ES04"] } },
-    }).catch((err) => console.log(err));
+    }).catch(err => console.log(err));
 
     const userProfile = await UserProfile.findOne({
       where: { userEmail: exhibitionItem.userEmail },
     });
 
+    const likeCnt = await ExhibitionLike.count({
+      where: { exhibitionId }
+    })
+
+    const scrapCnt = await ExhibitionScrap.count({
+      where: { exhibitionId }
+    })
+
+    const reviewStatus = await ExhibitionReviews.findAll({
+      attributes: [
+        [
+          sequelize.fn('COUNT', sequelize.col('exhibition_review_id')), 'reviewCnt'
+        ],
+        [
+          sequelize.fn('ROUND', sequelize.fn('AVG', sequelize.col('review_rating')), 2), 'reviewAvgRating'
+        ],
+        [
+          sequelize.fn('SUM', sequelize.where(sequelize.col('review_rating'), 1)), 'ratingOneCnt'
+        ],
+        [
+          sequelize.fn('SUM', sequelize.where(sequelize.col('review_rating'), 2)), 'ratingTwoCnt'
+        ],
+        [
+          sequelize.fn('SUM', sequelize.where(sequelize.col('review_rating'), 3)), 'ratingThreeCnt'
+        ],
+        [
+          sequelize.fn('SUM', sequelize.where(sequelize.col('review_rating'), 4)), 'ratingFourCnt'
+        ],
+        [
+          sequelize.fn('SUM', sequelize.where(sequelize.col('review_rating'), 5)), 'ratingFiveCnt'
+        ]
+      ],
+      where: {exhibitionId}
+    })
+
+    const liked = await ExhibitionLike.findOne({
+      where: { exhibitionId, user_email: userEmail }
+    })
+
+    const scraped = await ExhibitionScrap.findOne({
+      where: { exhibitionId, user_email: userEmail }
+    })
+
     const exhibitionInfo = exhibitionItem.toJSON();
 
-    if(userProfile){
+    exhibitionInfo.likeCnt = likeCnt;
+    exhibitionInfo.scrapCnt = scrapCnt;
+    exhibitionInfo.reviewStatus = reviewStatus;
+    exhibitionInfo.liked = liked instanceof ExhibitionLike ? 1 : 0;
+    exhibitionInfo.scraped = scraped instanceof ExhibitionScrap ? 1 : 0;
+
+    const startDate = new Date(exhibitionInfo.startDate);
+    const endDate = new Date(exhibitionInfo.endDate);
+    const targetDate = new Date(formatted);
+
+    exhibitionInfo.exhibitionStatus = startDate.getTime() > targetDate.getTime() ? '전시 예정' : endDate.getTime() < targetDate.getTime() ? '전시 종료' : '전시 진행'
+
+    if (userProfile) {
       exhibitionInfo.authorProfile = userProfile.toJSON();
-    }else{
+    } else {
       exhibitionInfo.authorProfile = {};
     }
 

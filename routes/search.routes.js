@@ -11,15 +11,27 @@ router.get("/", searchController.search);
 
 /**
  * 검색기록저장
- * 전시회
- * 아트그램
-//  */
-// router.post("/saveSelectedExhibition", searchController.selectExhibition);
-// router.post("/saveSelectedArtgram", searchController.selectArtgram);
+ */
+router.post("/save", searchController.selectResult);
 
 /**
  * 자동완성기능
  */
 router.get("/auto", searchController.autocomplete);
+
+/**
+ * 최근검색기록
+ */
+router.get("/recent", searchController.recentSearchHistory);
+
+/**
+ * 메뉴별 검색 구분기능
+ */
+router.get("/category", searchController.searchByType);
+
+/**
+ * 연관 검색어 기능
+ */
+// router.get("/related", searchController.searchTerms);
 
 module.exports = router;

@@ -15,6 +15,8 @@ class ExhibitionController {
    */
   getExhibitionList = async (req, res, next) => {
     try {
+      const { userEmail = ""} = res.locals.user;
+      
       const { limit = 10, offset = 0 } = await pageQuerySchema
         .validateAsync(req.query)
         .catch((err) => {
@@ -24,7 +26,8 @@ class ExhibitionController {
 
       const exhibitionItem = await this.exhibitionService.getExhibitionList(
         Number(limit),
-        Number(offset)
+        Number(offset),
+        userEmail
       );
 
       return res.status(200).json({
@@ -41,6 +44,8 @@ class ExhibitionController {
    */
   getExhibitionDetail = async (req, res, next) => {
     try {
+      const { userEmail = ""} = res.locals.user;
+
       const { exhibitionId } = await pkIdParamSchema
         .validateAsync(req.params)
         .catch((err) => {
@@ -49,7 +54,8 @@ class ExhibitionController {
         });
 
       const exhibitionInfo = await this.exhibitionService.getExhibitionInfo(
-        exhibitionId
+        exhibitionId,
+        userEmail
       );
 
       return res
@@ -224,6 +230,7 @@ class ExhibitionController {
    */
   searchCategoryExhibition = async (req, res, next) => {
     try {
+      const { userEmail = ""} = res.locals.user;
       const { ...item } = await categorySchema
         .validateAsync(req.query)
         .catch((err) => {
@@ -233,7 +240,8 @@ class ExhibitionController {
 
       const searchExhibition =
         await this.exhibitionService.searchCategoryExhibition(
-          Object.values(item)
+          Object.values(item),
+          userEmail
         );
 
       return res

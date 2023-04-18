@@ -74,7 +74,8 @@ module.exports = (sequelize, DataTypes) => {
     exhibitionEngTitle: {
       allowNull: false,
       type: DataTypes.STRING,
-      field: 'exhibition_eng_title'
+      field: 'exhibition_eng_title',
+      defaultValue: '미지정'
     },
     exhibitionDesc: {
       allowNull: false,
@@ -85,6 +86,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.STRING,
       field: 'exhibition_kind'
+    },
+    exhibitionHost: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      field: 'exhibition_host'
     },
     exhibitionLink: {
       allowNull: true,
@@ -109,30 +115,32 @@ module.exports = (sequelize, DataTypes) => {
     openTime: {
       type: DataTypes.TIME,
       allowNull: false,
-      field: 'open_time'
+      field: 'open_time',
+      defaultValue: '00:00:00'
     },
     closeTime: {
       type: DataTypes.TIME,
       allowNull: false,
-      field: 'close_time'
+      field: 'close_time',
+      defaultValue: '00:00:00'
     },
     openDay: {
-      type: DataTypes.ENUM('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Weekdays'),
+      type: DataTypes.ENUM('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Weekdays', '미지정'),
       allowNull: true,
-      field: 'oepn_day',
-      defaultValue: 'Weekdays'
+      field: 'open_day',
+      defaultValue: '미지정'
     },
     closeDay: {
-      type: DataTypes.ENUM('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Weekdays'),
+      type: DataTypes.ENUM('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Weekdays', '미지정'),
       allowNull: true,
       field: 'close_day',
-      defaultValue: 'Weekdays'
+      defaultValue: '미지정'
     },
     entranceFee: {
       allowNull: true,
       type: DataTypes.STRING,
       field: 'entrance_fee',
-      defaultValue: 'not written entrance fee'
+      defaultValue: '미지정'
     },
     postImage: {
       allowNull: true,
@@ -143,19 +151,19 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       type: DataTypes.STRING,
       field: 'art_work_cnt',
-      defaultValue: 'not written number of works'
+      defaultValue: '미지정'
     },
     contact: {
       allowNull: true,
       type: DataTypes.STRING,
       field: 'contact',
-      defaultValue: 'not written contact'
+      defaultValue: '미지정'
     },
     agencyAndSponsor: {
       allowNull: true,
       type: DataTypes.STRING,
       field: 'agency_and_sponsor',
-      defaultValue: 'not written agencyAndSponsor'
+      defaultValue: '미지정'
     },
     location: {
       allowNull: false,

@@ -139,12 +139,12 @@ class ArtgramCommentRepository extends ArtgramsComment {
     const findAllReply = await ArtgramsComment.findAll({
       where: {
         artgramId,
-        commentId,
         commentStatus: {
           [Op.ne]: "CS04",
         },
         commentParent: {
           [Op.ne]: null,
+          [Op.eq]: commentId, // commentParent와 commentId가 같은 경우에만 조회
         },
       },
       attributes: [
