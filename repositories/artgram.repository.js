@@ -541,6 +541,17 @@ class ArtgramRepository extends Artgrams {
   };
 
   /**
+   * 아트그램 게시글 좋아요 시 작성자에게 알림 발송하기 위해 작성자 조회
+   * @param {string} artgramId 
+   * @returns 아트그램 게시글 작성자 이메일
+   */
+  findNotiReceiver = async (artgramId) => {
+    const author = await Artgrams.findByPk(artgramId,{attributes:['user_email']})
+
+    return author.dataValues.user_email;
+  }
+
+  /**
    * 아트그램 스크랩등록/취소
    * @param {string} artgramId
    * @param {string} userEmail

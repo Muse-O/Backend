@@ -1,9 +1,11 @@
 const ArtgramRepository = require("../repositories/artgram.repository");
 const Boom = require("boom");
+const NotiRepository = require("../repositories/notification.repository")
 
 class ArtgramService {
   constructor() {
     this.artgramRepository = new ArtgramRepository();
+    this.notiRepository = new NotiRepository();
   }
 
   /**
@@ -116,6 +118,21 @@ class ArtgramService {
       artgramId,
       userEmail
     );
+
+    if (likeartgram=="create"){
+      const noti_receiver = await this.artgramRepository.findNotiReceiver(artgramId);
+      const noti_sender = await this.notiRepository.findNotiSenderProfile(userEmail);
+      const notiData = {
+        noti_sender : userEmail,
+        noti_sender_nickname: noti_sender.profile_nickname,
+        noti_sender_profileImg: noti_sender.profile_img,
+        noti_type: 'like',
+        noti_content: 'artgram',
+        noti_content_id: artgramId
+      };
+      await this.notiRepository.saveToStream(noti_receiver, notiData)
+    }
+    
     return likeartgram;
   };
 
