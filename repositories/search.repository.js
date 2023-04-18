@@ -1,16 +1,12 @@
 const { searchHistory, Artgrams, Exhibitions } = require("../models");
 const { Sequelize, Op } = require("sequelize");
 const RedisClient = require("../config/redisConnector");
-// const {
-//   RedisElasticsearchConnector,
-// } = require("../config/elasticSearch-redisConnector");
-// const redisElasticsearchConnectorInstance = new RedisElasticsearchConnector();
+const client = require("../config/elasticSearch-Connector");
 
 class SearchRepositroy extends searchHistory {
   constructor() {
     super();
     this.redisClient = RedisClient.getClient();
-    // this.connector = redisElasticsearchConnectorInstance;
   }
   /**
    * 아트그램 검색어 조회
@@ -139,23 +135,46 @@ class SearchRepositroy extends searchHistory {
   /**
    * 연관 검색어 기능
    */
-  async searchTerms(searchTerm) {
-    const { body } = await this.connector.esClient.search({
-      index: "your-index-name",
+  searchTerms = async (searchTerm) => {
+    const rows = await Artgrams.findAll({
+      attributes: ["artgram_title", "artgram_desc"],
+      where: Sequelize.literal(
+        `MATCH(artgram_title, artgram_desc) AGAINST (:searchTerm IN NATURAL LANGUAGE MODE)`
+      ),
+      replacements: { searchTerm },
+    }).concat(
+      await Exhibitions.findAll({
+        attributes: ["exhibition_title", "exhibition_desc"],
+        where: Sequelize.literal(
+          `MATCH(exhibition_title, exhibition_desc) AGAINST (:searchTerm IN NATURAL LANGUAGE MODE)`
+        ),
+        replacements: { searchTerm },
+      })
+    );
+
+    const relatedSearchTerms = rows.map(
+      (row) =>
+        row.artgram_title + " " + row.artgram_desc ||
+        row.exhibition_title + " " + row.exhibition_desc
+    );
+
+    const results = await client.search({
+      index: "your_elasticsearch_index_name",
       body: {
         query: {
           match: {
-            fieldName: searchTerm,
+            your_elasticsearch_field_name: relatedSearchTerms.join(" "),
           },
         },
       },
     });
 
-    const relatedSearchTerms = body.hits.hits.map(
-      (hit) => hit._source.fieldName
+    const hits = results.hits.hits;
+    const relatedSearchTermsInElasticsearch = hits.map(
+      (hit) => hit._source.your_elasticsearch_field_name
     );
-    return relatedSearchTerms;
-  }
+    return relatedSearchTermsInElasticsearch;
+  };
 }
 
 module.exports = SearchRepositroy;
