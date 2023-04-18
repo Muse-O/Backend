@@ -1,9 +1,11 @@
 const ArtgramCommentRepository = require("../repositories/artgramComment.repository");
+const NotiRepository = require("../repositories/notification.repository")
 const Boom = require("boom");
 
 class ArtgramCommentService {
   constructor() {
     this.artgramCommentRepository = new ArtgramCommentRepository();
+    this.notiRepository = new NotiRepository();
   }
 
   /**
@@ -20,6 +22,17 @@ class ArtgramCommentService {
       comment,
       artgramId
     );
+    const noti_receiver = await this.artgramCommentRepository.findNotiReceiver(artgramId);
+    const noti_sender = await this.notiRepository.findNotiSenderProfile(userEmail);
+    const notiData = {
+        noti_sender : userEmail,
+        noti_sender_nickname: noti_sender.profile_nickname,
+        noti_sender_profileImg: noti_sender.profile_img,
+        noti_type: 'comment',
+        noti_content: 'artgram',
+        noti_content_id: artgramId
+      };
+    await this.notiRepository.saveToStream(noti_receiver, notiData)
 
     return artgramcomment;
   };
@@ -111,6 +124,17 @@ class ArtgramCommentService {
       commentId,
       comment
     );
+    const noti_receiver = await this.artgramCommentRepository.findreplyNotiReceiver(commentId);
+    const noti_sender = await this.notiRepository.findNotiSenderProfile(userEmail);
+    const notiData = {
+        noti_sender : userEmail,
+        noti_sender_nickname: noti_sender.profile_nickname,
+        noti_sender_profileImg: noti_sender.profile_img,
+        noti_type: 'reply',
+        noti_content: 'artgram',
+        noti_content_id: artgramId
+      };
+    await this.notiRepository.saveToStream(noti_receiver, notiData)
     return createReply;
   };
 

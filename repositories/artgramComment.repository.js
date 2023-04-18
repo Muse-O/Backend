@@ -32,6 +32,28 @@ class ArtgramCommentRepository extends ArtgramsComment {
   };
 
   /**
+   * 아트그램 게시글 댓글 작성 시 작성자에게 알림 발송하기 위해 작성자 조회
+   * @param {string} artgramId 
+   * @returns 아트그램 게시글 작성자 이메일
+   */
+  findNotiReceiver = async (artgramId) => {
+    const author = await Artgrams.findByPk(artgramId,{attributes:['user_email']})
+
+    return author.dataValues.user_email;
+  }
+
+  /**
+   * 아트그램 게시글 답글 작성 시 댓글 작성자에게 알림 발송하기 위해 작성자 조회
+   * @param {string} artgramId 
+   * @returns 댓글 작성자 이메일
+   */
+  findreplyNotiReceiver = async (commentId) => {
+    const author = await ArtgramsComment.findByPk(commentId,{attributes:['user_email']})
+    
+    return author.dataValues.user_email;
+  }
+
+  /**
    * 댓글 전체조회
    * @param {string} artgramId
    * @returns artgramId에 해당하는 댓글전체반환 findArtgramComment
