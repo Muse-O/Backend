@@ -1,5 +1,5 @@
 const SearchRepositroy = require("../repositories/search.repository");
-const RedisElasticsearchConnector = require("../config/elasticSearch-redisConnector");
+const RedisElasticsearchConnector = require("../config/redisConnector");
 
 class SearchService {
   constructor() {
