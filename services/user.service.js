@@ -5,10 +5,12 @@ const { createHashPassword, comparePassword } = require("../modules/cryptoUtils.
 const Boom = require("boom");
 const RedisConnector = require("../config/redisConnector");
 const { transport } = require('../config/email')
+const NotiRepository = require("../repositories/notification.repository")
 
 class UserService {
   redisClient = RedisConnector.getClient();
   userRepository = new UserRepository();
+  notiRepository = new NotiRepository();
   
   //로그인
   userLogin = async (email, password) => {
@@ -100,6 +102,7 @@ class UserService {
   userSignup = async (email, nickname, password, author) => {
     const hashedPassword = await createHashPassword(password);
 
+    await this.notiRepository.createStream(email);
     await this.userRepository.userSignup(email, nickname, hashedPassword, author);
   };
 }

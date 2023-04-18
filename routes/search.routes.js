@@ -11,7 +11,7 @@ router.get("/", searchController.search);
 
 /**
  * 검색기록저장
-//  */
+ */
 router.post("/save", searchController.selectResult);
 
 /**
