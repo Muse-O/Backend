@@ -57,8 +57,7 @@ class ExhibitionRepository {
       get_code_name(e.exhibition_status) AS exhibitionStatusName,
       e.open_time AS openTime,
       e.close_time AS closeTime,
-      e.open_day AS openDay,
-      e.close_day AS closeDay,
+      e.significant AS significant,
       e.created_at AS createdAt,
       (CASE
           WHEN e.start_date > '${formatted}' THEN '전시 예정'
@@ -250,8 +249,7 @@ class ExhibitionRepository {
         "endDate",
         "openTime",
         "closeTime",
-        "openDay",
-        "closeDay",
+        "significant",
         "entranceFee",
         "postImage",
         "artWorkCnt",
