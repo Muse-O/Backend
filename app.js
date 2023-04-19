@@ -14,6 +14,7 @@ const swaggerUi = require("swagger-ui-express");
 const glob = require("glob");
 const passport = require("passport");
 const passportConfig = require("./passport");
+const { description } = require("./schemas/mypageReqSchema");
 
 const PORT = process.env.SERVER_PORT;
 const swaggerOptions = {
@@ -31,6 +32,10 @@ const swaggerOptions = {
         description: "유저등록",
       },
       {
+        name: "search",
+        description: "검색기능 로그인필요x",
+      },
+      {
         name: "artgram",
         description: "아트그램 CRUD",
       },
@@ -42,6 +47,10 @@ const swaggerOptions = {
       {
         name: "artgramReply",
         description: "아트그램 답글 CRUD",
+      },
+      {
+        name: "notification",
+        description: "알림기능",
       },
     ],
     securityDefinitions: {

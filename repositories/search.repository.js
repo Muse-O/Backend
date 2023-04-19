@@ -103,17 +103,22 @@ class SearchRepositroy extends searchHistory {
    * @returns
    */
   autocompleteArtgrams = async (searchText) => {
+    //입력된 문자열을 문자 단위로 분해한다
     const characters = searchText.split("");
 
+    //한글과 기타로 문자를 분리한다.
     const koreanChars = characters.filter(isKorean);
     const otherChars = characters.filter((char) => !isKorean(char));
 
     let chosungText = "";
+    //한글문자가 있다면 초성검색 패턴을 생성한다.
     if (koreanChars.length > 0) {
       chosungText = createFuzzyMatcherKor(koreanChars.join(""));
     }
 
+    //기타문자를 하나의 문자열로 연결
     const otherCharsText = otherChars.join("");
+    //데이터 베이스에서 일치하는 결과를 검색
     const rows = await Artgrams.findAll({
       attributes: ["artgramTitle"],
       where: {
