@@ -1,12 +1,15 @@
 const _ = require("lodash");
 
+// 한글 문자를 검사하여 searchText에 한글을 포함하는지 확인
 function isKorean(searchText) {
   return /[가-힣ㄱ-ㅎ]/.test(searchText);
 }
 
+//입력된 한글 문자에 대해 초성 검색을 위한 패턴을 생성
 function ch2pattern(searchText) {
   const offset = 44032;
 
+  //입력된 문자가 완성형 한글인 경우
   if (/[가-힣]/.test(searchText)) {
     const chCode = searchText.charCodeAt(0) - offset;
 
@@ -18,6 +21,7 @@ function ch2pattern(searchText) {
     return `[\\u${begin.toString(16)}-\\u${end.toString(16)}]`;
   }
 
+  //입력된 문자가 한글 자음인 경우
   if (/[ㄱ-ㅎ]/.test(searchText)) {
     const con2syl = {
       ㄱ: "가".charCodeAt(0),
@@ -38,18 +42,21 @@ function ch2pattern(searchText) {
     return `[${searchText}\\u${begin.toString(16)}-\\u${end.toString(16)}]`;
   }
 
+  //입력된 문자가 영어 알파벳인 경우
   if (/[a-zA-Z]/.test(searchText)) {
     return searchText;
   }
 
+  //입력된 문자가 위의 경우에 해당하지 않는 경우 정규식을 이스케이프한다.
   return _.escapeRegExp(searchText);
 }
 
+// 한글 초성 검색 패턴을 생성하는 함수
+// 입력된 문자열을 분해한 후 각 문자에 대해 ch2pattern 함수를 사용하여 패턴을 생성하고,
+// 모든 패턴을 '.*?'로 연결하여 반환한다.
 function createFuzzyMatcherKor(searchText) {
   const pattern = searchText.split("").map(ch2pattern).join(".*?");
   return pattern;
 }
 
-module.exports.createFuzzyMatcherKor = createFuzzyMatcherKor;
-module.exports.ch2pattern = ch2pattern;
-module.exports.isKorean = isKorean;
+module.exports = { createFuzzyMatcherKor, ch2pattern, isKorean };
