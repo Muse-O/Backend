@@ -1,7 +1,5 @@
 const Joi = require('joi');
 
-const validDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Weekdays', '미지정'];
-
 const exhibitionSchema = Joi.object({
   exhibitionId: Joi.string().allow(null).default(null),
   exhibitionTitle: Joi.string().required().messages({
@@ -32,8 +30,7 @@ const exhibitionSchema = Joi.object({
   }),
   exhibitionOnlineLink: Joi.string().allow(null, '').default('미지정'),
   exhibitionLink: Joi.string().allow(null, '').default('미지정'),
-  openDay: Joi.string().valid(...validDays).allow(null, '').empty('').default('미지정'),
-  closeDay: Joi.string().valid(...validDays).allow(null, '').empty('').default('미지정'),
+  significant: Joi.string().allow(null, '').empty('').default(''),
   openTime: Joi.date().required().messages({
     'date.empty': 'openTime(시작 시간)을 날짜형식의 문자열로 입력해주세요.',
     'any.required': 'openTime(시작 시간)값이 요청 파라미터로 전달되지 않았습니다.'

@@ -124,17 +124,11 @@ module.exports = (sequelize, DataTypes) => {
       field: 'close_time',
       defaultValue: '00:00:00'
     },
-    openDay: {
-      type: DataTypes.ENUM('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Weekdays', '미지정'),
+    significant: {
       allowNull: true,
-      field: 'open_day',
-      defaultValue: '미지정'
-    },
-    closeDay: {
-      type: DataTypes.ENUM('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Weekdays', '미지정'),
-      allowNull: true,
-      field: 'close_day',
-      defaultValue: '미지정'
+      type: DataTypes.STRING,
+      field: 'significant',
+      defaultValue: ''
     },
     entranceFee: {
       allowNull: true,
