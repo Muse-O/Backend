@@ -31,11 +31,11 @@ const exhibitionSchema = Joi.object({
   exhibitionOnlineLink: Joi.string().allow(null, '').default('미지정'),
   exhibitionLink: Joi.string().allow(null, '').default('미지정'),
   significant: Joi.string().allow(null, '').empty('').default(''),
-  openTime: Joi.date().required().messages({
+  openTime: Joi.string().required().messages({
     'date.empty': 'openTime(시작 시간)을 날짜형식의 문자열로 입력해주세요.',
     'any.required': 'openTime(시작 시간)값이 요청 파라미터로 전달되지 않았습니다.'
   }),
-  closeTime: Joi.date().required().messages({
+  closeTime: Joi.string().required().messages({
     'date.empty': 'closeTime(시작 시간)을 날짜형식의 문자열로 입력해주세요.',
     'any.required': 'closeTime(시작 시간)값이 요청 파라미터로 전달되지 않았습니다.'
   }),
@@ -50,15 +50,15 @@ const exhibitionSchema = Joi.object({
   exhibitionCategoty: Joi.array().items(Joi.string()).allow(null, '').default([]),
   artImage: Joi.array().items(Joi.object(
     {
-      order: Joi.number().required().messages({
+      order: Joi.number().allow(null, '').empty('').messages({
         'string.empty': 'order(이미지 순서) 값을 입력해주세요.',
         'any.required': 'order(이미지 순서)값이 요청 파라미터로 전달되지 않았습니다.',
       }),
-      imgUrl: Joi.string().required().messages({
+      imgUrl: Joi.string().allow(null, '').empty('').messages({
         'string.empty': 'imgUrl(이미지 url) 값을 입력해주세요.',
         'any.required': 'imgUrl(이미지 url)값이 요청 파라미터로 전달되지 않았습니다.',
       }),
-      imgCaption: Joi.string().default(null)
+      imgCaption: Joi.string().allow(null, '').empty('').default(null)
     }
   )).default([]),
   authors: Joi.array().items(Joi.object(
