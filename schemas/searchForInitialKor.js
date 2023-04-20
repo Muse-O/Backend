@@ -1,5 +1,3 @@
-const _ = require("lodash");
-
 // 한글 문자를 검사하여 searchText에 한글을 포함하는지 확인
 function isKorean(searchText) {
   return /[가-힣ㄱ-ㅎ]/.test(searchText);
@@ -42,13 +40,25 @@ function ch2pattern(searchText) {
     return `[${searchText}\\u${begin.toString(16)}-\\u${end.toString(16)}]`;
   }
 
-  //입력된 문자가 영어 알파벳인 경우
-  if (/[a-zA-Z]/.test(searchText)) {
-    return searchText;
-  }
-
   //입력된 문자가 위의 경우에 해당하지 않는 경우 정규식을 이스케이프한다.
   return _.escapeRegExp(searchText);
+}
+
+//입력된 문자가 영어 알파벳인 경우
+function isEnglish(searchText) {
+  return /[A-Z a-z]/.test(searchText);
+}
+
+//영어를 문자단위로 분해
+function createFuzzyMatcherEng(searchText) {
+  const pattern = searchText.split("").join(".*?");
+  return pattern;
+}
+
+//특수문자 제거
+function removeSpecialCharacters(searchText) {
+  const SearchText = searchText.replace(/[<>]/g, "");
+  return SearchText.replace(/\./g, "\\.");
 }
 
 // 한글 초성 검색 패턴을 생성하는 함수
@@ -59,4 +69,11 @@ function createFuzzyMatcherKor(searchText) {
   return pattern;
 }
 
-module.exports = { createFuzzyMatcherKor, ch2pattern, isKorean };
+module.exports = {
+  createFuzzyMatcherKor,
+  ch2pattern,
+  isKorean,
+  isEnglish,
+  createFuzzyMatcherEng,
+  removeSpecialCharacters,
+};

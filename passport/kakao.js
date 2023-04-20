@@ -1,6 +1,8 @@
 const passport = require('passport');
 const KakaoStrategy = require('passport-kakao').Strategy;
 require("dotenv").config();
+const NotiRepository = require("../repositories/notification.repository")
+const notiRepository = new NotiRepository();
 
 const { Users, UserProfile } = require("../models");
 
@@ -37,6 +39,7 @@ module.exports = () => {
                   userEmail: `${profile.id}@kakao.login`,
                   profileNickname: profile.displayName,
                   });
+                  await notiRepository.createStream(`${profile.id}@kakao.login`);
                   done(null, newUser); // 회원가입하고 로그인 인증 완료
                }
             } catch (error) {

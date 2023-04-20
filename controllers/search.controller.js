@@ -12,9 +12,10 @@ class SearchContorller {
    */
   search = async (req, res, next) => {
     try {
-      const { keyWord } = req.query;
-      const searchText = await this.searchService.search(keyWord);
-      res.status(200).json({ keyWord: searchText });
+      const { searchText } = req.query;
+      console.log("searchText", searchText);
+      const search = await this.searchService.search(searchText);
+      res.status(200).json({ searchText: search });
     } catch (err) {
       next(err);
     }
@@ -37,21 +38,6 @@ class SearchContorller {
   };
 
   /**
-   * 자동완성
-   * @param {query} keyWord
-   * @return
-   */
-  autocomplete = async (req, res, next) => {
-    // try {
-    const { searchText } = req.query;
-    const autoSearch = await this.searchService.autocomplete(searchText);
-    res.status(200).json({ autoSearch });
-    // } catch (err) {
-    //   next(err);
-    // }
-  };
-
-  /**
    * 최근검색기록
    */
   recentSearchHistory = async (req, res, next) => {
@@ -64,15 +50,26 @@ class SearchContorller {
   };
 
   /**
+   * 인기순 TOP10
+   */
+  searchByRank = async (req, res, next) => {
+    try {
+      const searchRank = await this.searchService.searchByRank();
+      res.status(200).json({ searchRank });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  /**
    * 메뉴별 검색 구분기능
    */
   searchByType = async (req, res, next) => {
     try {
-      const { category, keyWord } = req.query;
-      console.log(category);
+      const { category, searchText } = req.query;
       const categorySearch = await this.searchService.searchByType(
         category,
-        keyWord
+        searchText
       );
       res.status(200).json({ categorySearch });
     } catch (err) {
@@ -83,15 +80,15 @@ class SearchContorller {
   /**
    * 연관 검색어 기능
    */
-  searchTerms = async (req, res, next) => {
-    // try {
-    const { searchTerm } = req.query;
-    const relatedSearchTerms = await this.searchService.searchTerms(searchTerm);
-    res.status(200).json({ relatedSearchTerms });
-    // } catch (err) {
-    //   next(err);
-    // }
-  };
+  // searchTerms = async (req, res, next) => {
+  // try {
+  // const { searchTerm } = req.query;
+  // const relatedSearchTerms = await this.searchService.searchTerms(searchTerm);
+  // res.status(200).json({ relatedSearchTerms });
+  // } catch (err) {
+  //   next(err);
+  // }
+  // };
 }
 
 module.exports = SearchContorller;

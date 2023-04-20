@@ -26,7 +26,7 @@ const searchController = new SearchContorller();
  *            keyWord:
  *              type: string
  *   post:
- *     summary: Saves search history for a given title and type
+ *     summary: 검색후 유저가 선택한 게시글저장
  *     tags: [search]
  *     requestBody:
  *       required: true
@@ -58,34 +58,11 @@ const searchController = new SearchContorller();
  *                 message:
  *                   type: string
  *                   description: "type(아트그램, 전시회)을 입력해주는 부분"
- *               example:
- *                 selectKeyword: Example keyword
- *                 message: Your search history has been saved
-
- * /search/auto:
- *   get:
- *     tags:
- *      - search
- *     summary: "검색자동완성"
- *     parameters:
- *       - name: searchText
- *         in: query
- *         type: string
- *         required: true
- *         description: "받아온 키워드들로 자동완성을 해줍니다."
- *     responses:
- *       "200":
- *          description: OK
- *          schema:
- *            type: object
- *            properties:
- *              autoSearch:
- *                type: string
  * /search/recent:
  *   get:
  *     tags:
  *      - search
- *     summary: "최근 검색기록 TOP 5"
+ *     summary: "최근 검색기록 TOP 10"
  *     responses:
  *       200:
  *         description: 최근 검색기록을 조회
@@ -108,10 +85,30 @@ const searchController = new SearchContorller();
  *                       createdAt:
  *                         type: string
  *                         description: 최근 저장된 키워드의 시간을 조회합니다.
- *                     example:
- *                       keyWord: Example keyWord
- *                       type: exhibition
- *                       createdAt: 2022-01-01T00:00:00Z
+ * /search/rank:
+ *   get:
+ *     tags:
+ *      - search
+ *     summary: "인기검색어 TOP 10"
+ *     responses:
+ *       200:
+ *         description: 가장많이 검색된 검색어조회
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 searchRank:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       keyWord:
+ *                         type: string
+ *                         description: 가장 많이 검색된 순으로 조회
+ *                       count:
+ *                         type: string
+ *                         description: 조회된 count갯수
  * /search/category:
  *   get:
  *     tags:
@@ -161,12 +158,7 @@ router.get("/", searchController.search);
 router.post("/", searchController.selectResult);
 
 /**
- * 자동완성기능
- */
-router.get("/auto", searchController.autocomplete);
-
-/**
- * 최근검색기록
+ * 최근검색기록 TOP10
  */
 router.get("/recent", searchController.recentSearchHistory);
 
@@ -176,7 +168,12 @@ router.get("/recent", searchController.recentSearchHistory);
 router.get("/category", searchController.searchByType);
 
 /**
- * 연관 검색어 기능
+ * 인기검색어 TOP10
+ */
+router.get("/rank", searchController.searchByRank);
+
+/**
+ * 연관 검색어 기능(미구현)
  */
 // router.get("/related", searchController.searchTerms);
 
