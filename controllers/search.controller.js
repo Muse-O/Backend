@@ -13,7 +13,6 @@ class SearchContorller {
   search = async (req, res, next) => {
     try {
       const { searchText } = req.query;
-      console.log("searchText", searchText);
       const search = await this.searchService.search(searchText);
       res.status(200).json({ searchText: search });
     } catch (err) {
@@ -27,7 +26,6 @@ class SearchContorller {
   selectResult = async (req, res, next) => {
     try {
       const { title, type } = req.body;
-      console.log(title);
       const selectKeyword = await this.searchService.selectResult(title, type);
       res
         .status(200)
@@ -71,7 +69,7 @@ class SearchContorller {
         category,
         searchText
       );
-      res.status(200).json({ categorySearch });
+      res.status(200).json({ search: [category, categorySearch] });
     } catch (err) {
       next(err);
     }
