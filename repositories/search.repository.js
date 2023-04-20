@@ -23,7 +23,6 @@ class SearchRepositroy extends searchHistory {
    * @returns
    */
   selectResult = async (title, type) => {
-    console.log(title, type);
     const savedResult = await searchHistory.create({
       keyWord: title,
       type: type,

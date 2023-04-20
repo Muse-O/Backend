@@ -1,10 +1,7 @@
 const { CommonCodes } = require("../models");
 const { Op } = require("sequelize");
 
-class CommonAPIRepository extends CommonCodes{
-  constructor() {
-    super();
-  }
+class CommonAPIRepository{
   
   /**
    * 카테고리 검색 - 공통코드 대분류 검색

@@ -42,9 +42,13 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "exhibitionId", // 현재 모델의 exhibitionId 컬럼을
         foreignKey: "exhibitionId", // ExhibitionScrap 모델에 exhibitionId컬럼으로 연결합니다.
       });
-      this.hasMany(models.ArticleReport, {
+      this.hasMany(models.ExhibitionHashtag, {
         sourceKey: "exhibitionId", // 현재 모델의 exhibitionId 컬럼을
-        foreignKey: "exhibitionId", // ExhibitionReport 모델에 exhibitionId컬럼으로 연결합니다.
+        foreignKey: "exhibitionId", // ExhibitionHashtag 모델에 exhibitionId컬럼으로 연결합니다.
+      });
+      this.hasMany(models.ExhibitionReviews, {
+        sourceKey: "exhibitionId", // 현재 모델의 exhibitionId 컬럼을
+        foreignKey: "exhibitionId", // ExhibitionReview 모델에 exhibitionId컬럼으로 연결합니다.
       });
       
     }
@@ -67,10 +71,36 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       field: 'exhibition_title'
     },
+    exhibitionEngTitle: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      field: 'exhibition_eng_title',
+      defaultValue: '미지정'
+    },
     exhibitionDesc: {
       allowNull: false,
       type: DataTypes.STRING,
       field: 'exhibition_desc'
+    },
+    exhibitionKind: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      field: 'exhibition_kind'
+    },
+    exhibitionHost: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      field: 'exhibition_host'
+    },
+    exhibitionLink: {
+      allowNull: true,
+      type: DataTypes.STRING,
+      field: 'exhibition_link'
+    },
+    exhibitionOnlineLink: {
+      allowNull: true,
+      type: DataTypes.STRING,
+      field: 'exhibition_online_link'
     },
     startDate: {
       allowNull: false,
@@ -82,11 +112,29 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       field: 'end_date'
     },
+    openTime: {
+      type: DataTypes.TIME,
+      allowNull: false,
+      field: 'open_time',
+      defaultValue: '00:00:00'
+    },
+    closeTime: {
+      type: DataTypes.TIME,
+      allowNull: false,
+      field: 'close_time',
+      defaultValue: '00:00:00'
+    },
+    significant: {
+      allowNull: true,
+      type: DataTypes.STRING,
+      field: 'significant',
+      defaultValue: ''
+    },
     entranceFee: {
       allowNull: true,
       type: DataTypes.STRING,
       field: 'entrance_fee',
-      defaultValue: 'not written entrance fee'
+      defaultValue: '미지정'
     },
     postImage: {
       allowNull: true,
@@ -97,13 +145,19 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       type: DataTypes.STRING,
       field: 'art_work_cnt',
-      defaultValue: 'not written number of works'
+      defaultValue: '미지정'
     },
     contact: {
       allowNull: true,
       type: DataTypes.STRING,
       field: 'contact',
-      defaultValue: 'not written contact'
+      defaultValue: '미지정'
+    },
+    agencyAndSponsor: {
+      allowNull: true,
+      type: DataTypes.STRING,
+      field: 'agency_and_sponsor',
+      defaultValue: '미지정'
     },
     location: {
       allowNull: false,

@@ -1,6 +1,8 @@
 const passport = require('passport');
 const { Strategy: NaverStrategy, Profile: NaverProfile } = require('passport-naver-v2');
 require("dotenv").config();
+const NotiRepository = require("../repositories/notification.repository")
+const notiRepository = new NotiRepository();
 
 const { Users, UserProfile } = require("../models");
 
@@ -32,6 +34,7 @@ module.exports = () => {
                     userEmail: profile.email,
                     profileNickname: profile.name,
                     });
+                  await notiRepository.createStream(profile.email);
                   done(null, newUser);
                }
             } catch (error) {

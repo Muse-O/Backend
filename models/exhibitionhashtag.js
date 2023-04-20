@@ -4,7 +4,7 @@ const {
 } = require('sequelize');
 const Sequelize = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class ExhibitionAuthor extends Model {
+  class ExhibitionHashtag extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -16,37 +16,57 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "exhibitionId", // 현재 모델의 exhibitionId 외래키로 가진다.
         onDelete: "CASCADE",
       });
+      this.belongsTo(models.Users, {
+        targetKey: "userEmail", // Users 모델의 userEmail 컬럼을
+        foreignKey: "userEmail", // 현재 모델의 userEmail 외래키로 가진다.
+        onDelete: "CASCADE",
+      });
+      this.belongsTo(models.ExhibitionReviews, {
+        targetKey: "exhibitionReviewId", // ExhibitionReviews 모델의 exhibitionReviewId 컬럼을
+        foreignKey: "exhibitionReviewId", // 현재 모델의 exhibitionReviewId 외래키로 가진다.
+        onDelete: "CASCADE",
+      });
     }
   }
-  ExhibitionAuthor.init({
-    authorId: {
+  ExhibitionHashtag.init({
+    exhibitionTagId: {
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
       defaultValue: Sequelize.UUIDV4,
-      field: 'author_id'
+      field: 'exhibition_tag_id'
     },
     exhibitionId: {
       allowNull: false,
       type: DataTypes.UUID,
       field: 'exhibition_id'
     },
-    authorOrder: {
+    exhibitionReviewId: {
       allowNull: false,
-      type: DataTypes.INTEGER,
-      field: 'author_order',
-      defaultValue: 1
+      type: DataTypes.UUID,
+      field: 'exhibition_review_id'
     },
-    authorName: {
+    userEmail: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      field: 'user_email'
+    },
+    tagName: {
       allowNull: true,
       type: DataTypes.STRING,
-      field: 'author_name'
+      field: 'tag_name'
+    },
+    isUse: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      defaultValue: 'Y',
+      field: 'is_use'
     },
     createdAt: {
       allowNull: true,
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      field: 'created_at'
+      field: 'created_at',
     },
     updatedAt: {
       allowNull: true,
@@ -56,8 +76,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
-    modelName: 'ExhibitionAuthor',
-    tableName: 'exhibition_author'
+    modelName: 'ExhibitionHashtag',
+    tableName: 'exhibition_hashtag'
   });
-  return ExhibitionAuthor;
+  return ExhibitionHashtag;
 };

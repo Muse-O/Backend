@@ -1,29 +1,15 @@
 const UserService = require("../services/user.service");
 const logger = require("../middlewares/logger.js");
 const Boom = require("boom");
-const Joi = require("joi")
+const userSchema = require("../schemas/userReqSchema");
 
-const re_email = /^[a-zA-Z0-9+\-\_.]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-.]+$/;
-const re_password = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{6,15}$/;
-
-
-const userSchema = Joi.object({
-  email: Joi.string().pattern(re_email).required().messages({
-    'string.pattern.base': '이메일 주소 형식이 올바르지 않습니다.',
-    'any.required': '이메일 주소를 입력해주세요.',
-    'string.empty': '이메일 주소를 입력해주세요.'
-  }),
-  password: Joi.string().pattern(re_password).required().messages({
-    'string.pattern.base': '비밀번호 형식이 올바르지 않습니다.',
-    'any.required': '비밀번호를 입력해주세요.',
-    'string.empty': '비밀번호를 입력해주세요.'
-  })
-});
 
 class UserController {
   userService = new UserService();
 
-  // 로그인
+  /**
+   * 일반 로그인
+   */
   localLogin = async (req, res, next) => {
     try {
       const { email, password } = req.body;
@@ -42,7 +28,9 @@ class UserController {
     }
   };
 
-  // Stategy 성공 시
+  /**
+   * Strategy 성공시
+   */
   socialCallback = async (req,res, next) => {
     try {
     const email = req.user.userEmail
@@ -52,14 +40,16 @@ class UserController {
     console.log("strategy 성공시", email)
     // res.redirect("http://localhost:4000");
     res.setHeader('Set-Cookie', 'authorization='+`Bearer ${token}`+'; Path=/; HttpOnly');
-    return res.redirect('http://localhost:4000',301);
+    return res.redirect(301, 'http://localhost:4000');
     } catch (error){
     logger.error(error.message);
     next(error);
     }
     };
 
-  // 회원가입 전 이메일 중복확인
+  /**
+   * 회원가입 전 이메일 중복확인
+   */ 
   emailConfirm = async (req, res, next) => {
     try {
       const { email } = req.body;
@@ -77,7 +67,9 @@ class UserController {
     }
   }
 
-  // 인증번호 메일 전송
+  /*
+  *인증번호 메일 전송
+  */
   emailValidate = async (req, res, next) => {
     try {
       const { email } = req.body
@@ -92,7 +84,9 @@ class UserController {
     }
   }
 
-  // 인증번호 검증
+  /**
+   * 인증번호 검증
+   */
   emailValidateNumCheck = async (req, res, next) => {
     try {
       const { email, code } = req.body;
@@ -105,8 +99,9 @@ class UserController {
     }
   }
   
-
-  // 회원가입
+  /**
+   * 회원가입
+   */
   userSignup = async (req, res, next) => {
     try {
       const { email, nickname, password, author } = req.body;

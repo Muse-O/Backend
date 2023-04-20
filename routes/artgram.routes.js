@@ -1,15 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
-const multer = require("multer");
+const artgramAuthMiddleware = require("../middlewares/authMiddleware_public");
 
-const { upload } = require("../middlewares/multer");
 const ArtgramController = require("../controllers/artgram.controller");
 const artgramController = new ArtgramController();
 
 /**
  * @swagger
- * /artgram?limit=20&offset=0:
+ * /artgram?limit=10&offset=0:
  *   get:
  *     tags:
  *       - artgram
@@ -48,6 +47,20 @@ const artgramController = new ArtgramController();
  *     security:
  *       - jwt: []
  * /artgram/{artgramId}:
+ *   get:
+ *    tags:
+ *      - artgram
+ *    summary: "아트그램 상세조회"
+ *    parameters:
+ *     - name: artgramId
+ *       in: path
+ *       description: "3cdc5810-a5ed-4b39-a013-f027a0f7d54d"
+ *       required: true
+ *       schema:
+ *         type: string
+ *    responses:
+ *      "200":
+ *        description: "아트그램 상세정보를 조회합니다"
  *   patch:
  *     tags:
  *       - artgram
@@ -55,7 +68,7 @@ const artgramController = new ArtgramController();
  *     parameters:
  *       - name: artgramId
  *         in: path
- *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         description: "3cdc5810-a5ed-4b39-a013-f027a0f7d54d"
  *         required: true
  *         schema:
  *           type: string
@@ -87,7 +100,7 @@ const artgramController = new ArtgramController();
  *     parameters:
  *       - name: artgramId
  *         in: path
- *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         description: "3cdc5810-a5ed-4b39-a013-f027a0f7d54d"
  *         required: true
  *         schema:
  *           type: string
@@ -105,7 +118,7 @@ const artgramController = new ArtgramController();
  *     parameters:
  *       - name: artgramId
  *         in: path
- *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         description: "3cdc5810-a5ed-4b39-a013-f027a0f7d54d"
  *         required: true
  *         schema:
  *           type: string
@@ -122,7 +135,7 @@ const artgramController = new ArtgramController();
  *     parameters:
  *       - name: artgramId
  *         in: path
- *         description: "12806b45-533c-47ec-9fbc-3890dc131e7f"
+ *         description: "3cdc5810-a5ed-4b39-a013-f027a0f7d54d"
  *         required: true
  *         schema:
  *           type: string
@@ -134,9 +147,15 @@ const artgramController = new ArtgramController();
  */
 
 //아트그램 전체조회
-router.get("/", artgramController.allArtgrams);
+router.get("/", artgramAuthMiddleware, artgramController.allArtgrams);
 
-//제한하지않고
+//아트그램 상세조회
+router.get(
+  "/:artgramId",
+  artgramAuthMiddleware,
+  artgramController.detailArtgram
+);
+
 //아트그램 작성
 router.post("/", authMiddleware, artgramController.postArtgram);
 //아트그램 수정

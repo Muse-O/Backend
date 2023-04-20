@@ -1,5 +1,7 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {
+  Model
+} = require('sequelize');
 const Sequelize = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class ExhibitionReview extends Model {
@@ -24,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userEmail", // 현재 모델의 userEmail 외래키로 가진다.
         onDelete: "CASCADE",
       });
+
       this.hasMany(models.ArticleReport, {
         sourceKey: "exhibitionReviewId", // Users 모델의 userEmail 컬럼을
         foreignKey: "exhibitionReviewId", // 현재 모델의 userEmail이 외래키로 가진다.
