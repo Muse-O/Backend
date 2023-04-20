@@ -1,6 +1,8 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 require("dotenv").config();
+const NotiRepository = require("../repositories/notification.repository")
+const notiRepository = new NotiRepository();
 
 const { Users, UserProfile } = require("../models");
 
@@ -32,6 +34,7 @@ module.exports = () => {
                     userEmail: profile.emails[0].value,
                     profileNickname: profile.displayName,
                     });
+                  await notiRepository.createStream(profile.emails[0].value);
                   done(null, newUser); // 회원가입하고 로그인 인증 완료
                }
             } catch (error) {
