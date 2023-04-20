@@ -70,12 +70,12 @@ class ArtgramCommentRepository extends ArtgramsComment {
     });
 
     const userEmail = allEmail.map((artgram) => artgram.dataValues.userEmail);
-    const user = await Users.findOne({
+    const user = await Users.findAll({
       where: { userEmail: userEmail },
-      include: [{ model: UserProfile }],
+      include: [
+        { model: UserProfile, attributes: ["profileNickname", "profileImg"] },
+      ],
     });
-    const profileNickname = user.UserProfile.dataValues.profileNickname;
-    const profileImg = user.UserProfile.dataValues.profileImg;
 
     const findComment = await ArtgramsComment.findAll({
       where: {
@@ -93,6 +93,12 @@ class ArtgramCommentRepository extends ArtgramsComment {
     const findArtgramComment = [];
 
     for (const comment of findComment) {
+      const userProfile = user.find(
+        (u) => u.userEmail === comment.userEmail
+      )?.UserProfile;
+      const profileNickname = userProfile?.profileNickname ?? null;
+      const profileImg = userProfile?.profileImg ?? null;
+
       const replyCount =
         (await ArtgramsComment.count({
           where: {
