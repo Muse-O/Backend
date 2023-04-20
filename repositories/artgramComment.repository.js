@@ -33,25 +33,29 @@ class ArtgramCommentRepository extends ArtgramsComment {
 
   /**
    * 아트그램 게시글 댓글 작성 시 작성자에게 알림 발송하기 위해 작성자 조회
-   * @param {string} artgramId 
+   * @param {string} artgramId
    * @returns 아트그램 게시글 작성자 이메일
    */
   findNotiReceiver = async (artgramId) => {
-    const author = await Artgrams.findByPk(artgramId,{attributes:['user_email']})
+    const author = await Artgrams.findByPk(artgramId, {
+      attributes: ["user_email"],
+    });
 
     return author.dataValues.user_email;
-  }
+  };
 
   /**
    * 아트그램 게시글 답글 작성 시 댓글 작성자에게 알림 발송하기 위해 작성자 조회
-   * @param {string} artgramId 
+   * @param {string} artgramId
    * @returns 댓글 작성자 이메일
    */
   findreplyNotiReceiver = async (commentId) => {
-    const author = await ArtgramsComment.findByPk(commentId,{attributes:['user_email']})
-    
+    const author = await ArtgramsComment.findByPk(commentId, {
+      attributes: ["user_email"],
+    });
+
     return author.dataValues.user_email;
-  }
+  };
 
   /**
    * 댓글 전체조회
@@ -76,7 +80,7 @@ class ArtgramCommentRepository extends ArtgramsComment {
     const findComment = await ArtgramsComment.findAll({
       where: {
         artgramId,
-        // [Sequelize.Op.or]: [{ commentParent: null }, { commentParent: 0 }],
+        [Sequelize.Op.or]: [{ commentParent: null }, { commentParent: 0 }],
         commentStatus: {
           [Op.ne]: "CS04",
         },
@@ -198,6 +202,7 @@ class ArtgramCommentRepository extends ArtgramsComment {
       profileNickname,
       comment: reply.comment,
       createdAt: reply.createdAt,
+      commentParent: reply.commentParent,
     }));
     return findReplyComment;
   };
@@ -259,7 +264,7 @@ class ArtgramCommentRepository extends ArtgramsComment {
       { commentStatus: "CS04" },
       {
         where: { userEmail, artgramId, commentId, commentParent },
-        fields: ["connentStatus"],
+        fields: ["commentStatus"],
       }
     );
     return deletereply;
