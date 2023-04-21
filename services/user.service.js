@@ -38,7 +38,7 @@ class UserService {
    */
   generateToken = async (email) => {
     const token = jwt.sign({ email }, process.env.SECRET_KEY, {
-      expiresIn: "60m",
+      expiresIn: "4h",
     });
 
     return token;
