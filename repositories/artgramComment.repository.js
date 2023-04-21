@@ -174,12 +174,6 @@ class ArtgramCommentRepository extends ArtgramsComment {
       group: ["userEmail"],
     });
     const userEmail = allEmail.map((Reply) => Reply.dataValues.userEmail);
-    const user = await Users.findOne({
-      where: { userEmail: userEmail },
-      include: [{ model: UserProfile }],
-    });
-    const profileNickname = user.UserProfile.dataValues.profileNickname;
-    const profileImg = user.UserProfile.dataValues.profileImg;
 
     const findAllReply = await ArtgramsComment.findAll({
       where: {
@@ -189,7 +183,10 @@ class ArtgramCommentRepository extends ArtgramsComment {
         },
         commentParent: {
           [Op.ne]: null,
-          [Op.eq]: commentId, // commentParent와 commentId가 같은 경우에만 조회
+          [Op.eq]: commentId, // commentParent and commentId are the same
+        },
+        userEmail: {
+          [Op.in]: userEmail, // userEmail should be in the list of userEmails
         },
       },
       attributes: [
@@ -201,16 +198,31 @@ class ArtgramCommentRepository extends ArtgramsComment {
       ],
       order: [["createdAt", "DESC"]],
     });
-    const findReplyComment = findAllReply.map((reply) => ({
-      commentId: reply.commentId,
-      userEmail: reply.userEmail,
-      profileImg,
-      profileNickname,
-      comment: reply.comment,
-      createdAt: reply.createdAt,
-      commentParent: reply.commentParent,
-    }));
-    return findReplyComment;
+
+    const findArtgramReply = [];
+
+    for (const comment of findAllReply) {
+      const user = await Users.findOne({
+        where: { userEmail: comment.userEmail },
+        include: [{ model: UserProfile }],
+      });
+
+      const userProfile = user.UserProfile;
+      const profileNickname = userProfile?.profileNickname ?? null;
+      const profileImg = userProfile?.profileImg ?? null;
+
+      findArtgramReply.push({
+        commentId: comment.commentId,
+        userEmail: comment.userEmail,
+        profileImg,
+        profileNickname,
+        comment: comment.comment,
+        createdAt: comment.createdAt,
+        commentParent: comment.commentParent,
+      });
+    }
+
+    return findArtgramReply;
   };
 
   /**
