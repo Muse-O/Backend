@@ -183,7 +183,7 @@ class ArtgramCommentRepository extends ArtgramsComment {
     //모든 유저 이메일 조회
     //추후에 가져온 artgramId와 commentId를 사용해서 아트그램의id에 해당하는
     //댓글, 답글의 userEmail만 불러오도록 리펙토링 최대한 필요한만큼만의 데이터를 가져오기위해서
-    const allEmail = await Artgrams.findAll({
+    const allEmail = await ArtgramsComment.findAll({
       where: { artgramId },
       order: [["createdAt", "DESC"]],
       attributes: ["userEmail"],
