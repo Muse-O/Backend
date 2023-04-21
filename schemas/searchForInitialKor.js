@@ -41,7 +41,7 @@ function ch2pattern(searchText) {
   }
 
   //입력된 문자가 위의 경우에 해당하지 않는 경우 정규식을 이스케이프한다.
-  return _.escapeRegExp(searchText);
+  return searchText;
 }
 
 //입력된 문자가 영어 알파벳인 경우

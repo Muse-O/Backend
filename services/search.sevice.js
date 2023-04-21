@@ -13,17 +13,18 @@ class SearchService {
    * @returns
    */
   search = async (searchText) => {
-    console.log("searchText", searchText);
     const artgramTitles = await this.searchRepositroy.autocompleteArtgrams(
       searchText
     );
     const exhibitionTitles = await this.searchRepositroy.autocompleteExhibition(
       searchText
     );
+    const findUser = await this.searchRepositroy.findUsers(searchText);
 
     return {
       artgramTitles: artgramTitles,
       exhibitionTitles: exhibitionTitles,
+      findUsers: findUser,
     };
   };
 
@@ -31,8 +32,13 @@ class SearchService {
    * 전시회 검색기록저장
    * @param {query} title
    */
-  selectResult = async (title, type) => {
-    const saveResult = this.searchRepositroy.selectResult(title, type);
+  selectResult = async (title, type, userEmail) => {
+    let saveResult;
+    if (userEmail !== "guest" && userEmail !== undefined) {
+      saveResult = this.searchRepositroy.selectResult(title, type);
+    } else {
+      saveResult = this.searchRepositroy.selectResult(title, type, userEmail);
+    }
     return saveResult;
   };
 
@@ -40,8 +46,13 @@ class SearchService {
    * 최근검색기록 TOP10
    * @returns
    */
-  recentSearchHistory = async () => {
-    const findHistory = await this.searchRepositroy.recentSearchHistory();
+  recentSearchHistory = async (userEmail) => {
+    let findHistory;
+    if (userEmail !== "guest" && userEmail !== undefined) {
+      findHistory = this.searchRepositroy.recentSearchHistory(userEmail);
+    } else {
+      findHistory = this.searchRepositroy.recentSearchHistory(userEmail);
+    }
     return findHistory;
   };
 

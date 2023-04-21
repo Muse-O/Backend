@@ -11,13 +11,13 @@ class SearchContorller {
    * @return
    */
   search = async (req, res, next) => {
-    try {
-      const { searchText } = req.query;
-      const search = await this.searchService.search(searchText);
-      res.status(200).json({ searchText: search });
-    } catch (err) {
-      next(err);
-    }
+    // try {
+    const { searchText } = req.query;
+    const search = await this.searchService.search(searchText);
+    res.status(200).json({ searchText: search });
+    // } catch (err) {
+    //   next(err);
+    // }
   };
 
   /**
@@ -26,7 +26,12 @@ class SearchContorller {
   selectResult = async (req, res, next) => {
     try {
       const { title, type } = req.body;
-      const selectKeyword = await this.searchService.selectResult(title, type);
+      const { userEmail } = res.locals.user || "guest";
+      const selectKeyword = await this.searchService.selectResult(
+        title,
+        type,
+        userEmail
+      );
       res
         .status(200)
         .json({ selectKeyword, message: "검색기록저장되었습니다" });
@@ -40,7 +45,10 @@ class SearchContorller {
    */
   recentSearchHistory = async (req, res, next) => {
     try {
-      const findHistory = await this.searchService.recentSearchHistory();
+      const { userEmail } = res.locals.user || "guest";
+      const findHistory = await this.searchService.recentSearchHistory(
+        userEmail
+      );
       res.status(200).json({ recentHistory: findHistory });
     } catch (err) {
       next(err);
