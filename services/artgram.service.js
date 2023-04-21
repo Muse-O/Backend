@@ -1,6 +1,6 @@
 const ArtgramRepository = require("../repositories/artgram.repository");
 const Boom = require("boom");
-const NotiRepository = require("../repositories/notification.repository")
+const NotiRepository = require("../repositories/notification.repository");
 
 class ArtgramService {
   constructor() {
@@ -9,7 +9,7 @@ class ArtgramService {
   }
 
   /**
-   * 아트그램 전체조회(로그인X)
+   * 아트그램 전체조회(로그인유무검증)
    * @param {number} limit 요청할 아트그램 게시글 수
    * @param {number} offset 조회 아트그램 게시글 시작점
    * @returns artgrams
@@ -34,7 +34,7 @@ class ArtgramService {
   };
 
   /**
-   * 아트그램 상세조회(로그인O)
+   * 아트그램 상세조회(로그인유무검증)
    * @returns artgrams
    */
   detailArtgram = async (artgramId, userEmail) => {
@@ -119,20 +119,24 @@ class ArtgramService {
       userEmail
     );
 
-    if (likeartgram=="create"){
-      const noti_receiver = await this.artgramRepository.findNotiReceiver(artgramId);
-      const noti_sender = await this.notiRepository.findNotiSenderProfile(userEmail);
+    if (likeartgram == "create") {
+      const noti_receiver = await this.artgramRepository.findNotiReceiver(
+        artgramId
+      );
+      const noti_sender = await this.notiRepository.findNotiSenderProfile(
+        userEmail
+      );
       const notiData = {
-        noti_sender : userEmail,
+        noti_sender: userEmail,
         noti_sender_nickname: noti_sender.profile_nickname,
         noti_sender_profileImg: noti_sender.profile_img,
-        noti_type: 'like',
-        noti_content: 'artgram',
-        noti_content_id: artgramId
+        noti_type: "like",
+        noti_content: "artgram",
+        noti_content_id: artgramId,
       };
-      await this.notiRepository.saveToStream(noti_receiver, notiData)
+      await this.notiRepository.saveToStream(noti_receiver, notiData);
     }
-    
+
     return likeartgram;
   };
 

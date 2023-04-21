@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const publicAuthMiddleware = require("../middlewares/authMiddleware_public");
 
 const SearchContorller = require("../controllers/search.controller");
 const searchController = new SearchContorller();
@@ -25,6 +26,8 @@ const searchController = new SearchContorller();
  *          properties:
  *            keyWord:
  *              type: string
+ *     security:
+ *       - jwt: []
  *   post:
  *     summary: 검색후 유저가 선택한 게시글저장
  *     tags: [search]
@@ -58,6 +61,8 @@ const searchController = new SearchContorller();
  *                 message:
  *                   type: string
  *                   description: "type(아트그램, 전시회)을 입력해주는 부분"
+ *     security:
+ *        - jwt: []
  * /search/recent:
  *   get:
  *     tags:
@@ -85,6 +90,8 @@ const searchController = new SearchContorller();
  *                       createdAt:
  *                         type: string
  *                         description: 최근 저장된 키워드의 시간을 조회합니다.
+ *     security:
+ *       - jwt: []
  * /search/rank:
  *   get:
  *     tags:
@@ -109,6 +116,8 @@ const searchController = new SearchContorller();
  *                       count:
  *                         type: string
  *                         description: 조회된 count갯수
+ *     security:
+ *       - jwt: []
  * /search/category:
  *   get:
  *     tags:
@@ -145,32 +154,38 @@ const searchController = new SearchContorller();
  *                   example:
  *                     keyWord: 테스트
  *                     type: artgram
+ *     security:
+ *       - jwt: []
  */
 
 /**
  * 검색기능
  */
-router.get("/", searchController.search);
+router.get("/", publicAuthMiddleware, searchController.search);
 
 /**
  * 검색기록저장
  */
-router.post("/", searchController.selectResult);
+router.post("/", publicAuthMiddleware, searchController.selectResult);
 
 /**
- * 최근검색기록 TOP10
+ * 유저의 최근검색기록 10개조회
  */
-router.get("/recent", searchController.recentSearchHistory);
+router.get(
+  "/recent",
+  publicAuthMiddleware,
+  searchController.recentSearchHistory
+);
 
 /**
  * 메뉴별 검색 구분기능
  */
-router.get("/category", searchController.searchByType);
+router.get("/category", publicAuthMiddleware, searchController.searchByType);
 
 /**
  * 인기검색어 TOP10
  */
-router.get("/rank", searchController.searchByRank);
+router.get("/rank", publicAuthMiddleware, searchController.searchByRank);
 
 /**
  * 연관 검색어 기능(미구현)

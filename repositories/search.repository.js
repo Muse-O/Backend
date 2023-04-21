@@ -1,4 +1,10 @@
-const { searchHistory, Artgrams, Exhibitions } = require("../models");
+const {
+  searchHistory,
+  Artgrams,
+  Exhibitions,
+  Users,
+  UserProfile,
+} = require("../models");
 const { Sequelize, Op } = require("sequelize");
 const RedisClient = require("../config/redisConnector");
 const client = require("../config/elasticSearch-Connector");
@@ -18,11 +24,11 @@ class SearchRepositroy extends searchHistory {
   }
   /**
    * 유저가 검색후 선택한 게시글저장
-   * @param {query} title
-   * @param {query} type
+   * @param {string} title
+   * @param {string} type
    * @returns
    */
-  selectResult = async (title, type) => {
+  selectResult = async (title, type, userEmail) => {
     const savedResult = await searchHistory.create({
       keyWord: title,
       type: type,
@@ -32,7 +38,7 @@ class SearchRepositroy extends searchHistory {
 
   /**
    * 아트그램 검색
-   * @param {query} searchText
+   * @param {string} searchText
    * @returns
    */
   autocompleteArtgrams = async (searchText) => {
@@ -48,7 +54,6 @@ class SearchRepositroy extends searchHistory {
     if (cachedArtgrams) {
       return JSON.parse(cachedArtgrams);
     }
-    console.log("searchText", SearchText);
     //입력된 문자열을 문자 단위로 분해한다
     let characters = SearchText.split("");
 
@@ -129,7 +134,7 @@ class SearchRepositroy extends searchHistory {
 
   /**
    * 전시회 검색
-   * @param {query} searchText
+   * @param {string} searchText
    * @returns
    */
   autocompleteExhibition = async (searchText) => {
@@ -224,11 +229,138 @@ class SearchRepositroy extends searchHistory {
     return exhibitionSearch;
   };
 
+  /**-----------
+   * 유저검색
+   */
+  findUsers = async (searchText) => {
+    console.log("searchText", searchText);
+    // const cachedUsers = await this.redisClient.get(`search:user:${searchText}`);
+    // if (cachedUsers || cachedUsers !== null) {
+    //   return JSON.parse(cachedUsers);
+    // }
+    // console.log("cachedUsers", cachedUsers);
+
+    //입력된 문자열을 문자 단위로 분해한다
+    let characters = searchText.split("");
+    console.log("characters", characters);
+
+    // 한글과 영어,기타로 문자를 분리한다.
+    const koreanChars = characters.filter(ch2pattern);
+    const englishChars = characters.filter(isEnglish);
+    const otherChars = characters
+      .filter((char) => !isKorean(char))
+      .filter((char) => !isEnglish(char));
+    console.log("koreanChars", koreanChars);
+    console.log("englishChars", englishChars);
+    console.log("otherChars", otherChars);
+
+    let chosungText = "";
+    let engText = "";
+    //한글문자가 있다면 초성검색 패턴을 생성한다.
+    if (koreanChars.length > 0) {
+      chosungText = createFuzzyMatcherKor(koreanChars.join(""));
+      if (chosungText === null) {
+        console.error("초성값이 존재하지않습니다");
+        chosungText = "";
+      }
+    }
+    if (englishChars.length > 0) {
+      engText = createFuzzyMatcherEng(englishChars.join(""));
+      if (engText === null) {
+        console.error("알파벳없음");
+        engText = "";
+      }
+    }
+    console.log("chosungText", chosungText);
+    console.log("engText", engText);
+
+    //기타문자를 하나의 문자열로 연결
+    const otherCharsText = otherChars.join("");
+    const findUserEmail = [];
+    const findProfileNickname = [];
+
+    //데이터 베이스에서 일치하는 결과를 검색
+    // if (otherCharsText) {
+    //   findUserEmail.push({ [Sequelize.Op.regexp]: otherCharsText });
+    //   findProfileNickname.push({ [Sequelize.Op.regexp]: otherCharsText });
+    // }
+
+    if (chosungText) {
+      findUserEmail.push({ [Sequelize.Op.regexp]: chosungText });
+      findProfileNickname.push({ [Sequelize.Op.regexp]: chosungText });
+    }
+
+    if (engText) {
+      findUserEmail.push({ [Sequelize.Op.regexp]: engText });
+      findProfileNickname.push({ [Sequelize.Op.regexp]: engText });
+    }
+
+    if (findUserEmail.length === 0 && findProfileNickname.length === 0) {
+      return [[], []]; // 빈 배열을 반환하여 검색 결과가 없음을 나타냅니다.
+    }
+    console.log("findUserEmail", findUserEmail);
+    console.log("findProfileNickname", findProfileNickname);
+
+    const rows = await Users.findAll({
+      attributes: ["userEmail"],
+      include: [
+        {
+          model: UserProfile,
+          attributes: ["profileId", "profileNickname", "profileImg"],
+          required: false,
+        },
+      ],
+      where: {
+        [Sequelize.Op.or]: [
+          {
+            userEmail: {
+              [Sequelize.Op.or]: findUserEmail,
+            },
+          },
+          {
+            "$UserProfile.profile_nickname$": {
+              [Sequelize.Op.or]: findProfileNickname,
+            },
+          },
+        ],
+      },
+      limit: 5,
+    });
+
+    // 결과를 반환하기 위해 userEmailSearch와 profileResults로 분리
+    let userEmailSearch = rows.map((row) => row.userEmail);
+    let profileResults = rows.map((row) => ({
+      profileId: row.UserProfile.profileId,
+      profileNickname: row.UserProfile.profileNickname,
+      profileImg: row.UserProfile.profileImg,
+    }));
+
+    if (userEmailSearch.length === 0) {
+      userEmailSearch = null;
+    } else if (profileResults.length === 0) {
+      profileResults = null;
+    }
+    const userSearch = { userEmailSearch, profileResults };
+
+    //검색한 text를 저장해줌
+    await this.redisClient.set(
+      `search:user:${searchText}`,
+      JSON.stringify(userSearch),
+      "EX",
+      3600
+    );
+
+    return [userEmailSearch, profileResults];
+  };
+
   /**
    * 최근검색기록 TOP10
+   * @locals {staring} userEmail
+   * @returns
    */
-  recentSearchHistory = async () => {
+  recentSearchHistory = async (userEmail) => {
     const findRecentHistory = await searchHistory.findAll({
+      where: { userEmail },
       attributes: ["keyWord", "type", "createdAt"],
       limit: 10,
       order: [["createdAt", "DESC"]],
