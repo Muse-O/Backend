@@ -3,7 +3,13 @@ const { Model } = require("sequelize");
 const Sequelize = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class searchHistory extends Model {
-    static associate(models) {}
+    static associate(models) {
+      //Users Users N:1
+      this.hasMany(models.Users, {
+        targetKey: "userEmail", // 현재 모델의 userEmail 컬럼을
+        foreignKey: "userEmail", // ExhibitionReview 모델에 userEmail컬럼으로 연결합니다.
+      });
+    }
   }
   searchHistory.init(
     {
@@ -13,6 +19,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         defaultValue: Sequelize.UUIDV4,
         field: "search-id",
+      },
+      userEmail: {
+        allowNull: true,
+        primaryKey: true,
+        type: DataTypes.STRING,
+        field: "user_email",
       },
       keyWord: {
         allowNull: false,
