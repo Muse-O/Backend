@@ -80,19 +80,31 @@ class ArtgramCommentRepository extends ArtgramsComment {
     const findComment = await ArtgramsComment.findAll({
       where: {
         artgramId,
-        [Sequelize.Op.or]: [{ commentParent: null }, { commentParent: 0 }],
+        [Op.or]: [
+          // Move the Op.or outside of the commentParent object
+          { commentParent: null },
+        ],
         commentStatus: {
           [Op.ne]: "CS04",
         },
       },
-
-      attributes: ["commentId", "userEmail", "comment", "createdAt"],
+      attributes: [
+        "commentId",
+        "userEmail",
+        "comment",
+        "createdAt",
+        "commentParent",
+      ],
       order: [["createdAt", "DESC"]],
     });
 
     const findArtgramComment = [];
 
     for (const comment of findComment) {
+      if (comment.commentParent !== null && comment.commentParent !== 0) {
+        continue;
+      }
+
       const userProfile = user.find(
         (u) => u.userEmail === comment.userEmail
       )?.UserProfile;
@@ -168,7 +180,11 @@ class ArtgramCommentRepository extends ArtgramsComment {
    * @returns 답글 조회결과 반환 findReplyComment
    */
   allReply = async (artgramId, commentId) => {
+    //모든 유저 이메일 조회
+    //추후에 가져온 artgramId와 commentId를 사용해서 아트그램의id에 해당하는
+    //댓글, 답글의 userEmail만 불러오도록 리펙토링 최대한 필요한만큼만의 데이터를 가져오기위해서
     const allEmail = await Artgrams.findAll({
+      where: { artgramId },
       order: [["createdAt", "DESC"]],
       attributes: ["userEmail"],
       group: ["userEmail"],
@@ -183,10 +199,10 @@ class ArtgramCommentRepository extends ArtgramsComment {
         },
         commentParent: {
           [Op.ne]: null,
-          [Op.eq]: commentId, // commentParent and commentId are the same
+          [Op.eq]: commentId, // commentParent와 commentId가 일치
         },
         userEmail: {
-          [Op.in]: userEmail, // userEmail should be in the list of userEmails
+          [Op.in]: userEmail,
         },
       },
       attributes: [
@@ -201,6 +217,7 @@ class ArtgramCommentRepository extends ArtgramsComment {
 
     const findArtgramReply = [];
 
+    //반복문으로 userEmail에 해당하는 UserProfile조회
     for (const comment of findAllReply) {
       const user = await Users.findOne({
         where: { userEmail: comment.userEmail },
