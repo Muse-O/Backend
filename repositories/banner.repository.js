@@ -279,6 +279,7 @@ class BannerRepository {
           profile_img
         FROM user_profile
       ) AS up ON a.user_email = up.user_email
+      WHERE a.artgram_status != 'AS04'
       ORDER BY a.created_at DESC
       LIMIT ${reqCnt};
       `,
