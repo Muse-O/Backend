@@ -108,6 +108,9 @@ class SearchRepositroy extends searchHistory {
     const rows = await Artgrams.findAll({
       attributes: ["artgramTitle"],
       where: {
+        artgram_status: {
+          [Op.ne]: "AS04",
+        },
         [Sequelize.Op.or]: [
           { artgramTitle: { [Sequelize.Op.and]: titleConditions } },
           { artgramDesc: { [Sequelize.Op.and]: descConditions } },
@@ -126,7 +129,7 @@ class SearchRepositroy extends searchHistory {
       `search:artgram:${SearchText}`,
       JSON.stringify(artgramSearch),
       "EX",
-      3600
+      120
     );
 
     return artgramSearch;
@@ -205,6 +208,9 @@ class SearchRepositroy extends searchHistory {
     const rows = await Exhibitions.findAll({
       attributes: ["exhibitionTitle"],
       where: {
+        exhibition_status: {
+          [Op.ne]: "ES04",
+        },
         [Sequelize.Op.or]: [
           { exhibitionTitle: { [Sequelize.Op.and]: titleConditions } },
           { exhibitionDesc: { [Sequelize.Op.and]: descConditions } },
@@ -223,7 +229,7 @@ class SearchRepositroy extends searchHistory {
       `search:exhibition:${SearchText}`,
       JSON.stringify(exhibitionSearch),
       "EX",
-      3600
+      120
     );
 
     return exhibitionSearch;
@@ -233,16 +239,13 @@ class SearchRepositroy extends searchHistory {
    * 유저검색
    */
   findUsers = async (searchText) => {
-    console.log("searchText", searchText);
-    // const cachedUsers = await this.redisClient.get(`search:user:${searchText}`);
-    // if (cachedUsers || cachedUsers !== null) {
-    //   return JSON.parse(cachedUsers);
-    // }
-    // console.log("cachedUsers", cachedUsers);
+    const cachedUsers = await this.redisClient.get(`search:user:${searchText}`);
+    if (cachedUsers || cachedUsers !== null) {
+      return JSON.parse(cachedUsers);
+    }
 
     //입력된 문자열을 문자 단위로 분해한다
     let characters = searchText.split("");
-    console.log("characters", characters);
 
     // 한글과 영어,기타로 문자를 분리한다.
     const koreanChars = characters.filter(ch2pattern);
@@ -250,9 +253,6 @@ class SearchRepositroy extends searchHistory {
     const otherChars = characters
       .filter((char) => !isKorean(char))
       .filter((char) => !isEnglish(char));
-    console.log("koreanChars", koreanChars);
-    console.log("englishChars", englishChars);
-    console.log("otherChars", otherChars);
 
     let chosungText = "";
     let engText = "";
@@ -271,8 +271,6 @@ class SearchRepositroy extends searchHistory {
         engText = "";
       }
     }
-    console.log("chosungText", chosungText);
-    console.log("engText", engText);
 
     //기타문자를 하나의 문자열로 연결
     const otherCharsText = otherChars.join("");
@@ -280,10 +278,10 @@ class SearchRepositroy extends searchHistory {
     const findProfileNickname = [];
 
     //데이터 베이스에서 일치하는 결과를 검색
-    // if (otherCharsText) {
-    //   findUserEmail.push({ [Sequelize.Op.regexp]: otherCharsText });
-    //   findProfileNickname.push({ [Sequelize.Op.regexp]: otherCharsText });
-    // }
+    if (otherCharsText) {
+      findUserEmail.push({ [Sequelize.Op.regexp]: otherCharsText });
+      findProfileNickname.push({ [Sequelize.Op.regexp]: otherCharsText });
+    }
 
     if (chosungText) {
       findUserEmail.push({ [Sequelize.Op.regexp]: chosungText });
@@ -298,8 +296,6 @@ class SearchRepositroy extends searchHistory {
     if (findUserEmail.length === 0 && findProfileNickname.length === 0) {
       return [[], []]; // 빈 배열을 반환하여 검색 결과가 없음을 나타냅니다.
     }
-    console.log("findUserEmail", findUserEmail);
-    console.log("findProfileNickname", findProfileNickname);
 
     const rows = await Users.findAll({
       attributes: ["userEmail"],
@@ -311,6 +307,9 @@ class SearchRepositroy extends searchHistory {
         },
       ],
       where: {
+        user_status: {
+          [Op.ne]: "US04",
+        },
         [Sequelize.Op.or]: [
           {
             userEmail: {

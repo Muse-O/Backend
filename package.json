@@ -7,7 +7,8 @@
     "test": "jest",
     "sync-model": "node ./modules/sync-sequelize-model.js",
     "dev": "nodemon app start",
-    "prettify": "prettier --write *.js **/*.js"
+    "prettify": "prettier --write *.js **/*.js",
+    "coverage": "jest --coverage"
   },
   "keywords": [],
   "author": "",
@@ -51,6 +52,7 @@
     "nodemon": "^2.0.22",
     "prettier": "^2.8.7",
     "sequelize-cli": "^6.6.0",
+    "supertest": "^6.3.3",
     "swagger-autogen": "^2.23.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.2",
