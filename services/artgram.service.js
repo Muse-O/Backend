@@ -1,6 +1,6 @@
 const ArtgramRepository = require("../repositories/artgram.repository");
 const Boom = require("boom");
-const NotiRepository = require("../repositories/notification.repository")
+const NotiRepository = require("../repositories/notification.repository");
 
 class ArtgramService {
   constructor() {
@@ -18,14 +18,14 @@ class ArtgramService {
     let findAllArtgrams;
     if (userEmail !== "guest" && userEmail !== undefined) {
       // user 객체가 존재하고 userEmail 속성이 존재하는 경우
-      findAllArtgrams = await this.artgramRepository.allArtgrams(
+      findAllArtgrams = await this.artgramRepository.getAllArtgram(
         limit,
         offset,
         userEmail
       );
     } else {
       // user 객체가 존재하지 않거나 userEmail 속성이 존재하지 않는 경우
-      findAllArtgrams = await this.artgramRepository.publicAllArtgrams(
+      findAllArtgrams = await this.artgramRepository.getPublicAllArtgram(
         limit,
         offset
       );
@@ -119,20 +119,24 @@ class ArtgramService {
       userEmail
     );
 
-    if (likeartgram=="create"){
-      const noti_receiver = await this.artgramRepository.findNotiReceiver(artgramId);
-      const noti_sender = await this.notiRepository.findNotiSenderProfile(userEmail);
+    if (likeartgram == "create") {
+      const noti_receiver = await this.artgramRepository.findNotiReceiver(
+        artgramId
+      );
+      const noti_sender = await this.notiRepository.findNotiSenderProfile(
+        userEmail
+      );
       const notiData = {
-        noti_sender : userEmail,
+        noti_sender: userEmail,
         noti_sender_nickname: noti_sender.profile_nickname,
         noti_sender_profileImg: noti_sender.profile_img,
-        noti_type: 'like',
-        noti_content: 'artgram',
-        noti_content_id: artgramId
+        noti_type: "like",
+        noti_content: "artgram",
+        noti_content_id: artgramId,
       };
-      await this.notiRepository.saveToStream(noti_receiver, notiData)
+      await this.notiRepository.saveToStream(noti_receiver, notiData);
     }
-    
+
     return likeartgram;
   };
 
