@@ -19,14 +19,16 @@ class ArtgramService {
     let findAllArtgrams;
     if (userEmail !== "guest" && userEmail !== undefined) {
       // user 객체가 존재하고 userEmail 속성이 존재하는 경우
-      findAllArtgrams = await this.artgramRepository.loadAllArtgrams(
+
+      findAllArtgrams = await this.artgramRepository.getAllArtgram(
         limit,
         offset,
         userEmail
       );
     } else {
       // user 객체가 존재하지 않거나 userEmail 속성이 존재하지 않는 경우
-      findAllArtgrams = await this.artgramRepository.loadPublicAllArtgrams(
+
+      findAllArtgrams = await this.artgramRepository.getPublicAllArtgram(
         limit,
         offset
       );

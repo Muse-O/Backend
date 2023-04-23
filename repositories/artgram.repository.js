@@ -23,7 +23,8 @@ class ArtgramRepository extends Artgrams {
    * @returns sortedArtgramList AS04제외 조회 스크랩/좋아요 유무확인가능
    */
 
-  loadAllArtgrams = async (limit, offset, userEmail) => {
+
+  getAllArtgram = async (limit, offset, userEmail) => {
     const myuserEmail = userEmail;
     const findAllArtgrams = await Artgrams.findAll({
       raw: true,
@@ -446,45 +447,37 @@ class ArtgramRepository extends Artgrams {
       artgramTitle,
       artgramDesc,
     });
+    //trim() 양쪽끝 공백제거
     if (hashtag) {
       const tags = Array.isArray(hashtag)
         ? hashtag
         : hashtag.split(/[\[\],]+/).filter((tag) => tag.trim().length > 0);
 
-      for (let i = 0; i < tags.length; i++) {
-        if (tags.length > 0) {
+      hashTag = await Promise.all(
+        tags.map(async (tag) => {
           const tagname = await ArtgramHashtag.create({
             artgramId: createArtgram.artgramId,
-            tagName: tags[i].trim(),
+            tagName: tag.trim(),
           });
-          hashTag.push(tagname);
-        }
-      }
+          return tagname;
+        })
+      );
     }
 
-    if (!imgUrl || imgUrl.length === 0) {
-      return createArtgram;
-    } else if (Array.isArray(imgUrl)) {
-      for (let i = 0; i < imgUrl.length; i++) {
-        const artgramImg = await ArtgramImg.create({
-          artgramId: createArtgram.artgramId,
-          imgUrl: imgUrl[i].trim(),
-          imgOrder: i + 1,
-          hashtag: hashTag.tagName,
-        });
-        artgramImgs.push(artgramImg);
-      }
-    } else {
-      let splitImg = imgUrl.split(",");
-      for (let i = 0; i < splitImg.length; i++) {
-        const artgramImg = await ArtgramImg.create({
-          artgramId: createArtgram.artgramId,
-          imgUrl: splitImg[i].trim(),
-          imgOrder: i + 1,
-          hashtag: hashTag.tagName,
-        });
-        artgramImgs.push(artgramImg);
-      }
+    if (imgUrl && imgUrl.length > 0) {
+      const images = Array.isArray(imgUrl) ? imgUrl : imgUrl.split(",");
+
+      artgramImgs = await Promise.all(
+        images.map(async (image, index) => {
+          const artgramImg = await ArtgramImg.create({
+            artgramId: createArtgram.artgramId,
+            imgUrl: image.trim(),
+            imgOrder: index + 1,
+            hashtag: hashTag.tagName,
+          });
+          return artgramImg;
+        })
+      );
     }
 
     return [createArtgram, artgramImgs, hashTag];
