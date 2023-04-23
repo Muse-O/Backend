@@ -12,7 +12,8 @@ class SearchService {
    * @param {query} searchText
    * @returns
    */
-  search = async (searchText) => {
+  search = async (result) => {
+    const { searchText } = result.value;
     const artgramTitles = await this.searchRepositroy.autocompleteArtgrams(
       searchText
     );
@@ -69,7 +70,8 @@ class SearchService {
    * @param {}
    * @returns
    */
-  searchByType = async (category, searchText) => {
+  searchByType = async (result) => {
+    const { category, searchText } = result.value;
     let findByCategory;
     if (category === "artgram") {
       findByCategory = await this.searchRepositroy.autocompleteArtgrams(
@@ -79,6 +81,8 @@ class SearchService {
       findByCategory = await this.searchRepositroy.autocompleteExhibition(
         searchText
       );
+    } else if (category === "user") {
+      findByCategory = await this.searchRepositroy.findUsers(searchText);
     }
 
     return findByCategory;

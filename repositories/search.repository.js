@@ -28,7 +28,8 @@ class SearchRepositroy extends searchHistory {
    * @param {string} type
    * @returns
    */
-  selectResult = async (title, type, userEmail) => {
+  selectResult = async (result, userEmail) => {
+    const { value: title, value: type } = result;
     const savedResult = await searchHistory.create({
       keyWord: title,
       type: type,
