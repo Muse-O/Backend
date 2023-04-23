@@ -22,7 +22,7 @@ class ArtgramRepository extends Artgrams {
    * @returns artgrams
    */
 
-  allArtgrams = async (limit, offset, userEmail) => {
+  getAllArtgram = async (limit, offset, userEmail) => {
     const myuserEmail = userEmail;
     const artgrams = await Artgrams.findAll({
       raw: true,
@@ -121,7 +121,7 @@ class ArtgramRepository extends Artgrams {
 
     return {
       sortedArtgramList: {
-        count: artgrams.count,
+        count: findAllArtgrams.count,
         findArtgrmas,
       },
       paginationInfo,
@@ -134,8 +134,8 @@ class ArtgramRepository extends Artgrams {
    * @param {*} offset
    * @returns
    */
-  publicAllArtgrams = async (limit, offset) => {
-    const artgrams = await Artgrams.findAll({
+  loadPublicAllArtgrams = async (limit, offset) => {
+    const findAllArtgrams = await Artgrams.findAll({
       raw: true,
       include: [
         {
@@ -215,7 +215,7 @@ class ArtgramRepository extends Artgrams {
 
     return {
       sortedArtgramList: {
-        count: artgrams.count,
+        count: findAllArtgrams.count,
         findArtgrmas,
       },
       paginationInfo,
@@ -226,7 +226,7 @@ class ArtgramRepository extends Artgrams {
    * 로그인시 상세조회
    * @returns
    */
-  detailArtgram = async (artgramId, userEmail) => {
+  loadDetailArtgram = async (artgramId, userEmail) => {
     const myuserEmail = userEmail;
     const thisArtgram = await Artgrams.findOne({
       where: {
@@ -334,7 +334,7 @@ class ArtgramRepository extends Artgrams {
    * @param {*} artgramId
    * @returns
    */
-  publicDetailArtgram = async (artgramId) => {
+  loadPublicDetailArtgram = async (artgramId) => {
     const artgram = await Artgrams.findOne({
       where: {
         artgramId,
@@ -438,45 +438,37 @@ class ArtgramRepository extends Artgrams {
       artgramTitle,
       artgramDesc,
     });
+    //trim() 양쪽끝 공백제거
     if (hashtag) {
       const tags = Array.isArray(hashtag)
         ? hashtag
         : hashtag.split(/[\[\],]+/).filter((tag) => tag.trim().length > 0);
 
-      for (let i = 0; i < tags.length; i++) {
-        if (tags.length > 0) {
+      hashTag = await Promise.all(
+        tags.map(async (tag) => {
           const tagname = await ArtgramHashtag.create({
             artgramId: createArtgram.artgramId,
-            tagName: tags[i].trim(),
+            tagName: tag.trim(),
           });
-          hashTag.push(tagname);
-        }
-      }
+          return tagname;
+        })
+      );
     }
 
-    if (!imgUrl || imgUrl.length === 0) {
-      return createArtgram;
-    } else if (Array.isArray(imgUrl)) {
-      for (let i = 0; i < imgUrl.length; i++) {
-        const artgramImg = await ArtgramImg.create({
-          artgramId: createArtgram.artgramId,
-          imgUrl: imgUrl[i].trim(),
-          imgOrder: i + 1,
-          hashtag: hashTag.tagName,
-        });
-        artgramImgs.push(artgramImg);
-      }
-    } else {
-      let splitImg = imgUrl.split(",");
-      for (let i = 0; i < splitImg.length; i++) {
-        const artgramImg = await ArtgramImg.create({
-          artgramId: createArtgram.artgramId,
-          imgUrl: splitImg[i].trim(),
-          imgOrder: i + 1,
-          hashtag: hashTag.tagName,
-        });
-        artgramImgs.push(artgramImg);
-      }
+    if (imgUrl && imgUrl.length > 0) {
+      const images = Array.isArray(imgUrl) ? imgUrl : imgUrl.split(",");
+
+      artgramImgs = await Promise.all(
+        images.map(async (image, index) => {
+          const artgramImg = await ArtgramImg.create({
+            artgramId: createArtgram.artgramId,
+            imgUrl: image.trim(),
+            imgOrder: index + 1,
+            hashtag: hashTag.tagName,
+          });
+          return artgramImg;
+        })
+      );
     }
 
     return [createArtgram, artgramImgs, hashTag];
@@ -542,14 +534,16 @@ class ArtgramRepository extends Artgrams {
 
   /**
    * 아트그램 게시글 좋아요 시 작성자에게 알림 발송하기 위해 작성자 조회
-   * @param {string} artgramId 
+   * @param {string} artgramId
    * @returns 아트그램 게시글 작성자 이메일
    */
   findNotiReceiver = async (artgramId) => {
-    const author = await Artgrams.findByPk(artgramId,{attributes:['user_email']})
+    const author = await Artgrams.findByPk(artgramId, {
+      attributes: ["user_email"],
+    });
 
     return author.dataValues.user_email;
-  }
+  };
 
   /**
    * 아트그램 스크랩등록/취소
