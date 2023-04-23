@@ -23,7 +23,6 @@ class ArtgramRepository extends Artgrams {
    * @returns sortedArtgramList AS04제외 조회 스크랩/좋아요 유무확인가능
    */
 
-
   getAllArtgram = async (limit, offset, userEmail) => {
     const myuserEmail = userEmail;
     const findAllArtgrams = await Artgrams.findAll({
@@ -140,7 +139,7 @@ class ArtgramRepository extends Artgrams {
    * @param {local.user} userEmail or "guest"
    * @returns sortedArtgramList AS04제외 조회 스크랩/좋아요 유무제외
    */
-  loadPublicAllArtgrams = async (limit, offset) => {
+  getPublicAllArtgram = async (limit, offset) => {
     const findAllArtgrams = await Artgrams.findAll({
       raw: true,
       include: [
