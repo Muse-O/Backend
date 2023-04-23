@@ -12,12 +12,14 @@ class ArtgramService {
    * 아트그램 전체조회(로그인유무검증)
    * @param {number} limit 요청할 아트그램 게시글 수
    * @param {number} offset 조회 아트그램 게시글 시작점
-   * @returns artgrams
+   * @param {Locals.user} userEmail 현재 로그인한 유저의 이메일
+   * @returns findAllArtgrams db에서 조회해온 값
    */
-  allArtgrams = async (limit, offset, userEmail) => {
+  loadAllArtgrams = async (limit, offset, userEmail) => {
     let findAllArtgrams;
     if (userEmail !== "guest" && userEmail !== undefined) {
       // user 객체가 존재하고 userEmail 속성이 존재하는 경우
+
       findAllArtgrams = await this.artgramRepository.getAllArtgram(
         limit,
         offset,
@@ -25,6 +27,7 @@ class ArtgramService {
       );
     } else {
       // user 객체가 존재하지 않거나 userEmail 속성이 존재하지 않는 경우
+
       findAllArtgrams = await this.artgramRepository.getPublicAllArtgram(
         limit,
         offset
@@ -35,17 +38,20 @@ class ArtgramService {
 
   /**
    * 아트그램 상세조회(로그인유무검증)
-   * @returns artgrams
+   * @param {params} artgramId 조회 아트그램 게시글 시작점
+   * @param {Locals.user} userEmail 현재 로그인한 유저의 이메일
+   * @returns findAllArtgrams db에서 조회해온 값
+   * @returns detailartgram db에서 가져온 데이터반환
    */
-  detailArtgram = async (artgramId, userEmail) => {
+  loadDetailArtgram = async (artgramId, userEmail) => {
     let detailartgram;
     if (userEmail !== "guest" && userEmail !== undefined) {
-      detailartgram = await this.artgramRepository.detailArtgram(
+      detailartgram = await this.artgramRepository.loadDetailArtgram(
         artgramId,
         userEmail
       );
     } else {
-      detailartgram = await this.artgramRepository.publicDetailArtgram(
+      detailartgram = await this.artgramRepository.loadPublicDetailArtgram(
         artgramId
       );
     }
@@ -60,9 +66,9 @@ class ArtgramService {
    * @returns 작성 결과
    */
 
-  postArtgram = async (userEmail, validatedData) => {
+  creatingAnArtgram = async (userEmail, validatedData) => {
     const { artgramTitle, artgramDesc, hashtag, imgUrl } = validatedData;
-    const postartgram = await this.artgramRepository.postArtgram(
+    const postartgram = await this.artgramRepository.creatingAnArtgram(
       userEmail,
       artgramTitle,
       artgramDesc,
@@ -77,9 +83,9 @@ class ArtgramService {
    * @param {artgramSchema} artgramReq
    * @returns 수정결과반환
    */
-  modifyArtgram = async (artgramId, artgramReq) => {
+  ArtgramToModify = async (artgramId, artgramReq) => {
     const { artgramTitle, artgramDesc } = artgramReq;
-    const patchartgram = await this.artgramRepository.modifyArtgram(
+    const patchartgram = await this.artgramRepository.ArtgramToModify(
       artgramId,
       artgramTitle,
       artgramDesc
@@ -113,8 +119,8 @@ class ArtgramService {
    * @param {string} userEmail
    * @returns 좋아요등록/취소결과
    */
-  likeArtgram = async (artgramId, userEmail) => {
-    const likeartgram = await this.artgramRepository.likeArtgram(
+  artgramWithLike = async (artgramId, userEmail) => {
+    const likeartgram = await this.artgramRepository.artgramWithLike(
       artgramId,
       userEmail
     );
@@ -146,8 +152,8 @@ class ArtgramService {
    * @param {string} userEmail
    * @returns
    */
-  scrapArtgram = async (artgramId, userEmail) => {
-    const scrapartgram = await this.artgramRepository.scrapArtgram(
+  artgramWithScrap = async (artgramId, userEmail) => {
+    const scrapartgram = await this.artgramRepository.artgramWithScrap(
       artgramId,
       userEmail
     );

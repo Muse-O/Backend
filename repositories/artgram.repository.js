@@ -19,12 +19,14 @@ class ArtgramRepository extends Artgrams {
    * 로그인시 아트그램 전체조회
    * @param {number} limit 요청할 아트그램 게시글 수
    * @param {number} offset 조회 아트그램 게시글 시작점
-   * @returns artgrams
+   * @param {local.user} userEmail or "guest"
+   * @returns sortedArtgramList AS04제외 조회 스크랩/좋아요 유무확인가능
    */
+
 
   getAllArtgram = async (limit, offset, userEmail) => {
     const myuserEmail = userEmail;
-    const artgrams = await Artgrams.findAll({
+    const findAllArtgrams = await Artgrams.findAll({
       raw: true,
       attributes: ["artgramId", "artgramTitle", "userEmail", "createdAt"],
       include: [
@@ -46,7 +48,7 @@ class ArtgramRepository extends Artgrams {
       order: [["createdAt", "DESC"]],
     });
     const findArtgrmas = await Promise.all(
-      artgrams.map(async (artgram) => {
+      findAllArtgrams.map(async (artgram) => {
         const userEmail = artgram.userEmail;
         const user = await Users.findOne({
           where: { userEmail: userEmail },
@@ -86,6 +88,8 @@ class ArtgramRepository extends Artgrams {
           where: { artgramId: artgramId },
         });
 
+        //객체분해할당 원래 객체의 속성이름과 동일한 변수이름을 사용
+        //하지만 특수문자가 들어간 경우엔 ""나 []를 사용해서 변수이름으로 사용가능
         const { "ArtgramImgs.imgUrl": _, ...rest } = artgram;
 
         return {
@@ -99,6 +103,7 @@ class ArtgramRepository extends Artgrams {
           liked: !!likedByCurrentUser,
           scrap: !!scrapByCurrentUser,
           createdAt: dayjs(artgram.createdAt)
+            //locale은 지역또는 언어설정을 의미함.
             .locale("en")
             .format("YYYY-MM-DD HH:mm:ss"),
         };
@@ -130,9 +135,10 @@ class ArtgramRepository extends Artgrams {
 
   /**
    * 비로그인시 전체조회
-   * @param {*} limit
-   * @param {*} offset
-   * @returns
+   * @param {Number} limit
+   * @param {Number} offset
+   * @param {local.user} userEmail or "guest"
+   * @returns sortedArtgramList AS04제외 조회 스크랩/좋아요 유무제외
    */
   loadPublicAllArtgrams = async (limit, offset) => {
     const findAllArtgrams = await Artgrams.findAll({
@@ -158,7 +164,7 @@ class ArtgramRepository extends Artgrams {
     });
 
     const findArtgrmas = await Promise.all(
-      artgrams.map(async (artgram) => {
+      findAllArtgrams.map(async (artgram) => {
         const userEmail = artgram.userEmail;
         const user = await Users.findOne({
           where: { userEmail: userEmail },
@@ -224,7 +230,9 @@ class ArtgramRepository extends Artgrams {
 
   /**
    * 로그인시 상세조회
-   * @returns
+   * @param {Locals.user} userEmail
+   * @param {params} artgramId
+   * @returns detailArtgram AS04제외 좋아요/스크랩유무확인가능
    */
   loadDetailArtgram = async (artgramId, userEmail) => {
     const myuserEmail = userEmail;
@@ -322,7 +330,7 @@ class ArtgramRepository extends Artgrams {
       liked: !!likedByCurrentUser,
       scrap: !!scrapByCurrentUser,
       createdAt: dayjs(thisArtgram.createdAt)
-        // .locale("en")
+        .locale("en")
         .format("YYYY-MM-DD HH:mm:ss"),
     };
 
@@ -331,8 +339,9 @@ class ArtgramRepository extends Artgrams {
 
   /**
    * 비로그인 상세정보
-   * @param {*} artgramId
-   * @returns
+   * @param {Locals.user} userEmail
+   * @param {params} artgramId
+   * @returns detailArtgram AS04제외 좋아요/스크랩유무제외
    */
   loadPublicDetailArtgram = async (artgramId) => {
     const artgram = await Artgrams.findOne({
@@ -424,7 +433,7 @@ class ArtgramRepository extends Artgrams {
    * @param {string} imgUrl
    * @returns 아트그램 작성결과 createArtgram, artgramImgs
    */
-  postArtgram = async (
+  creatingAnArtgram = async (
     userEmail,
     artgramTitle,
     artgramDesc,
@@ -481,7 +490,7 @@ class ArtgramRepository extends Artgrams {
    * @param {string} artgramDesc
    * @returns 수정결과반환 cngArtgram
    */
-  modifyArtgram = async (artgramId, artgramTitle, artgramDesc) => {
+  ArtgramToModify = async (artgramId, artgramTitle, artgramDesc) => {
     const cngArtgram = await Artgrams.update(
       {
         artgramTitle,
@@ -513,7 +522,7 @@ class ArtgramRepository extends Artgrams {
    * @param {string} userEmail
    * @returns 좋아요등록/취소여부 반환 likeartgram
    */
-  likeArtgram = async (artgramId, userEmail) => {
+  artgramWithLike = async (artgramId, userEmail) => {
     const likeartgram = await ArtgramLike.findOrCreate({
       where: {
         [Op.and]: [{ artgramId }, { userEmail }],
@@ -551,7 +560,7 @@ class ArtgramRepository extends Artgrams {
    * @param {string} userEmail
    * @returns 아트그램 스크랩등록/취소여부 반환 scrapArtgram
    */
-  scrapArtgram = async (artgramId, userEmail) => {
+  artgramWithScrap = async (artgramId, userEmail) => {
     const scrapArtgram = await ArtgramScrap.findOrCreate({
       where: {
         [Op.and]: [{ artgramId }, { userEmail }],

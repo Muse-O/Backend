@@ -1,5 +1,5 @@
-const { find } = require("lodash");
 const SearchService = require("../services/search.sevice");
+const { searchSchema } = require("../schemas/searchSchema");
 
 class SearchContorller {
   constructor() {
@@ -7,29 +7,33 @@ class SearchContorller {
   }
   /**
    * 검색
-   * @param {query} keyWord
+   * @param {string} searchText
    * @return
    */
   search = async (req, res, next) => {
-    // try {
-    const { searchText } = req.query;
-    const search = await this.searchService.search(searchText);
-    res.status(200).json({ searchText: search });
-    // } catch (err) {
-    //   next(err);
-    // }
+    try {
+      const { searchText } = req.query;
+      const result = searchSchema.validate(searchText);
+
+      const search = await this.searchService.search(result);
+      res.status(200).json({ searchText: search });
+    } catch (err) {
+      next(err);
+    }
   };
 
   /**
    * 전시회 검색기록저장
+   * @param {string} title
+   * @param {string} type
    */
   selectResult = async (req, res, next) => {
     try {
       const { title, type } = req.body;
+      const result = searchSchema.validate({ title, type });
       const { userEmail } = res.locals.user || "guest";
       const selectKeyword = await this.searchService.selectResult(
-        title,
-        type,
+        result,
         userEmail
       );
       res
@@ -69,14 +73,14 @@ class SearchContorller {
 
   /**
    * 메뉴별 검색 구분기능
+   * @param {string} category
+   * @param {string} searchText
    */
   searchByType = async (req, res, next) => {
     try {
       const { category, searchText } = req.query;
-      const categorySearch = await this.searchService.searchByType(
-        category,
-        searchText
-      );
+      const result = searchSchema.validate({ category, searchText });
+      const categorySearch = await this.searchService.searchByType(result);
       res.status(200).json({ search: [category, categorySearch] });
     } catch (err) {
       next(err);
