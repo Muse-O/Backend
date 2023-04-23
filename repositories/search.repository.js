@@ -15,7 +15,7 @@ const {
   createFuzzyMatcherEng,
   isEnglish,
   removeSpecialCharacters,
-} = require("../schemas/searchForInitialKor");
+} = require("../schemas/searchForInitial");
 
 class SearchRepositroy extends searchHistory {
   constructor() {
@@ -28,8 +28,7 @@ class SearchRepositroy extends searchHistory {
    * @param {string} type
    * @returns
    */
-  selectResult = async (result, userEmail) => {
-    const { value: title, value: type } = result;
+  selectResult = async (title, type, userEmail) => {
     const savedResult = await searchHistory.create({
       keyWord: title,
       type: type,
@@ -388,46 +387,46 @@ class SearchRepositroy extends searchHistory {
   /**
    * 연관 검색어 기능(미구현)
    */
-  searchTerms = async (searchTerm) => {
-    const rows = await Artgrams.findAll({
-      attributes: ["artgram_title", "artgram_desc"],
-      where: Sequelize.literal(
-        `MATCH(artgram_title, artgram_desc) AGAINST (:searchTerm IN NATURAL LANGUAGE MODE)`
-      ),
-      replacements: { searchTerm },
-    }).concat(
-      await Exhibitions.findAll({
-        attributes: ["exhibition_title", "exhibition_desc"],
-        where: Sequelize.literal(
-          `MATCH(exhibition_title, exhibition_desc) AGAINST (:searchTerm IN NATURAL LANGUAGE MODE)`
-        ),
-        replacements: { searchTerm },
-      })
-    );
+  //   searchTerms = async (searchTerm) => {
+  //     const rows = await Artgrams.findAll({
+  //       attributes: ["artgram_title", "artgram_desc"],
+  //       where: Sequelize.literal(
+  //         `MATCH(artgram_title, artgram_desc) AGAINST (:searchTerm IN NATURAL LANGUAGE MODE)`
+  //       ),
+  //       replacements: { searchTerm },
+  //     }).concat(
+  //       await Exhibitions.findAll({
+  //         attributes: ["exhibition_title", "exhibition_desc"],
+  //         where: Sequelize.literal(
+  //           `MATCH(exhibition_title, exhibition_desc) AGAINST (:searchTerm IN NATURAL LANGUAGE MODE)`
+  //         ),
+  //         replacements: { searchTerm },
+  //       })
+  //     );
 
-    const relatedSearchTerms = rows.map(
-      (row) =>
-        row.artgram_title + " " + row.artgram_desc ||
-        row.exhibition_title + " " + row.exhibition_desc
-    );
+  //     const relatedSearchTerms = rows.map(
+  //       (row) =>
+  //         row.artgram_title + " " + row.artgram_desc ||
+  //         row.exhibition_title + " " + row.exhibition_desc
+  //     );
 
-    const results = await client.search({
-      index: "your_elasticsearch_index_name",
-      body: {
-        query: {
-          match: {
-            your_elasticsearch_field_name: relatedSearchTerms.join(" "),
-          },
-        },
-      },
-    });
+  //     const results = await client.search({
+  //       index: "your_elasticsearch_index_name",
+  //       body: {
+  //         query: {
+  //           match: {
+  //             your_elasticsearch_field_name: relatedSearchTerms.join(" "),
+  //           },
+  //         },
+  //       },
+  //     });
 
-    const hits = results.hits.hits;
-    const relatedSearchTermsInElasticsearch = hits.map(
-      (hit) => hit._source.your_elasticsearch_field_name
-    );
-    return relatedSearchTermsInElasticsearch;
-  };
+  //     const hits = results.hits.hits;
+  //     const relatedSearchTermsInElasticsearch = hits.map(
+  //       (hit) => hit._source.your_elasticsearch_field_name
+  //     );
+  //     return relatedSearchTermsInElasticsearch;
+  //   };
 }
 
 module.exports = SearchRepositroy;

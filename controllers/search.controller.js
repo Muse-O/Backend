@@ -30,7 +30,7 @@ class SearchContorller {
   selectResult = async (req, res, next) => {
     try {
       const { title, type } = req.body;
-      const result = searchSchema.validate(title, type);
+      const result = searchSchema.validate({ title, type });
       const { userEmail } = res.locals.user || "guest";
       const selectKeyword = await this.searchService.selectResult(
         result,
@@ -79,7 +79,6 @@ class SearchContorller {
   searchByType = async (req, res, next) => {
     try {
       const { category, searchText } = req.query;
-      console.log(searchText);
       const result = searchSchema.validate({ category, searchText });
       const categorySearch = await this.searchService.searchByType(result);
       res.status(200).json({ search: [category, categorySearch] });
