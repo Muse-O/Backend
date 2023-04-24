@@ -132,6 +132,9 @@ class ArtgramService {
       const noti_sender = await this.notiRepository.findNotiSenderProfile(
         userEmail
       );
+      if (noti_receiver == userEmail){
+        return likeartgram
+      }
       const notiData = {
         noti_sender: userEmail,
         noti_sender_nickname: noti_sender.profile_nickname,

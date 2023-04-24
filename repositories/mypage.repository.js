@@ -82,12 +82,14 @@ class MypageRepository {
     });
 
     const hasNextPage = offset + limit < myExhibitionCnt;
+    const hasBackPage = offset > 0;
 
     const paginationInfo = {
       limit,
       offset,
       myExhibitionCnt,
       hasNextPage,
+      hasBackPage,
     };
 
     return { myExhibitionList, paginationInfo };
@@ -156,12 +158,14 @@ class MypageRepository {
     });
 
     const hasNextPage = offset + limit < myExhibitionCnt;
+    const hasBackPage = offset > 0;
 
     const paginationInfo = {
       limit,
       offset,
       myExhibitionCnt,
       hasNextPage,
+      hasBackPage,
     };
 
     return { exhibitionList, paginationInfo };
@@ -228,12 +232,14 @@ class MypageRepository {
     });
 
     const hasNextPage = offset + limit < myArtgramCnt;
+    const hasBackPage = offset > 0;
 
     const paginationInfo = {
       limit,
       offset,
       myArtgramCnt,
       hasNextPage,
+      hasBackPage
     };
 
     return { myArtgramList, paginationInfo };
@@ -308,12 +314,14 @@ class MypageRepository {
     });
 
     const hasNextPage = offset + limit < myArtgramCnt;
+    const hasBackPage = offset > 0;
 
     const paginationInfo = {
       limit,
       offset,
       myArtgramCnt,
       hasNextPage,
+      hasBackPage,
     };
 
     return { artgramList, paginationInfo };
