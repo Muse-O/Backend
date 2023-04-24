@@ -49,12 +49,12 @@ class SearchRepositroy extends searchHistory {
       ? removeSpecialCharacters(searchText)
       : searchText;
     //레디스에 저장된값이 있는지 확인 있다면 바로 출력해줌
-    const cachedArtgrams = await this.redisClient.get(
-      `search:artgram:${SearchText}`
-    );
-    if (cachedArtgrams) {
-      return JSON.parse(cachedArtgrams);
-    }
+    // const cachedArtgrams = await this.redisClient.get(
+    //   `search:artgram:${SearchText}`
+    // );
+    // if (cachedArtgrams) {
+    //   return JSON.parse(cachedArtgrams);
+    // }
     //입력된 문자열을 문자 단위로 분해한다
     let characters = SearchText.split("");
 
@@ -88,33 +88,28 @@ class SearchRepositroy extends searchHistory {
     const otherCharsText = otherChars.join("");
     const titleConditions = [];
     const descConditions = [];
+    const hashtagConditions = [];
 
     //데이터 베이스에서 일치하는 결과를 검색
     if (otherCharsText) {
       titleConditions.push({ [Sequelize.Op.regexp]: otherCharsText });
       descConditions.push({ [Sequelize.Op.regexp]: otherCharsText });
+      hashtagConditions.push({ [Sequelize.Op.regexp]: otherCharsText });
     }
 
     if (chosungText) {
       titleConditions.push({ [Sequelize.Op.regexp]: chosungText });
       descConditions.push({ [Sequelize.Op.regexp]: chosungText });
+      hashtagConditions.push({ [Sequelize.Op.regexp]: chosungText });
     }
 
     if (engText) {
       titleConditions.push({ [Sequelize.Op.regexp]: engText });
       descConditions.push({ [Sequelize.Op.regexp]: engText });
+      hashtagConditions.push({ [Sequelize.Op.regexp]: engText });
     }
 
     const rows = await Artgrams.findAll({
-      include: [
-        {
-          model: ArtgramHashtag,
-          attributes: ["tag_name"],
-          where: {
-            tag_name: { [Sequelize.Op.or]: descConditions },
-          },
-        },
-      ],
       attributes: ["artgramTitle", "artgramDesc"],
       where: {
         artgram_status: {
@@ -125,28 +120,71 @@ class SearchRepositroy extends searchHistory {
           { artgramDesc: { [Sequelize.Op.or]: descConditions } },
         ],
       },
-      limit: 5,
     });
 
-    const artgramsWithTags = rows
-      .filter((row) => row.ArtgramHashtags.length > 0)
-      .map((row) => {
-        const artgramTitle = row.artgramTitle;
-        const hashtags = row.ArtgramHashtags.map(
-          (artgramHashtag) => artgramHashtag.dataValues.tag_name
-        );
+    const hashTag = await Artgrams.findAll({
+      attributes: ["artgramTitle"],
+      include: [
+        {
+          model: ArtgramHashtag,
+          attributes: ["tag_name"],
+          required: true,
+          where: { tag_name: { [Sequelize.Op.or]: hashtagConditions } },
+        },
+      ],
+      where: {
+        artgram_status: {
+          [Op.ne]: "AS04",
+        },
+      },
+    });
 
+    let artgramsWithTags = [];
+    if (rows.length === 0) {
+      artgramsWithTags = hashTag.map((hashTagRow) => {
+        const artgramTitle = hashTagRow.dataValues.artgramTitle;
+
+        const artgramHashtags = hashTagRow.ArtgramHashtags
+          ? hashTagRow.ArtgramHashtags
+          : [];
+
+        const hashtags = artgramHashtags.map(
+          (hashtag) => hashtag.dataValues.tag_name
+        );
         return { artgramTitle, hashtags };
       });
+    } else {
+      artgramsWithTags = rows.map((row) => {
+        const artgramTitle = row.dataValues.artgramTitle;
 
+        const matchingHashTag = hashTag.find(
+          (hashTagRow) => hashTagRow.dataValues.artgramTitle === artgramTitle
+        );
+
+        const artgramHashtags = matchingHashTag
+          ? matchingHashTag.dataValues.ArtgramHashtags
+          : [];
+
+        const hashtags = artgramHashtags.map(
+          (hashtag) => hashtag.dataValues.tag_name
+        );
+        return { artgramTitle, hashtags };
+      });
+    }
+
+    const uniqueArtgramsWithTags = [
+      ...new Map(
+        artgramsWithTags.map((item) => [item.artgramTitle, item])
+      ).values(),
+    ];
     //검색한 text를 저장해줌
     await this.redisClient.set(
       `search:artgram:${SearchText}`,
-      JSON.stringify(artgramsWithTags),
+      JSON.stringify(uniqueArtgramsWithTags),
       "EX",
       120
     );
-    return artgramsWithTags;
+    return uniqueArtgramsWithTags;
   };
 
   /**
