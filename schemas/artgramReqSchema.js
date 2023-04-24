@@ -11,7 +11,7 @@ const artgramSchema = Joi.object({
     "any.required":
       "artgramDesc (설명) 값이 요청 매개 변수로 전달되지 않았습니다.",
   }),
-  hashtag: Joi.array().items(Joi.string().required()).messages({
+  hashtag: Joi.array().items(Joi.string()).messages({
     "string.empty": "배열에 문자열로 해시태그를 입력하세요",
   }),
   imgUrl: Joi.alternatives().try(
