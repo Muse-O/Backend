@@ -52,7 +52,6 @@ class NotiService {
     const notiData = {
       noti_sender: userEmail,
       noti_sender_nickname: noti_sender.profile_nickname,
-      noti_sender_profileImg: noti_sender.profile_img,
       noti_type: "announcement",
       noti_content: noti_content,
     };

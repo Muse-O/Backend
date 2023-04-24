@@ -135,7 +135,6 @@ class ArtgramService {
       const notiData = {
         noti_sender: userEmail,
         noti_sender_nickname: noti_sender.profile_nickname,
-        noti_sender_profileImg: noti_sender.profile_img,
         noti_type: "like",
         noti_content: "artgram",
         noti_content_id: artgramId,

@@ -16,36 +16,38 @@ class NotiRepository {
     constructor(){
         this.redis = redis;
     }
+
     /**
      * 알림창 정보 가져오기
-     * or result랑 pending ID 주면 프론트에서 pendingId만 강조표시? 안읽음표시처리
      * @param {string} userEmail 
      * @returns 
      */
     getNotiList = async (userEmail) => {
-        // 최신순으로 모든 메시지 가져오기
-        const result = await this.redis.xrevrange(userEmail,'+','-');
-      
-        // 처리하지 않은 메시지의 ID들 가져오기
-        const pending = await this.redis.xpending(userEmail, `noti_receiver_${userEmail}`, '-', '+', '1000000');
-        const pendingIds = pending.map(entry => entry[0]);
-        console.log('pendingIds======', pendingIds)
-      
-        // 처리하지 않은 메시지만 최신순으로 추출하여 반환하기
-        const parsedData = result.filter(entry => pendingIds.includes(entry[0])).map(entry => {
-          const [notiId, values] = entry;
-          const data = {};
-          for (let i = 0; i < values.length; i += 2) {
-            data[values[i]] = values[i + 1];
-          }
-          return {
-            notiId,
-            ...data
-          };
-        });
-      
-        return parsedData;
-      }
+      // 최신순으로 모든 메시지 가져오기
+      const result = await this.redis.xrevrange(userEmail,'+','-');
+    
+      // 처리하지 않은 메시지의 ID들 가져오기
+      const pending = await this.redis.xpending(userEmail, `noti_receiver_${userEmail}`, '-', '+', '1000000');
+      const pendingIds = pending.map(entry => entry[0]);
+      console.log('pendingIds======', pendingIds)
+    
+      // 처리하지 않은 메시지만 최신순으로 추출하여 반환하기
+      const parsedData = result.map(entry => {
+        const [notiId, values] = entry;
+        const data = {};
+        for (let i = 0; i < values.length; i += 2) {
+          data[values[i]] = values[i + 1];
+        }
+        const seen = pendingIds.includes(notiId) ? false : true;
+        return {
+          notiId,
+          seen,
+          ...data
+        };
+      });
+    
+      return parsedData;
+    }
 
     /**
      * 메인에 띄울만한 알림 카운트
@@ -127,7 +129,7 @@ class NotiRepository {
     findNotiSenderProfile = async (userEmail) =>{
       const sender = await UserProfile.findOne({
         where: { user_email: userEmail },
-        attributes: ['profile_nickname', 'profile_img']
+        attributes: ['profile_nickname']
       });
       return sender.dataValues;
     };

@@ -27,7 +27,6 @@ class ArtgramCommentService {
     const notiData = {
         noti_sender : userEmail,
         noti_sender_nickname: noti_sender.profile_nickname,
-        noti_sender_profileImg: noti_sender.profile_img,
         noti_type: 'comment',
         noti_content: 'artgram',
         noti_content_id: artgramId
@@ -129,7 +128,6 @@ class ArtgramCommentService {
     const notiData = {
         noti_sender : userEmail,
         noti_sender_nickname: noti_sender.profile_nickname,
-        noti_sender_profileImg: noti_sender.profile_img,
         noti_type: 'reply',
         noti_content: 'artgram',
         noti_content_id: artgramId
