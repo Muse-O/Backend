@@ -4,6 +4,7 @@ const {
   Exhibitions,
   Users,
   UserProfile,
+  ArtgramHashtag,
 } = require("../models");
 const { Sequelize, Op } = require("sequelize");
 const RedisClient = require("../config/redisConnector");
@@ -104,35 +105,48 @@ class SearchRepositroy extends searchHistory {
       descConditions.push({ [Sequelize.Op.regexp]: engText });
     }
 
-    //데이터베이스에서 값을 찾아옴(두 값이 동일하지 않을수 있기때문에 Op.or을 사용)
     const rows = await Artgrams.findAll({
-      attributes: ["artgramTitle"],
+      include: [
+        {
+          model: ArtgramHashtag,
+          attributes: ["tag_name"],
+          where: {
+            tag_name: { [Sequelize.Op.or]: descConditions },
+          },
+        },
+      ],
+      attributes: ["artgramTitle", "artgramDesc"],
       where: {
         artgram_status: {
           [Op.ne]: "AS04",
         },
         [Sequelize.Op.or]: [
-          { artgramTitle: { [Sequelize.Op.and]: titleConditions } },
-          { artgramDesc: { [Sequelize.Op.and]: descConditions } },
+          { artgramTitle: { [Sequelize.Op.or]: titleConditions } },
+          { artgramDesc: { [Sequelize.Op.or]: descConditions } },
         ],
       },
       limit: 5,
     });
 
-    //map을 사용해서 값이 일치하는 artgramTitle만 가져옴
-    let artgramSearch = rows.map((row) => row.artgramTitle);
-    if (artgramSearch.length === 0) {
-      artgramSearch = null;
-    }
+    const artgramsWithTags = rows
+      .filter((row) => row.ArtgramHashtags.length > 0)
+      .map((row) => {
+        const artgramTitle = row.artgramTitle;
+        const hashtags = row.ArtgramHashtags.map(
+          (artgramHashtag) => artgramHashtag.dataValues.tag_name
+        );
+
+        return { artgramTitle, hashtags };
+      });
+
     //검색한 text를 저장해줌
     await this.redisClient.set(
       `search:artgram:${SearchText}`,
-      JSON.stringify(artgramSearch),
+      JSON.stringify(artgramsWithTags),
       "EX",
       120
     );
-
-    return artgramSearch;
+    return artgramsWithTags;
   };
 
   /**

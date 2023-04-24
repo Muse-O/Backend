@@ -36,20 +36,20 @@ class ArtgramController {
    * 아트그램 상세조회(로그인X)
    */
   loadDetailArtgram = async (req, res, next) => {
-    // try {
-    const { userEmail } = res.locals.user || "guest";
-    const { artgramId } = req.params;
-    const datailArtgram = await this.artgramService.loadDetailArtgram(
-      artgramId,
-      userEmail
-    );
-    res.status(200).json({
-      datailArtgram,
-      message: "아트그램을 정상적으로 가져왔습니다.",
-    });
-    // } catch (error) {
-    //   next(error);
-    // }
+    try {
+      const { userEmail } = res.locals.user || "guest";
+      const { artgramId } = req.params;
+      const datailArtgram = await this.artgramService.loadDetailArtgram(
+        artgramId,
+        userEmail
+      );
+      res.status(200).json({
+        datailArtgram,
+        message: "아트그램을 정상적으로 가져왔습니다.",
+      });
+    } catch (error) {
+      next(error);
+    }
   };
 
   /**
