@@ -214,6 +214,9 @@ class ExhibitionService {
     if (updateExhibitionLike=="create"){
       const noti_receiver = await this.exhibitionRepository.findNotiReceiver(exhibitionId);
       const noti_sender = await this.notiRepository.findNotiSenderProfile(userEmail);
+      if (noti_receiver == userEmail){
+        return updateExhibitionLike
+      }
       const notiData = {
         noti_sender : userEmail,
         noti_sender_nickname: noti_sender.profile_nickname,
