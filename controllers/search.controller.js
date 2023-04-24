@@ -11,15 +11,15 @@ class SearchContorller {
    * @return
    */
   search = async (req, res, next) => {
-    // try {
-    const { searchText } = req.query;
-    const result = searchSchema.validate(searchText);
+    try {
+      const { searchText } = req.query;
+      const result = searchSchema.validate(searchText);
 
-    const search = await this.searchService.search(result);
-    res.status(200).json({ searchText: search });
-    // } catch (err) {
-    //   next(err);
-    // }
+      const search = await this.searchService.search(result);
+      res.status(200).json({ search });
+    } catch (err) {
+      next(err);
+    }
   };
 
   /**

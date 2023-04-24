@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 const Sequelize = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class ArtgramHashtag extends Model {
@@ -18,40 +16,43 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-  ArtgramHashtag.init({
-    artgramTagId: {
-      allowNull: false,
-      primaryKey: true,
-      type: DataTypes.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      field: 'artgram_tag_id'
+  ArtgramHashtag.init(
+    {
+      artgramTagId: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        field: "artgram_tag_id",
+      },
+      artgramId: {
+        allowNull: false,
+        type: DataTypes.UUID,
+        field: "artgram_id",
+      },
+      tagName: {
+        allowNull: true,
+        type: DataTypes.STRING,
+        field: "tag_name",
+      },
+      createdAt: {
+        allowNull: true,
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        field: "created_at",
+      },
+      updatedAt: {
+        allowNull: true,
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        field: "updated_at",
+      },
     },
-    artgramId: {
-      allowNull: false,
-      type: DataTypes.UUID,
-      field: 'artgram_id'
-    },
-    tagName: {
-      allowNull: true,
-      type: DataTypes.STRING,
-      field: 'tag_name'
-    },
-    createdAt: {
-      allowNull: true,
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-      field: 'created_at',
-    },
-    updatedAt: {
-      allowNull: true,
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-      field: 'updated_at'
+    {
+      sequelize,
+      modelName: "ArtgramHashtag",
+      tableName: "artgram_hashtag",
     }
-  }, {
-    sequelize,
-    modelName: 'ArtgramHashtag',
-    tableName: 'artgram_hashtag'
-  });
+  );
   return ArtgramHashtag;
 };
