@@ -9,10 +9,11 @@ class SearchService {
   }
   /**
    * 검색기능
-   * @param {query} searchText
+   * @param {validator} result
    * @returns
    */
-  search = async (searchText) => {
+  search = async (result) => {
+    const searchText = result.value;
     const artgramTitles = await this.searchRepositroy.autocompleteArtgrams(
       searchText
     );
@@ -30,9 +31,11 @@ class SearchService {
 
   /**
    * 전시회 검색기록저장
-   * @param {query} title
+   * @param {validator} result
+   * @param {Locals.user} userEmail
    */
-  selectResult = async (title, type, userEmail) => {
+  selectResult = async (result, userEmail) => {
+    const { title, type } = result.value;
     let saveResult;
     if (userEmail !== "guest" && userEmail !== undefined) {
       saveResult = this.searchRepositroy.selectResult(title, type);
@@ -44,6 +47,7 @@ class SearchService {
 
   /**
    * 최근검색기록 TOP10
+   * @param {Locals.user} userEmail
    * @returns
    */
   recentSearchHistory = async (userEmail) => {
@@ -66,10 +70,11 @@ class SearchService {
 
   /**
    * 메뉴별 검색구분
-   * @param {}
+   * @param {validator} result
    * @returns
    */
-  searchByType = async (category, searchText) => {
+  searchByType = async (result) => {
+    const { category, searchText } = result.value;
     let findByCategory;
     if (category === "artgram") {
       findByCategory = await this.searchRepositroy.autocompleteArtgrams(
@@ -79,6 +84,8 @@ class SearchService {
       findByCategory = await this.searchRepositroy.autocompleteExhibition(
         searchText
       );
+    } else if (category === "user") {
+      findByCategory = await this.searchRepositroy.findUsers(searchText);
     }
 
     return findByCategory;
