@@ -13,13 +13,15 @@ class ExhibitionService {
    * @param {number} limit 요청할 전시 게시글 수
    * @param {number} offset 조회 전시 게시글 시작점
    * @param {string} userEmail 유저 이메일
+   * @param {object} filter 검색 필터링
    * @returns exhibitionItem
    */
-  getExhibitionList = async (limit, offset, userEmail) => {
+  getExhibitionList = async (limit, offset, userEmail, filter) => {
     const exhibitionItem = await this.exhibitionRepository.getExhibitionList(
       limit,
       offset,
-      userEmail
+      userEmail,
+      filter
     );
 
     if (!exhibitionItem) {
