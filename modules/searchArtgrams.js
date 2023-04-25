@@ -8,6 +8,7 @@ const {
 const dayjs = require("dayjs");
 
 const searchArtgram = async (search, myuserEmail) => {
+  console.log("myuserEmail", myuserEmail);
   const searchResult = await Promise.all(
     search.map(async (artgram) => {
       const userEmail = artgram.userEmail;
@@ -36,7 +37,7 @@ const searchArtgram = async (search, myuserEmail) => {
       const { "ArtgramImgs.imgUrl": imgUrl, ...rest } = artgram.dataValues;
 
       const likedByCurrentUser =
-        myuserEmail !== "guest"
+        myuserEmail !== "guest" && myuserEmail !== undefined
           ? await ArtgramLike.findOne({
               where: {
                 userEmail: myuserEmail,
@@ -46,7 +47,7 @@ const searchArtgram = async (search, myuserEmail) => {
           : null;
 
       const scrapByCurrentUser =
-        myuserEmail !== "guest"
+        myuserEmail !== "guest" && myuserEmail !== undefined
           ? await ArtgramScrap.findOne({
               where: {
                 userEmail: myuserEmail,

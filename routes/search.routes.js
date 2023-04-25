@@ -13,7 +13,7 @@ const searchController = new SearchContorller();
  *       - search
  *     summary: "기본검색"
  *     parameters:
- *       - name: keyWord
+ *       - name: searchText
  *         in: query
  *         type: string
  *         require: true
@@ -24,7 +24,7 @@ const searchController = new SearchContorller();
  *         schema:
  *          type: object
  *          properties:
- *            keyWord:
+ *            searchText:
  *              type: string
  *     security:
  *       - jwt: []
@@ -129,7 +129,7 @@ const searchController = new SearchContorller();
  *         type: string
  *         required: true
  *         description: "검색할 카테고리입력 exhibition or artgram"
- *       - name: keyWord
+ *       - name: searchText
  *         in: query
  *         type: string
  *         required: true
@@ -145,14 +145,14 @@ const searchController = new SearchContorller();
  *                 items:
  *                   type: object
  *                   properties:
- *                     keyWord:
+ *                     searchText:
  *                       type: string
  *                     type:
  *                       type: stirng
  *                     createdAt:
  *                       type: string
  *                   example:
- *                     keyWord: 테스트
+ *                     searchText: 테스트
  *                     type: artgram
  *     security:
  *       - jwt: []

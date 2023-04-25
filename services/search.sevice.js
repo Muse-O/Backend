@@ -42,6 +42,7 @@ class SearchService {
    */
   selectResult = async (result, userEmail) => {
     const { title, type } = result.value;
+
     let saveResult;
     if (userEmail !== "guest" && userEmail !== undefined) {
       saveResult = this.searchRepositroy.selectResult(title, type, userEmail);

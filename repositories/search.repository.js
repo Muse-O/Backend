@@ -56,12 +56,12 @@ class SearchRepositroy extends searchHistory {
       ? removeSpecialCharacters(searchText)
       : searchText;
     //레디스에 저장된값이 있는지 확인 있다면 바로 출력해줌
-    // const cachedArtgrams = await this.redisClient.get(
-    //   `search:artgram:${SearchText}`
-    // );
-    // if (cachedArtgrams) {
-    //   return JSON.parse(cachedArtgrams);
-    // }
+    const cachedArtgrams = await this.redisClient.get(
+      `search:artgram:${SearchText}`
+    );
+    if (cachedArtgrams) {
+      return JSON.parse(cachedArtgrams);
+    }
     //입력된 문자열을 문자 단위로 분해한다
     let characters = SearchText.split("");
 
@@ -289,18 +289,12 @@ class SearchRepositroy extends searchHistory {
     const searchExhibition = await Promise.all(
       rows.map(async (exhibition) => {
         const exhibitionId = exhibition.exhibitionId;
-        // const likeCount = await ExhibitionLike.count({
-        //   where: { exhibitionId },
-        // });
-        // const scrapCount = await ExhibitionScrap.count({
-        //   where: { exhibitionId },
-        // });
 
         const { "ExhibitionImgs.imgUrl": imgUrl, ...rest } =
           exhibition.dataValues;
 
         const likedByCurrentUser =
-          myuserEmail !== "guest"
+          myuserEmail !== "guest" && myuserEmail !== undefined
             ? await ExhibitionLike.findOne({
                 where: {
                   userEmail: myuserEmail,
@@ -310,7 +304,7 @@ class SearchRepositroy extends searchHistory {
             : null;
 
         const scrapByCurrentUser =
-          myuserEmail !== "guest"
+          myuserEmail !== "guest" && myuserEmail !== undefined
             ? await ExhibitionScrap.findOne({
                 where: {
                   userEmail: myuserEmail,
@@ -439,11 +433,11 @@ class SearchRepositroy extends searchHistory {
     let userSearch = [];
     if (rows.length > 0) {
       userSearch = rows.map((row) => ({
+        type: "user",
         userEmail: row.userEmail,
         profileId: row.UserProfile.profileId,
         profileNickname: row.UserProfile.profileNickname,
         profileImg: row.UserProfile.profileImg,
-        type: "user",
       }));
     }
 
@@ -452,7 +446,7 @@ class SearchRepositroy extends searchHistory {
       `search:user:${searchText}`,
       JSON.stringify(userSearch),
       "EX",
-      3600
+      120
     );
 
     return userSearch;
