@@ -442,6 +442,7 @@ class SearchRepositroy extends searchHistory {
         profileId: row.UserProfile.profileId,
         profileNickname: row.UserProfile.profileNickname,
         profileImg: row.UserProfile.profileImg,
+        type: "user",
       }));
     }
 
