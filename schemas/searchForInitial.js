@@ -1,6 +1,6 @@
 // 한글 문자를 검사하여 searchText에 한글을 포함하는지 확인
 function isKorean(searchText) {
-  return /[가-힣ㄱ-ㅎ]/.test(searchText);
+  return /[가-힣ㄱ-ㅎㅏ-ㅣ]/.test(searchText);
 }
 
 //입력된 한글 문자에 대해 초성 검색을 위한 패턴을 생성
