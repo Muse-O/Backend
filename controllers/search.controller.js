@@ -29,18 +29,20 @@ class SearchContorller {
    * @param {string} type
    */
   selectResult = async (req, res, next) => {
-    // try {
-    const { title, type } = req.body;
-    const result = searchSchema.validate({ title, type });
-    const { userEmail } = res.locals.user || "guest";
-    const selectKeyword = await this.searchService.selectResult(
-      result,
-      userEmail
-    );
-    res.status(200).json({ selectKeyword, message: "검색기록저장되었습니다" });
-    // } catch (err) {
-    //   next(err);
-    // }
+    try {
+      const { title, type } = req.body;
+      const result = searchSchema.validate({ title, type });
+      const { userEmail } = res.locals.user || "guest";
+      const selectKeyword = await this.searchService.selectResult(
+        result,
+        userEmail
+      );
+      res
+        .status(200)
+        .json({ selectKeyword, message: "검색기록저장되었습니다" });
+    } catch (err) {
+      next(err);
+    }
   };
 
   /**
