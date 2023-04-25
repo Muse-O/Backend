@@ -461,22 +461,22 @@ class ExhibitionRepository {
    * @param {array[string]} categories 추가할 카테고리
    * @returns deleteCategoriesCnt: number, updateCategoriesCnt: number 카테고리 수정 정보
    */
-  updateExhibitionCategory = async (mode, exhibitionId, categories) => {
+  updateExhibitionCategory = async (mode, exhibitionId, category) => {
     let updateCategoryStatus = {
       deleteCategoriesCnt: 0,
       updateCategoriesCnt: 0,
     };
     let updateExhibitionCategories = null;
 
-    const rowToCategories = categories.map((categoryCode) => ({
+    const rowToCategory = {
       exhibitionId,
-      categoryCode,
-    }));
+      categoryCode: category,
+    };
 
     if (mode === "C") {
       // 카테고리 추가
-      updateExhibitionCategories = await ExhibitionCategory.bulkCreate(
-        rowToCategories
+      updateExhibitionCategories = await ExhibitionCategory.create(
+        rowToCategory
       );
 
       updateCategoryStatus.updateCategoriesCnt =
@@ -488,8 +488,8 @@ class ExhibitionRepository {
       });
       updateCategoryStatus.deleteCategoriesCnt = deleteCategoriesCnt;
       // 카테고리 추가
-      updateExhibitionCategories = await ExhibitionCategory.bulkCreate(
-        rowToCategories
+      updateExhibitionCategories = await ExhibitionCategory.create(
+        rowToCategory
       );
 
       updateCategoryStatus.updateCategoriesCnt =
