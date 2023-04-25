@@ -263,6 +263,7 @@ class SearchRepositroy extends searchHistory {
         "startDate",
         "endDate",
         "createdAt",
+        "location",
       ],
       where: {
         exhibition_status: {
