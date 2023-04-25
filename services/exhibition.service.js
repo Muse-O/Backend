@@ -1,5 +1,6 @@
 const Boom = require("boom");
 const ExhibitionRepository = require("../repositories/exhibition.repository");
+const { isNotNull }  = require("../modules/isNotNull.js");
 
 class ExhibitionService {
   constructor() {
@@ -108,8 +109,9 @@ class ExhibitionService {
       // 이미지 수정 정보
       updateInfo.imgUpdate = writeImageStatus;
     }
-    if (exhibitionCategoty.length > 0) {
+    if (isNotNull(exhibitionCategoty)) {
       // 카테고리
+
       const writeExhibitionCategories =
         await this.exhibitionRepository.updateExhibitionCategory(
           mode,

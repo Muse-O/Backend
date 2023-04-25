@@ -47,7 +47,10 @@ const exhibitionSchema = Joi.object({
     'any.required': 'location(장소)값이 요청 파라미터로 전달되지 않았습니다.'
   }),
   contact: Joi.string().allow(null).default('미지정'),
-  exhibitionCategoty: Joi.array().items(Joi.string()).allow(null, '').default([]),
+  exhibitionCategoty: Joi.string().required().messages({
+    'string.empty': 'exhibitionCategoty(카테고리)를 입력해주세요.',
+    'any.required': 'exhibitionCategoty(카테고리)값이 요청 파라미터로 전달되지 않았습니다.'
+  }),
   artImage: Joi.array().items(Joi.object(
     {
       order: Joi.number().allow(null, '').empty('').messages({
