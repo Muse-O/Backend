@@ -38,6 +38,7 @@ class SearchRepositroy extends searchHistory {
     const savedResult = await searchHistory.create({
       keyWord: title,
       type: type,
+      userEmail: userEmail,
     });
     return savedResult;
   };
