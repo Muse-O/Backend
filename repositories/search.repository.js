@@ -56,13 +56,13 @@ class SearchRepositroy extends searchHistory {
       ? removeSpecialCharacters(searchText)
       : searchText;
     //레디스에 저장된값이 있는지 확인 있다면 바로 출력해줌
-    const cachedArtgrams = await this.redisClient.get(
-      `search:artgram:${SearchText}`
-    );
+    // const cachedArtgrams = await this.redisClient.get(
+    //   `search:artgram:${SearchText}`
+    // );
 
-    if (cachedArtgrams) {
-      return JSON.parse(cachedArtgrams);
-    }
+    // if (cachedArtgrams) {
+    //   return JSON.parse(cachedArtgrams);
+    // }
     //입력된 문자열을 문자 단위로 분해한다
     let characters = SearchText.split("");
 
@@ -170,6 +170,11 @@ class SearchRepositroy extends searchHistory {
 
     const searchTitle = await searchArtgram(rows, myuserEmail);
     const searchHashtag = await searchArtgram(hashTag, myuserEmail);
+    const combinedResults = [...searchTitle, ...searchHashtag];
+    const uniqueResults = combinedResults.filter(
+      (artgram, index, self) =>
+        index === self.findIndex((t) => t.artgramId === artgram.artgramId)
+    );
 
     const uniqueArtgramsWithTags = [searchTitle, searchHashtag];
     //검색한 text를 저장해줌
@@ -179,7 +184,7 @@ class SearchRepositroy extends searchHistory {
       "EX",
       120
     );
-    return [searchTitle, searchHashtag];
+    return uniqueResults;
   };
 
   /**
