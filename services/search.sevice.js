@@ -43,9 +43,9 @@ class SearchService {
     const { title, type } = result.value;
     let saveResult;
     if (userEmail !== "guest" && userEmail !== undefined) {
-      saveResult = this.searchRepositroy.selectResult(title, type);
-    } else {
       saveResult = this.searchRepositroy.selectResult(title, type, userEmail);
+    } else {
+      saveResult = this.searchRepositroy.selectResult(title, type);
     }
     return saveResult;
   };

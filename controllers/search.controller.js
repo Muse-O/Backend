@@ -11,16 +11,16 @@ class SearchContorller {
    * @return
    */
   search = async (req, res, next) => {
-    // try {
-    const { searchText } = req.query;
-    const { userEmail } = res.locals.user || "guest";
-    const result = searchSchema.validate(searchText);
+    try {
+      const { searchText } = req.query;
+      const { userEmail } = res.locals.user || "guest";
+      const result = searchSchema.validate(searchText);
 
-    const search = await this.searchService.search(result, userEmail);
-    res.status(200).json({ search });
-    // } catch (err) {
-    //   next(err);
-    // }
+      const search = await this.searchService.search(result, userEmail);
+      res.status(200).json({ search });
+    } catch (err) {
+      next(err);
+    }
   };
 
   /**
@@ -29,20 +29,18 @@ class SearchContorller {
    * @param {string} type
    */
   selectResult = async (req, res, next) => {
-    try {
-      const { title, type } = req.body;
-      const result = searchSchema.validate({ title, type });
-      const { userEmail } = res.locals.user || "guest";
-      const selectKeyword = await this.searchService.selectResult(
-        result,
-        userEmail
-      );
-      res
-        .status(200)
-        .json({ selectKeyword, message: "검색기록저장되었습니다" });
-    } catch (err) {
-      next(err);
-    }
+    // try {
+    const { title, type } = req.body;
+    const result = searchSchema.validate({ title, type });
+    const { userEmail } = res.locals.user || "guest";
+    const selectKeyword = await this.searchService.selectResult(
+      result,
+      userEmail
+    );
+    res.status(200).json({ selectKeyword, message: "검색기록저장되었습니다" });
+    // } catch (err) {
+    //   next(err);
+    // }
   };
 
   /**
