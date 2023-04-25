@@ -59,6 +59,7 @@ class SearchRepositroy extends searchHistory {
     const cachedArtgrams = await this.redisClient.get(
       `search:artgram:${SearchText}`
     );
+
     if (cachedArtgrams) {
       return JSON.parse(cachedArtgrams);
     }
@@ -144,9 +145,6 @@ class SearchRepositroy extends searchHistory {
         {
           model: ArtgramHashtag,
           attributes: ["tagName"],
-          where: {
-            tagName: { [Sequelize.Op.or]: hashtagConditions },
-          },
         },
       ],
       order: [["createdAt", "DESC"]],
@@ -263,6 +261,7 @@ class SearchRepositroy extends searchHistory {
         "startDate",
         "endDate",
         "createdAt",
+        "location",
       ],
       where: {
         exhibition_status: {

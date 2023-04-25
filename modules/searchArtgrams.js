@@ -8,7 +8,6 @@ const {
 const dayjs = require("dayjs");
 
 const searchArtgram = async (search, myuserEmail) => {
-  console.log("myuserEmail", myuserEmail);
   const searchResult = await Promise.all(
     search.map(async (artgram) => {
       const userEmail = artgram.userEmail;
