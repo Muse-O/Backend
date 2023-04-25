@@ -12,20 +12,25 @@ class SearchService {
    * @param {validator} result
    * @returns
    */
-  search = async (result) => {
+  search = async (result, userEmail) => {
     const searchText = result.value;
     const artgramTitles = await this.searchRepositroy.autocompleteArtgrams(
-      searchText
+      searchText,
+      userEmail
     );
     const exhibitionTitles = await this.searchRepositroy.autocompleteExhibition(
-      searchText
+      searchText,
+      userEmail
     );
-    const findUser = await this.searchRepositroy.findUsers(searchText);
+    const findUser = await this.searchRepositroy.findUsers(
+      searchText,
+      userEmail
+    );
 
     return {
-      artgramTitles: artgramTitles,
-      exhibitionTitles: exhibitionTitles,
-      findUsers: findUser,
+      artgrams: artgramTitles,
+      exhibitions: exhibitionTitles,
+      users: findUser,
     };
   };
 
