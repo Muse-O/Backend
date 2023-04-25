@@ -1,5 +1,6 @@
 const SearchRepositroy = require("../repositories/search.repository");
 const RedisElasticsearchConnector = require("../config/redisConnector");
+const Boom = require("boom");
 
 class SearchService {
   constructor() {
@@ -45,7 +46,7 @@ class SearchService {
     if (userEmail !== "guest" && userEmail !== undefined) {
       saveResult = this.searchRepositroy.selectResult(title, type, userEmail);
     } else {
-      saveResult = this.searchRepositroy.selectResult(title, type);
+      throw Boom.notFound("유저정보가 없으면 저장할 수 없습니다.");
     }
     return saveResult;
   };
