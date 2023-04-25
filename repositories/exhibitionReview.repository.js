@@ -1,4 +1,5 @@
 const {
+  Exhibitions,
   ExhibitionReviews,
   ExhibitionHashtag,
   Users,
@@ -51,6 +52,19 @@ class ExhibitionReviewRepository {
     );
 
     return insertExhibitionHashTag;
+  };
+
+  /**
+   * 전시 게시글 리뷰작성 시 전시게시글 작성자에게 알림 발송하기 위해 작성자 조회
+   * @param {string} exhibitionId
+   * @returns 전시 게시글 작성자 이메일
+   */
+  findreviewNotiReceiver = async (exhibitionId) => {
+    const author = await Exhibitions.findByPk(exhibitionId, {
+      attributes: ["user_email"],
+    });
+
+    return author.dataValues.user_email;
   };
 
   /**

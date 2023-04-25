@@ -7,7 +7,9 @@ const userSchema = require("../schemas/userReqSchema");
 class UserController {
   userService = new UserService();
 
-  // 로그인
+  /**
+   * 일반 로그인
+   */
   localLogin = async (req, res, next) => {
     try {
       const { email, password } = req.body;
@@ -26,7 +28,9 @@ class UserController {
     }
   };
 
-  // Stategy 성공 시
+  /**
+   * Strategy 성공시
+   */
   socialCallback = async (req,res, next) => {
     try {
     const email = req.user.userEmail
@@ -43,7 +47,9 @@ class UserController {
     }
     };
 
-  // 회원가입 전 이메일 중복확인
+  /**
+   * 회원가입 전 이메일 중복확인
+   */ 
   emailConfirm = async (req, res, next) => {
     try {
       const { email } = req.body;
@@ -61,7 +67,9 @@ class UserController {
     }
   }
 
-  // 인증번호 메일 전송
+  /*
+  *인증번호 메일 전송
+  */
   emailValidate = async (req, res, next) => {
     try {
       const { email } = req.body
@@ -76,7 +84,9 @@ class UserController {
     }
   }
 
-  // 인증번호 검증
+  /**
+   * 인증번호 검증
+   */
   emailValidateNumCheck = async (req, res, next) => {
     try {
       const { email, code } = req.body;
@@ -89,8 +99,9 @@ class UserController {
     }
   }
   
-
-  // 회원가입
+  /**
+   * 회원가입
+   */
   userSignup = async (req, res, next) => {
     try {
       const { email, nickname, password, author } = req.body;

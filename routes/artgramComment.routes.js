@@ -275,13 +275,13 @@ router.post(
 );
 //답글 수정
 router.patch(
-  "/:artgramId/comments/:commentId/reply/:commentParent",
+  "/:artgramId/comments/:commentParent/reply/:commentId",
   authMiddleware,
   artgramCommentController.updateReply
 );
 //답글 삭제
 router.patch(
-  "/:artgramId/comments/:commentId/reply/:commentParent/remove",
+  "/:artgramId/comments/:commentParent/reply/:commentId/remove",
   authMiddleware,
   artgramCommentController.deleteReply
 );

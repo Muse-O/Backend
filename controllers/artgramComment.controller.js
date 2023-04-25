@@ -46,20 +46,20 @@ class ArtgramCommentController {
    * 댓글 전체조회
    */
   allComment = async (req, res, next) => {
-    try {
-      const { artgramId } = await pkIdParamSchema
-        .validateAsync(req.params)
-        .catch((err) => {
-          res.status(400).json({ message: err.message });
-          throw Boom.badRequest(err.message);
-        });
-      const createArtgram = await this.artgramCommentService.allComment(
-        artgramId
-      );
-      res.status(200).json({ comment: createArtgram });
-    } catch (error) {
-      next(error);
-    }
+    // try {
+    const { artgramId } = await pkIdParamSchema
+      .validateAsync(req.params)
+      .catch((err) => {
+        res.status(400).json({ message: err.message });
+        throw Boom.badRequest(err.message);
+      });
+    const createArtgram = await this.artgramCommentService.allComment(
+      artgramId
+    );
+    res.status(200).json({ comment: createArtgram });
+    // } catch (error) {
+    //   next(error);
+    // }
   };
   /**
    * 댓글 수정

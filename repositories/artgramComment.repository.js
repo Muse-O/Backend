@@ -32,6 +32,32 @@ class ArtgramCommentRepository extends ArtgramsComment {
   };
 
   /**
+   * 아트그램 게시글 댓글 작성 시 작성자에게 알림 발송하기 위해 작성자 조회
+   * @param {string} artgramId
+   * @returns 아트그램 게시글 작성자 이메일
+   */
+  findNotiReceiver = async (artgramId) => {
+    const author = await Artgrams.findByPk(artgramId, {
+      attributes: ["user_email"],
+    });
+
+    return author.dataValues.user_email;
+  };
+
+  /**
+   * 아트그램 게시글 답글 작성 시 댓글 작성자에게 알림 발송하기 위해 작성자 조회
+   * @param {string} artgramId
+   * @returns 댓글 작성자 이메일
+   */
+  findreplyNotiReceiver = async (commentId) => {
+    const author = await ArtgramsComment.findByPk(commentId, {
+      attributes: ["user_email"],
+    });
+
+    return author.dataValues.user_email;
+  };
+
+  /**
    * 댓글 전체조회
    * @param {string} artgramId
    * @returns artgramId에 해당하는 댓글전체반환 findArtgramComment
@@ -44,34 +70,65 @@ class ArtgramCommentRepository extends ArtgramsComment {
     });
 
     const userEmail = allEmail.map((artgram) => artgram.dataValues.userEmail);
-    const user = await Users.findOne({
+    const user = await Users.findAll({
       where: { userEmail: userEmail },
-      include: [{ model: UserProfile }],
+      include: [
+        { model: UserProfile, attributes: ["profileNickname", "profileImg"] },
+      ],
     });
-    const profileNickname = user.UserProfile.dataValues.profileNickname;
-    const profileImg = user.UserProfile.dataValues.profileImg;
 
     const findComment = await ArtgramsComment.findAll({
       where: {
         artgramId,
-        commentParent: null,
+        [Op.or]: [
+          // Move the Op.or outside of the commentParent object
+          { commentParent: null },
+        ],
         commentStatus: {
           [Op.ne]: "CS04",
         },
       },
-
-      attributes: ["commentId", "userEmail", "comment", "createdAt"],
+      attributes: [
+        "commentId",
+        "userEmail",
+        "comment",
+        "createdAt",
+        "commentParent",
+      ],
       order: [["createdAt", "DESC"]],
     });
 
-    const findArtgramComment = findComment.map((comment) => ({
-      commentId: comment.commentId,
-      userEmail: comment.userEmail,
-      profileImg,
-      profileNickname,
-      comment: comment.comment,
-      createdAt: comment.createdAt,
-    }));
+    const findArtgramComment = [];
+
+    for (const comment of findComment) {
+      if (comment.commentParent !== null && comment.commentParent !== 0) {
+        continue;
+      }
+
+      const userProfile = user.find(
+        (u) => u.userEmail === comment.userEmail
+      )?.UserProfile;
+      const profileNickname = userProfile?.profileNickname ?? null;
+      const profileImg = userProfile?.profileImg ?? null;
+
+      const replyCount =
+        (await ArtgramsComment.count({
+          where: {
+            commentParent: comment.commentId,
+          },
+        })) || 0;
+
+      findArtgramComment.push({
+        commentId: comment.commentId,
+        userEmail: comment.userEmail,
+        profileImg,
+        profileNickname,
+        comment: comment.comment,
+        createdAt: comment.createdAt,
+        replyCount,
+      });
+    }
+
     return findArtgramComment;
   };
 
@@ -123,18 +180,16 @@ class ArtgramCommentRepository extends ArtgramsComment {
    * @returns 답글 조회결과 반환 findReplyComment
    */
   allReply = async (artgramId, commentId) => {
-    const allEmail = await Artgrams.findAll({
+    //모든 유저 이메일 조회
+    //추후에 가져온 artgramId와 commentId를 사용해서 아트그램의id에 해당하는
+    //댓글, 답글의 userEmail만 불러오도록 리펙토링 최대한 필요한만큼만의 데이터를 가져오기위해서
+    const allEmail = await ArtgramsComment.findAll({
+      where: { artgramId },
       order: [["createdAt", "DESC"]],
       attributes: ["userEmail"],
       group: ["userEmail"],
     });
     const userEmail = allEmail.map((Reply) => Reply.dataValues.userEmail);
-    const user = await Users.findOne({
-      where: { userEmail: userEmail },
-      include: [{ model: UserProfile }],
-    });
-    const profileNickname = user.UserProfile.dataValues.profileNickname;
-    const profileImg = user.UserProfile.dataValues.profileImg;
 
     const findAllReply = await ArtgramsComment.findAll({
       where: {
@@ -144,7 +199,10 @@ class ArtgramCommentRepository extends ArtgramsComment {
         },
         commentParent: {
           [Op.ne]: null,
-          [Op.eq]: commentId, // commentParent와 commentId가 같은 경우에만 조회
+          [Op.eq]: commentId, // commentParent와 commentId가 일치
+        },
+        userEmail: {
+          [Op.in]: userEmail,
         },
       },
       attributes: [
@@ -156,15 +214,32 @@ class ArtgramCommentRepository extends ArtgramsComment {
       ],
       order: [["createdAt", "DESC"]],
     });
-    const findReplyComment = findAllReply.map((reply) => ({
-      commentId: reply.commentId,
-      userEmail: reply.userEmail,
-      profileImg,
-      profileNickname,
-      comment: reply.comment,
-      createdAt: reply.createdAt,
-    }));
-    return findReplyComment;
+
+    const findArtgramReply = [];
+
+    //반복문으로 userEmail에 해당하는 UserProfile조회
+    for (const comment of findAllReply) {
+      const user = await Users.findOne({
+        where: { userEmail: comment.userEmail },
+        include: [{ model: UserProfile }],
+      });
+
+      const userProfile = user.UserProfile;
+      const profileNickname = userProfile?.profileNickname ?? null;
+      const profileImg = userProfile?.profileImg ?? null;
+
+      findArtgramReply.push({
+        commentId: comment.commentId,
+        userEmail: comment.userEmail,
+        profileImg,
+        profileNickname,
+        comment: comment.comment,
+        createdAt: comment.createdAt,
+        commentParent: comment.commentParent,
+      });
+    }
+
+    return findArtgramReply;
   };
 
   /**
@@ -224,7 +299,7 @@ class ArtgramCommentRepository extends ArtgramsComment {
       { commentStatus: "CS04" },
       {
         where: { userEmail, artgramId, commentId, commentParent },
-        fields: ["connentStatus"],
+        fields: ["commentStatus"],
       }
     );
     return deletereply;

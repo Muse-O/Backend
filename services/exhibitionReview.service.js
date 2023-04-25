@@ -1,5 +1,6 @@
 const Boom = require("boom");
 const ExhibitionReviewRepository = require("../repositories/exhibitionReview.repository");
+const NotiRepository = require("../repositories/notification.repository")
 
 const { isNotNull } = require("../modules/isNotNull");
 const { ExhibitionReviews, ExhibitionHashtag } = require("../models");
@@ -7,6 +8,7 @@ const { ExhibitionReviews, ExhibitionHashtag } = require("../models");
 class ExhibitionService {
   constructor() {
     this.exhibitionReviewRepository = new ExhibitionReviewRepository();
+    this.notiRepository = new NotiRepository();
   }
 
   /**
@@ -69,6 +71,20 @@ class ExhibitionService {
         "리뷰 작성에 실패했습니다. 전시 게시글이 삭제되었거나, 권한이 존재하지 않습니다."
       );
     }
+
+    const noti_receiver = await this.exhibitionReviewRepository.findreviewNotiReceiver(exhibitionId);
+    const noti_sender = await this.notiRepository.findNotiSenderProfile(userEmail);
+    if (noti_receiver == userEmail){
+      return true
+    }
+    const notiData = {
+        noti_sender : userEmail,
+        noti_sender_nickname: noti_sender.profile_nickname,
+        noti_type: 'comment',
+        noti_content: 'exhibition',
+        noti_content_id: exhibitionId
+      };
+    await this.notiRepository.saveToStream(noti_receiver, notiData)
 
     return true;
   };
