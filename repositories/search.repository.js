@@ -309,6 +309,7 @@ class SearchRepositroy extends SearchHistory {
 
         const exhibitionObject = {
           ...rest,
+          detailRouter: `/exhibition/detail/${exhibitionId}`,
           type: "exhibition",
           liked: !!likedByCurrentUser,
           scrap: !!scrapByCurrentUser,
