@@ -15,7 +15,6 @@ class SearchService {
    */
   search = async (result, userEmail) => {
     const searchText = result.value;
-    console.log("=========", searchText);
     if (!searchText) {
       return Boom.notFound("검색어가 존재하지 않습니다.");
     }
