@@ -1,10 +1,4 @@
 const AdminController = require("../../../controllers/admin.controller");
-const {
-  processReport,
-  approveExhibition,
-  getAllReports,
-  processReport,
-} = require("../../../controllers/admin.controller");
 // const { describe } = require("../../../schemas/userReqSchema");
 const adminService = require("../../../services/admin.service");
 

@@ -18,9 +18,9 @@
     "test:unit": "NODE_ENV=test jest test/unit --forceExit",
     "test:integration": "NODE_ENV=test jest test/integration --forceExit",
 
-    "window:test": "set NODE_ENV=test && jest --forceExit",
+    "window:test": "set NODE_ENV=test jest --forceExit --detectOpenHandles",
     "window:test:silent": "set NODE_ENV=test && jest --silent --forceExit",
-    "window:test:coverage": "set NODE_ENV=test && jest --coverage --forceExit",
+    "window:test:coverage": "set NODE_ENV=test && jest --coverage --forceExit --detectOpenHandles",
     "window:test:unit": "set NODE_ENV=test && jest test/unit --forceExit",
     "window:test:integration": "set NODE_ENV=test && jest test/integration --forceExit"
   },
