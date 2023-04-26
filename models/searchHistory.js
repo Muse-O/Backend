@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         field: "search-id",
       },
       userEmail: {
-        allowNull: true,
+        allowNull: false,
         primaryKey: true,
         type: DataTypes.STRING,
         field: "user_email",
