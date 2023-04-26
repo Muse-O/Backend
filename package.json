@@ -9,8 +9,10 @@
     "prettify": "prettier --write *.js **/*.js",
     "coverage": "jest --coverage",
 
-    "test:init": "NODE_ENV=test sequelize db:create --config=./src/config/config.json && NODE_ENV=test sequelize db:migrate --config=./src/config/config.json --migrations-path=./src/migrations",
-    "window:test:init": "set NODE_ENV=test sequelize db:create --config=./src/config/config.json && set NODE_ENV=test sequelize db:migrate --config=./src/config/config.json --migrations-path=./src/migrations",
+    "test:init": "NODE_ENV=test sequelize db:create --config=./config/config.js && NODE_ENV=test sequelize db:migrate --config=./config/config.js --model-path=./model",
+    "window:test:init": "set sequelize db:create --env test --config=./config/config.js && sequelize db:migrate --env test --config=./config/config.js",
+    "new:init": "sequelize db:create --env test --config=./config/config.js && sequelize db:migrate --env test --config=./config/config.js --migrations-path ./models",
+    "sync-test":"set NODE_ENV=test node ./modules/sync-sequelize-model-testsync.js",
 
     "test": "NODE_ENV=test jest --forceExit",
     "test:silent": "NODE_ENV=test jest --silent --forceExit",
