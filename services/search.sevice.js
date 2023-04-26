@@ -18,23 +18,20 @@ class SearchService {
     if (!searchText) {
       return Boom.notFound("검색어가 존재하지 않습니다.");
     }
-    const artgramTitles = await this.searchRepositroy.autocompleteArtgrams(
+    const artgrams = await this.searchRepositroy.autocompleteArtgrams(
       searchText,
       userEmail
     );
-    const exhibitionTitles = await this.searchRepositroy.autocompleteExhibition(
+    const exhibitions = await this.searchRepositroy.autocompleteExhibition(
       searchText,
       userEmail
     );
-    const findUser = await this.searchRepositroy.findUsers(
-      searchText,
-      userEmail
-    );
+    const users = await this.searchRepositroy.findUsers(searchText, userEmail);
 
     return {
-      artgrams: artgramTitles,
-      exhibitions: exhibitionTitles,
-      users: findUser,
+      artgrams,
+      exhibitions,
+      users,
     };
   };
 
