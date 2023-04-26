@@ -1,5 +1,5 @@
 const {
-  searchHistory,
+  SearchHistory,
   Artgrams,
   Exhibitions,
   Users,
@@ -23,7 +23,7 @@ const {
   removeSpecialCharacters,
 } = require("../schemas/searchForInitial");
 
-class SearchRepositroy extends searchHistory {
+class SearchRepositroy extends SearchHistory {
   constructor() {
     super();
     this.redisClient = RedisClient.getClient();
@@ -267,6 +267,7 @@ class SearchRepositroy extends searchHistory {
         "endDate",
         "createdAt",
         "location",
+        "postImage",
       ],
       where: {
         exhibition_status: {
@@ -278,15 +279,6 @@ class SearchRepositroy extends searchHistory {
           { exhibitionEngTitle: { [Sequelize.Op.and]: engTitleConditions } },
         ],
       },
-      include: [
-        {
-          model: ExhibitionImg,
-          attributes: ["imgUrl"],
-          where: {
-            imgOrder: 1,
-          },
-        },
-      ],
       order: [["createdAt", "DESC"]],
     });
 
@@ -294,8 +286,7 @@ class SearchRepositroy extends searchHistory {
       rows.map(async (exhibition) => {
         const exhibitionId = exhibition.exhibitionId;
 
-        const { "ExhibitionImgs.imgUrl": imgUrl, ...rest } =
-          exhibition.dataValues;
+        const { ...rest } = exhibition.dataValues;
 
         const likedByCurrentUser =
           myuserEmail !== "guest" && myuserEmail !== undefined
@@ -320,9 +311,6 @@ class SearchRepositroy extends searchHistory {
         const exhibitionObject = {
           ...rest,
           type: "exhibition",
-          imgUrl,
-          // likeCount,
-          // scrapCount,
           liked: !!likedByCurrentUser,
           scrap: !!scrapByCurrentUser,
           createdAt: dayjs(exhibition.createdAt)
@@ -462,7 +450,7 @@ class SearchRepositroy extends searchHistory {
    * @returns
    */
   recentSearchHistory = async (userEmail) => {
-    const findRecentHistory = await searchHistory.findAll({
+    const findRecentHistory = await SearchHistory.findAll({
       where: { userEmail },
       attributes: ["keyWord", "type", "createdAt"],
       limit: 10,
@@ -475,11 +463,11 @@ class SearchRepositroy extends searchHistory {
    * 인기검색어 TOP10
    */
   searchByRank = async () => {
-    const findByRank = await searchHistory.findAll({
+    const findByRank = await SearchHistory.findAll({
       attributes: [
         "keyWord",
         "type",
-        [Sequelize.fn("COUNT", Sequelize.col("key-word")), "count"],
+        [Sequelize.fn("COUNT", Sequelize.col("key_word")), "count"],
       ],
       group: ["keyWord", "type"],
       order: [[Sequelize.literal("count"), "DESC"]],
