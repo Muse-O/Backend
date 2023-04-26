@@ -176,11 +176,10 @@ class SearchRepositroy extends SearchHistory {
         index === self.findIndex((t) => t.artgramId === artgram.artgramId)
     );
 
-    const uniqueArtgramsWithTags = [searchTitle, searchHashtag];
     //검색한 text를 저장해줌
     await this.redisClient.set(
       `search:artgram:${SearchText}`,
-      JSON.stringify(uniqueArtgramsWithTags),
+      JSON.stringify(uniqueResults),
       "EX",
       120
     );
