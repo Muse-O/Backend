@@ -8,6 +8,7 @@ const {
   ArtgramHashtag,
   ArtgramsComment,
 } = require("../models");
+const artgramModify = require("../modules/artgramModify");
 const { Op, Sequelize } = require("sequelize");
 const dayjs = require("dayjs");
 
@@ -489,8 +490,14 @@ class ArtgramRepository extends Artgrams {
    * @param {string} artgramDesc
    * @returns 수정결과반환 cngArtgram
    */
-  ArtgramToModify = async (artgramId, artgramTitle, artgramDesc) => {
-    const cngArtgram = await Artgrams.update(
+  ArtgramToModify = async (
+    artgramId,
+    artgramTitle,
+    artgramDesc,
+    imgUrlArray,
+    hashtag
+  ) => {
+    const changeArtgram = await Artgrams.update(
       {
         artgramTitle,
         artgramDesc,
@@ -499,7 +506,74 @@ class ArtgramRepository extends Artgrams {
         where: { artgramId },
       }
     );
-    return cngArtgram;
+
+    const modify = await artgramModify(artgramId, imgUrlArray, hashtag);
+    // // 1. 기존 해시태그 가져오기
+    // const existingHashtags = await ArtgramHashtag.findAll({
+    //   where: { artgramId },
+    // });
+
+    // // 2. 새 해시태그를 기준으로 추가 및 업데이트 수행
+    // for (let newHashtag of hashtag) {
+    //   const existingHashtag = existingHashtags.find(
+    //     (h) => h.tagName === newHashtag
+    //   );
+
+    //   if (existingHashtag) {
+    //     // 해시태그가 이미 존재하면 업데이트
+    //     await ArtgramHashtag.update(
+    //       { tagName: newHashtag },
+    //       { where: { artgramTagId: existingHashtag.artgramTagId } }
+    //     );
+    //   } else {
+    //     // 해시태그가 존재하지 않으면 추가
+    //     await ArtgramHashtag.create({ tagName: newHashtag, artgramId });
+    //   }
+    // }
+
+    // // 3. 기존 해시태그를 기준으로 삭제 수행
+    // for (let existingHashtag of existingHashtags) {
+    //   if (!hashtag.includes(existingHashtag.tagName)) {
+    //     // 새 해시태그에 없는 경우 삭제
+    //     await ArtgramHashtag.destroy({
+    //       where: { artgramTagId: existingHashtag.artgramTagId },
+    //     });
+    //   }
+    // }
+    // // 1. 기존 이미지 가져오기
+    // const existingImgs = await ArtgramImg.findAll({
+    //   where: { artgramId },
+    // });
+
+    // // 2. 새 이미지를 기준으로 추가 및 업데이트 수행
+    // let imgOrder = 1;
+    // for (let newImg of imgUrlArray) {
+    //   const existingImg = existingImgs.find((h) => h.tagName === newImg);
+
+    //   if (existingImg) {
+    //     // 이미지가 이미 존재하면 업데이트
+    //     await ArtgramImg.update(
+    //       { imgUrl: newImg, imgOrder },
+    //       { where: { artgramImgId: existingImg.artgramImgId } }
+    //     );
+    //   } else {
+    //     // 이미지가 존재하지 않으면 추가
+    //     await ArtgramImg.create({ imgOrder, imgUrl: newImg, artgramId });
+    //   }
+    //   imgOrder++; // imgOrder 속성 값 증가
+    // }
+
+    // // 3. 기존 이미지를 기준으로 삭제 수행
+    // for (let existingImg of existingImgs) {
+    //   if (!imgUrlArray.includes(existingImg.tagName)) {
+    //     // 새 이미지에 없는 경우 삭제
+    //     await ArtgramImg.destroy({
+    //       where: { artgramImgId: existingImg.artgramImgId },
+    //     });
+    //   }
+    // }
+
+    return changeArtgram;
   };
 
   /**

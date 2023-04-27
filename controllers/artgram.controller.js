@@ -58,6 +58,7 @@ class ArtgramController {
   creatingAnArtgram = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
+      console.log("=========", req.body);
       const validatedData = await artgramSchema
         .validateAsync(req.body)
         .catch((err) => {
@@ -81,6 +82,7 @@ class ArtgramController {
    */
   ArtgramToModify = async (req, res, next) => {
     try {
+      console.log(req.body);
       const { artgramId } = await pkIdParamSchema
         .validateAsync(req.params)
         .catch((err) => {
