@@ -9,6 +9,7 @@ const {
   ExhibitionImg,
   ExhibitionLike,
   ExhibitionScrap,
+  ExhibitionAddress,
 } = require("../models");
 const { searchArtgram } = require("../modules/searchArtgrams");
 const dayjs = require("dayjs");
@@ -265,6 +266,12 @@ class SearchRepositroy extends SearchHistory {
     }
 
     const rows = await Exhibitions.findAll({
+      include: [
+        {
+          model: ExhibitionAddress,
+          attributes: ["address"],
+        },
+      ],
       attributes: [
         "exhibitionId",
         "exhibitionEngTitle",
@@ -272,7 +279,6 @@ class SearchRepositroy extends SearchHistory {
         "startDate",
         "endDate",
         "createdAt",
-        "location",
         "postImage",
       ],
       where: {
@@ -292,7 +298,16 @@ class SearchRepositroy extends SearchHistory {
       rows.map(async (exhibition) => {
         const exhibitionId = exhibition.exhibitionId;
 
-        const { ...rest } = exhibition.dataValues;
+        let address = "";
+
+        if (exhibition.ExhibitionAddress !== null) {
+          address = exhibition.ExhibitionAddress.address
+            .split(" ")
+            .slice(0, 2)
+            .join(" ");
+        }
+
+        const { ExhibitionAddress, ...rest } = exhibition.dataValues;
 
         const likedByCurrentUser =
           myuserEmail !== "guest" && myuserEmail !== undefined
@@ -317,6 +332,7 @@ class SearchRepositroy extends SearchHistory {
         const exhibitionObject = {
           ...rest,
           detailRouter: `/exhibition/view/${exhibitionId}`,
+          address,
           type: "exhibition",
           liked: !!likedByCurrentUser,
           scrap: !!scrapByCurrentUser,
