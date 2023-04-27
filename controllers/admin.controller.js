@@ -20,12 +20,13 @@ class AdminController {
   approveExhibition = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
-      const { exhibitionId } = res.body;
+      const { exhibitionId } = req.body;
+      console.log("exhibitionId", exhibitionId);
       const approved = await this.adminService.approveExhibition(
         userEmail,
         exhibitionId
       );
-      res.status(200).json({ approved });
+      res.status(200).json({ message: "전시글이 승인되었습니다." });
     } catch (err) {
       next(err);
     }
@@ -44,6 +45,7 @@ class AdminController {
   processReport = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
+      const {exhibitionId,reportUserEmail, artgramId, commentId,commentParent} = req.body
       const reportSuccess = await this.adminService.processReport(userEmail);
       res.status(200).json({ reportSuccess });
     } catch (err) {
