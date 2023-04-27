@@ -40,7 +40,7 @@ class UserController {
     console.log("strategy 성공시", email)
     // res.redirect("http://localhost:4000");
     res.setHeader('Set-Cookie', 'authorization='+`Bearer ${token}`+'; Path=/; HttpOnly');
-    return res.redirect(301, 'http://localhost:4000');
+    return res.redirect(301, 'http://localhost:3000');
     } catch (error){
     logger.error(error.message);
     next(error);
