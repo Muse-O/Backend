@@ -7,6 +7,7 @@ const {
   ExhibitionLike,
   ExhibitionScrap,
   ExhibitionReviews,
+  ExhibitionHashtag,
   UserProfile,
   sequelize,
 } = require("../models");
@@ -15,6 +16,7 @@ const { Op } = require("sequelize");
 const { isNotNull } = require("../modules/isNotNull.js");
 
 const dayjs = require("dayjs");
+const { subtract } = require("lodash");
 require("dayjs/locale/ko"); // 현재 지역에 해당하는 locale 로드 현재 국내 서비스이므로 한국 시간 설정
 
 class ExhibitionRepository {
@@ -48,6 +50,8 @@ class ExhibitionRepository {
       e.post_image AS postImage,
       e.art_work_cnt AS artWorkCnt,
       e.location,
+      SUBSTRING_INDEX(a.address,' ', 2) AS sigungu,
+      a.address,
       e.contact,
       e.exhibition_host AS exhibitionHost,
       get_code_name(e.exhibition_host) AS exhibitionHostName,
@@ -141,7 +145,9 @@ class ExhibitionRepository {
       OFFSET ${offset};
       `,
       { type: sequelize.QueryTypes.SELECT }
-    );
+    ).catch(err => {
+      console.log(err);
+    });
 
     result.forEach((row, idx) => {
       const { tagName, categoryCode, categoryCodeName } = row;
@@ -656,17 +662,6 @@ class ExhibitionRepository {
   };
 
   /**
-   * 전시 게시글 좋아요 시 작성자에게 알림 발송하기 위해 작성자 조회
-   * @param {string} exhibitionId 
-   * @returns 전시회 게시글 작성자 이메일
-   */
-  findNotiReceiver = async (exhibitionId) => {
-    const author = await Exhibitions.findByPk(exhibitionId,{attributes:['user_email']})
-
-    return author.dataValues.user_email;
-  }
-
-  /**
    * 전시 게시글 카테고리별 검색
    * @param {array[string]} categories
    * @returns 검색된 게시글 리스트
@@ -684,6 +679,29 @@ class ExhibitionRepository {
     });
 
     return exhibitionList;
+  };
+
+  /**
+   * 3개월간 가장 많은 태그 TOP 10
+   * @returns tagTags TOP 10 태그
+   */
+  getTopTags = async () => {
+    
+    const tagTags = await ExhibitionHashtag.findAll({
+      attributes: ['tagName', [sequelize.fn('COUNT', sequelize.col('tag_name')),'tagCount']],
+      where: {
+        createdAt: {
+          [Op.gt]: dayjs().subtract(3, 'month').toDate(),
+          [Op.lte]: dayjs().toDate()
+        }
+      },
+      group: ['tagName'],
+      order: [[sequelize.literal('tagCount'), 'DESC']],
+      limit:10,
+      raw: true
+    }).catch(err => console.log(err));
+
+    return tagTags;
   };
 }
 

@@ -1,12 +1,10 @@
 const Boom = require("boom");
 const ExhibitionRepository = require("../repositories/exhibition.repository");
 const { isNotNull }  = require("../modules/isNotNull.js");
-const NotiRepository = require("../repositories/notification.repository")
 
 class ExhibitionService {
   constructor() {
     this.exhibitionRepository = new ExhibitionRepository();
-    this.notiRepository = new NotiRepository();
   }
 
   /**
@@ -215,22 +213,6 @@ class ExhibitionService {
       );
     }
 
-    if (updateExhibitionLike=="create"){
-      const noti_receiver = await this.exhibitionRepository.findNotiReceiver(exhibitionId);
-      const noti_sender = await this.notiRepository.findNotiSenderProfile(userEmail);
-      if (noti_receiver == userEmail){
-        return updateExhibitionLike
-      }
-      const notiData = {
-        noti_sender : userEmail,
-        noti_sender_nickname: noti_sender.profile_nickname,
-        noti_type: 'like',
-        noti_content: 'exhibition',
-        noti_content_id: exhibitionId
-      };
-      await this.notiRepository.saveToStream(noti_receiver, notiData)
-    }
-
     return updateExhibitionLike;
   };
 
@@ -252,6 +234,20 @@ class ExhibitionService {
     }
 
     return searchExhibition;
+  };
+
+  /**
+   * 3개월간 가장 많은 태그 TOP 10
+   * @returns tagTags TOP 10 태그
+   */
+  getTopTags = async () => {
+    const topTags = await this.exhibitionRepository.getTopTags();
+
+    if (!searchExhibition.length > 0) {
+      throw Boom.notFound("최근 3개월간 작성된 태그가 없습니다.");
+    }
+
+    return topTags;
   };
 }
 module.exports = ExhibitionService;

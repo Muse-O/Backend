@@ -255,6 +255,24 @@ class ExhibitionController {
       next(error);
     }
   };
+
+  /**
+   * TOP 10 태그 조회
+   */
+  getTopTags = async (req, res, next) => {
+    try {
+      const topTags = await this.exhibitionService.getTopTags();
+
+      return res
+        .status(200)
+        .json({
+          topTags,
+          message: "전시 TOP 10 태그를 정상적으로 가져왔습니다.",
+        });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 module.exports = ExhibitionController;
