@@ -21,6 +21,6 @@ router.use("/search", searchRouter);
 router.use("/banner", bannerRouter);
 router.use("/notification", notiRouter);
 router.use("/report", reportRouter);
-// router.use("/admin", adminRouter)
+router.use("/admin", adminRouter);
 
 module.exports = router;

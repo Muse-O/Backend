@@ -3,7 +3,6 @@ const logger = require("../middlewares/logger.js");
 const Boom = require("boom");
 const userSchema = require("../schemas/userReqSchema");
 
-
 class UserController {
   userService = new UserService();
 
@@ -13,8 +12,8 @@ class UserController {
   localLogin = async (req, res, next) => {
     try {
       const { email, password } = req.body;
-      if (!email || !password){
-        throw Boom.badRequest("요청한 데이터 형식이 올바르지 않습니다.")
+      if (!email || !password) {
+        throw Boom.badRequest("요청한 데이터 형식이 올바르지 않습니다.");
       }
       await this.userService.userLogin(email, password);
 
@@ -31,58 +30,63 @@ class UserController {
   /**
    * Strategy 성공시
    */
-  socialCallback = async (req,res, next) => {
+  socialCallback = async (req, res, next) => {
     try {
-    const email = req.user.userEmail
-    const token = await this.userService.generateToken(email);
-    // res.set("Authorization", `${token}`);
-    // res.cookie("authorization", `Bearer ${token}`);
-    console.log("strategy 성공시", email)
-    // res.redirect("http://localhost:4000");
-    res.setHeader('Set-Cookie', 'authorization='+`Bearer ${token}`+'; Path=/; HttpOnly');
-    return res.redirect(301, 'http://localhost:3000');
-    } catch (error){
-    logger.error(error.message);
-    next(error);
+      const email = req.user.userEmail;
+      const token = await this.userService.generateToken(email);
+      // res.set("Authorization", `${token}`);
+      // res.cookie("authorization", `Bearer ${token}`);
+      console.log("strategy 성공시", email);
+      // res.redirect("http://localhost:4000");
+      res.setHeader(
+        "Set-Cookie",
+        "authorization=" + `Bearer ${token}` + "; Path=/; HttpOnly"
+      );
+      return res.redirect(301, "http://localhost:3000");
+    } catch (error) {
+      logger.error(error.message);
+      next(error);
     }
-    };
+  };
 
   /**
    * 회원가입 전 이메일 중복확인
-   */ 
+   */
   emailConfirm = async (req, res, next) => {
     try {
       const { email } = req.body;
 
-      if (!email){
-        throw Boom.badRequest("요청한 데이터 형식이 올바르지 않습니다.")
+      if (!email) {
+        throw Boom.badRequest("요청한 데이터 형식이 올바르지 않습니다.");
       }
 
-      await this.userService.findByEmail(email)
+      await this.userService.findByEmail(email);
 
       return res.status(201).json({ message: "가입 가능한 이메일입니다." });
     } catch (error) {
       logger.error(error.message);
       next(error);
     }
-  }
+  };
 
   /*
-  *인증번호 메일 전송
-  */
+   *인증번호 메일 전송
+   */
   emailValidate = async (req, res, next) => {
     try {
-      const { email } = req.body
-      if (!email){
-        throw Boom.badRequest("요청한 데이터 형식이 올바르지 않습니다.")
+      const { email } = req.body;
+      if (!email) {
+        throw Boom.badRequest("요청한 데이터 형식이 올바르지 않습니다.");
       }
-      await this.userService.sendMail(email)
-      return res.status(201).json({ message: "인증 메일이 성공적으로 발송되었습니다." });
+      await this.userService.sendMail(email);
+      return res
+        .status(201)
+        .json({ message: "인증 메일이 성공적으로 발송되었습니다." });
     } catch (error) {
       logger.error(error.message);
       next(error);
     }
-  }
+  };
 
   /**
    * 인증번호 검증
@@ -90,15 +94,15 @@ class UserController {
   emailValidateNumCheck = async (req, res, next) => {
     try {
       const { email, code } = req.body;
-      const result = await this.userService.emailValidateNumCheck(email, code)
+      const result = await this.userService.emailValidateNumCheck(email, code);
 
-      return res.status(200).json(result)
+      return res.status(200).json(result);
     } catch (error) {
       logger.error(error.message);
       next(error);
     }
-  }
-  
+  };
+
   /**
    * 회원가입
    */
@@ -115,7 +119,7 @@ class UserController {
         console.log("Valid input!");
       }
 
-      await this.userService.findByEmail(email) // 혹시 모르니 중복 한번 더 확인
+      await this.userService.findByEmail(email); // 혹시 모르니 중복 한번 더 확인
       await this.userService.userSignup(email, nickname, password, author);
 
       return res.status(201).json({ message: "회원 가입에 성공하였습니다." });

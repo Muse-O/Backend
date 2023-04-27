@@ -5,7 +5,6 @@ artgramModify = async (artgramId, imgUrlArray, hashtag) => {
   const existingHashtags = await ArtgramHashtag.findAll({
     where: { artgramId },
   });
-  console.log("existingHashtags", existingHashtags);
   if (hashtag) {
     if (Array.isArray(hashtag)) {
       // ... 이전 코드와 동일 ...
