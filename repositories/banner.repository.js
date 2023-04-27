@@ -26,7 +26,7 @@ class BannerRepository {
         e.start_date AS startDate,
         e.end_date AS endDate,
         e.post_image AS postImage,
-        e.location AS location,
+        CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS location,
         get_code_name(e.exhibition_kind) AS exhibitionKind,
         l.like_cnt,
         GROUP_CONCAT(ea.authorName ORDER BY ea.author_order ASC) AS author,
@@ -91,7 +91,7 @@ class BannerRepository {
         e.start_date AS startDate,
         e.end_date AS endDate,
         e.post_image AS postImage,
-        e.location AS location,
+        CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS location,
         get_code_name(e.exhibition_kind) AS exhibitionKind,
         l.like_cnt,
         a.address
@@ -123,8 +123,12 @@ class BannerRepository {
       delete row.address
     })
 
+
+    const row1 = result.slice(0, 5);
+    const row2 = result.slice(5, 10);
+
     const exhibitionList = {
-      rows: result,
+      row1, row2
     };
 
     return exhibitionList;
@@ -147,7 +151,7 @@ class BannerRepository {
       e.start_date AS startDate,
       e.end_date AS endDate,
       e.post_image AS postImage,
-      e.location AS location,
+      CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS location,
       get_code_name(e.exhibition_kind) AS exhibitionKind,
       l.like_cnt,
       a.address
@@ -203,7 +207,7 @@ class BannerRepository {
       e.start_date AS startDate,
       e.end_date AS endDate,
       e.post_image AS postImage,
-      e.location AS location,
+      CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS location,
       get_code_name(e.exhibition_kind) AS exhibitionKind,
       l.like_cnt,
       a.address

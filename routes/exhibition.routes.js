@@ -27,5 +27,7 @@ router.patch("/like/:exhibitionId", authMiddleware, exhibitionController.likeExh
 router.get("/category", commonAPIController.getCategory);
 // 전시회 카테고리 검색
 router.get("/category/search", publicAuthMiddleware, exhibitionController.searchCategoryExhibition);
+// 전시 TOP 10 태그 검색
+router.get("/topTags", exhibitionController.getTopTags);
 
 module.exports = router;
