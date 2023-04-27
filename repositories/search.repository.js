@@ -298,10 +298,6 @@ class SearchRepositroy extends SearchHistory {
       rows.map(async (exhibition) => {
         const exhibitionId = exhibition.exhibitionId;
 
-        console.log(
-          "==========",
-          exhibition.ExhibitionAddress.address.split(" ").slice(0, 2).join(" ")
-        );
         let address = "";
 
         if (exhibition.ExhibitionAddress !== null) {
