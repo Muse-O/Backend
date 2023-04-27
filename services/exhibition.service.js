@@ -243,7 +243,7 @@ class ExhibitionService {
   getTopTags = async () => {
     const topTags = await this.exhibitionRepository.getTopTags();
 
-    if (!searchExhibition.length > 0) {
+    if (!topTags.length > 0) {
       throw Boom.notFound("최근 3개월간 작성된 태그가 없습니다.");
     }
 
