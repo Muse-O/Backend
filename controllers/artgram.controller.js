@@ -1,5 +1,6 @@
 const ArtgramService = require("../services/artgram.service");
 const artgramSchema = require("../schemas/artgramReqSchema");
+const artgramModify = require("../schemas/artgramModifyReqSchema");
 const pkIdParamSchema = require("../schemas/pkIdParamSchema");
 const pageQuerySchema = require("../schemas/pageQuerySchema");
 const Boom = require("boom");
@@ -58,7 +59,6 @@ class ArtgramController {
   creatingAnArtgram = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
-      console.log("=========", req.body);
       const validatedData = await artgramSchema
         .validateAsync(req.body)
         .catch((err) => {
@@ -82,18 +82,15 @@ class ArtgramController {
    */
   ArtgramToModify = async (req, res, next) => {
     try {
-      console.log(req.body);
       const { artgramId } = await pkIdParamSchema
         .validateAsync(req.params)
         .catch((err) => {
-          res.status(400).json({ message: err.message });
-          throw Boom.badRequest(err.message);
+          throw new Error(err.message);
         });
-      const validatedData = await artgramSchema
+      const validatedData = await artgramModify
         .validateAsync(req.body)
         .catch((err) => {
-          res.status(402).json({ message: err.message });
-          throw Boom.badRequest(err.message);
+          throw new Error(err.message);
         });
       const cngArtgram = await this.artgramService.ArtgramToModify(
         artgramId,
@@ -104,6 +101,7 @@ class ArtgramController {
       next(error);
     }
   };
+
   /**
    * 아트그램 삭제
    */

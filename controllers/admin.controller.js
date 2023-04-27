@@ -45,6 +45,7 @@ class AdminController {
   processReport = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
+      const {exhibitionId,reportUserEmail, artgramId, commentId,commentParent} = req.body
       const reportSuccess = await this.adminService.processReport(userEmail);
       res.status(200).json({ reportSuccess });
     } catch (err) {

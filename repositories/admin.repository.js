@@ -39,6 +39,10 @@ class AdminRepository extends Users {
     console.log(reports);
     return reports;
   };
+
+  // processReport = async() => {
+  //   const
+  // }
 }
 
 module.exports = AdminRepository;
