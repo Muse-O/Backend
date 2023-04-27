@@ -159,6 +159,13 @@ class SearchRepositroy extends SearchHistory {
           required: true,
           where: { tag_name: { [Sequelize.Op.or]: hashtagConditions } },
         },
+        {
+          model: ArtgramImg,
+          attributes: ["imgUrl"],
+          where: {
+            imgOrder: 1,
+          },
+        },
       ],
       where: {
         artgram_status: {
@@ -309,7 +316,7 @@ class SearchRepositroy extends SearchHistory {
 
         const exhibitionObject = {
           ...rest,
-          detailRouter: `/exhibition/detail/${exhibitionId}`,
+          detailRouter: `/exhibition/view/${exhibitionId}`,
           type: "exhibition",
           liked: !!likedByCurrentUser,
           scrap: !!scrapByCurrentUser,

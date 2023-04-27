@@ -4,6 +4,7 @@ const env = process.env;
 
 const config = {
   development: {
+    use_env_variable: "DATABASE_URL_DEV",
     username: env.MYSQL_USERNAME,
     //env.MYSQL_USERNAME은 불러오고자 하는 데이터의 키값이므로 자유롭게 이름설정이 가능하다.
     password: env.MYSQL_PASSWORD,
@@ -15,6 +16,7 @@ const config = {
   },
 
   test: {
+    use_env_variable: "DATABASE_URL_TEST",
     username: env.MYSQL_USERNAME_TEST,
     password: env.MYSQL_PASSWORD_TEST,
     database: env.MYSQL_DATABASE_TEST,
@@ -25,6 +27,7 @@ const config = {
   },
 
   production: {
+    use_env_variable: "DATABASE_URL_PROD",
     username: env.MYSQL_USERNAME,
     password: env.MYSQL_PASSWORD,
     database: env.MYSQL_DATABASE,
