@@ -8,8 +8,12 @@ const {
 const dayjs = require("dayjs");
 
 const searchArtgram = async (search, myuserEmail) => {
+  const filteredSearch = search.filter(
+    (artgram) => artgram.artgramStatus !== "AS04"
+  );
+
   const searchResult = await Promise.all(
-    search.map(async (artgram) => {
+    filteredSearch.map(async (artgram) => {
       const userEmail = artgram.userEmail;
       const user = await Users.findOne({
         where: { userEmail: userEmail },
@@ -33,7 +37,8 @@ const searchArtgram = async (search, myuserEmail) => {
         where: { artgramId: artgramId },
       });
 
-      const { "ArtgramImgs.imgUrl": imgUrl, ...rest } = artgram.dataValues;
+      const imgUrl = artgram.ArtgramImgs[0].dataValues.imgUrl;
+      const { ArtgramImgs, ...rest } = artgram.dataValues;
 
       const likedByCurrentUser =
         myuserEmail !== "guest" && myuserEmail !== undefined
