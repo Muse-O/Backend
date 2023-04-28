@@ -90,6 +90,13 @@ class ReportRepository {
         commentId: target,
         articleType: "RP000004",
       });
+    } else if (targetType === "userEmail") {
+      savedReport = await this.articleReportModel.create({
+        userEmail,
+        reportMessage,
+        reportEmail: target,
+        articleType: "RP000006",
+      });
     }
     return savedReport;
   };
