@@ -62,7 +62,7 @@ class ArtgramCommentRepository extends ArtgramsComment {
    * @param {string} artgramId
    * @returns artgramId에 해당하는 댓글전체반환 findArtgramComment
    */
-  allComment = async (artgramId) => {
+ allComment = async (artgramId) => {
     const allEmail = await Artgrams.findAll({
       order: [["createdAt", "DESC"]],
       attributes: ["userEmail"],

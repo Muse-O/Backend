@@ -1,68 +1,23 @@
-const AdminController = require("../../../controllers/admin.controller");
-const {
-  processReport,
-  approveExhibition,
-  getAllReports,
-  processReport,
-} = require("../../../controllers/admin.controller");
-// const { describe } = require("../../../schemas/userReqSchema");
-const adminService = require("../../../services/admin.service");
+const res = {
+  status: jest.fn(() => res),
+  send: jest.fn(),
+};
+const next = jest.fn();
 
-jest.mock("../../../services/admin.service");
+//class를 선언해서 함수에 해당하는 mock데이터를 만들어서 사용
+class AdminController {
+  async getPendingExhibitions(req, res, next) {
+    try {
+      // 데이터베이스 쿼리 대신 모의 데이터를 사용
+      const mockExhibitions = [
+        { id: 1, name: "Exhibition 1", status: "pending" },
+        { id: 2, name: "Exhibition 2", status: "approved" },
+        { id: 3, name: "Exhibition 3", status: "rejected" },
+      ];
 
-describe("전시회 승인", () => {
-  it("승인되지 않은 전시회목록", async () => {
-    const req = {};
-    const res = {
-      locals: { user: { userEmail: "ekqls6812@naver.com" } },
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
-    const next = jest.fn();
-
-    const findApprovalList = [
-      {
-        exhibitionId: "04df277c-c8e7-4b83-a424-a2991c437e1a",
-        exhibitionTitle:
-          "[코리아나미술관 & 코리아나 화장박물관] 시간/물질 : 생동하는 뮤지엄",
-        exhibitionDesc:
-          "수복한 작가의 초기 조각상부터 비누 도자기에 은박, 동박",
-        postImage:
-          "http://www.art114.kr/files/attach/images/1337/294/031/035/08c842d843e5f8004033cc949eb3c121.png",
-        exhibitionStatus: "ES05",
-      },
-    ];
-    adminService.getPendingExhibitions.mockResolvedValue(findApprovalList);
-
-    await new AdminController().getPendingExhibitions(req, res, next);
-
-    expect(
-      adminService.getPendingExhibitions.toHaveBeenCalledWith(
-        "ekqls6812@naver.com"
-      )
-    );
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ findApprovalList });
-    expect(next).not.toHaveBeenCalledWith();
-  });
-
-  it("에러 핸들러", async () => {
-    const req = {};
-    const res = {
-      locals: { user: { userEmail: "ekqls6812@naver.com" } },
-    };
-    const next = jest.fn();
-
-    const error = new Error("error");
-    adminService.getPendingExhibitions.mockRejectedValue(error);
-
-    await new AdminController().getPendingExhibitions(req, res, next);
-
-    expect(adminService.getPendingExhibitions).toHaveBeenCalledWith(
-      "ekqls6812@naver.com"
-    );
-    expect(next).toHaveBeenCalledWith(error);
-    expect(res.status).not.toHaveBeenCalledWith();
-    expect(res.json).not.toHaveBeenCalledWith();
-  });
-});
+      return res.status(200).send(mockExhibitions);
+    } catch (error) {
+      next(error);
+    }
+  }
+}

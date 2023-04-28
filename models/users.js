@@ -83,9 +83,10 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       //Users searchHistory 1:N
-      this.hasMany(models.searchHistory, {
+      this.hasMany(models.SearchHistory, {
         sourceKey: "userEmail", // 현재 모델의 userEmail 컬럼을
-        foreignKey: "userEmail", // ExhibitionReview 모델에 userEmail컬럼으로 연결합니다.
+        foreignKey: "userEmail", // searchHistory 모델에 userEmail컬럼으로 연결합니다.
+        onDelete: "CASCADE",
       });
     }
   }

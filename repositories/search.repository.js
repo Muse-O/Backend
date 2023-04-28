@@ -1,5 +1,5 @@
 const {
-  searchHistory,
+  SearchHistory,
   Artgrams,
   Exhibitions,
   Users,
@@ -9,6 +9,7 @@ const {
   ExhibitionImg,
   ExhibitionLike,
   ExhibitionScrap,
+  ExhibitionAddress,
 } = require("../models");
 const { searchArtgram } = require("../modules/searchArtgrams");
 const dayjs = require("dayjs");
@@ -23,7 +24,7 @@ const {
   removeSpecialCharacters,
 } = require("../schemas/searchForInitial");
 
-class SearchRepositroy extends searchHistory {
+class SearchRepositroy extends SearchHistory {
   constructor() {
     super();
     this.redisClient = RedisClient.getClient();
@@ -159,6 +160,13 @@ class SearchRepositroy extends searchHistory {
           required: true,
           where: { tag_name: { [Sequelize.Op.or]: hashtagConditions } },
         },
+        {
+          model: ArtgramImg,
+          attributes: ["imgUrl"],
+          where: {
+            imgOrder: 1,
+          },
+        },
       ],
       where: {
         artgram_status: {
@@ -176,11 +184,10 @@ class SearchRepositroy extends searchHistory {
         index === self.findIndex((t) => t.artgramId === artgram.artgramId)
     );
 
-    const uniqueArtgramsWithTags = [searchTitle, searchHashtag];
     //검색한 text를 저장해줌
     await this.redisClient.set(
       `search:artgram:${SearchText}`,
-      JSON.stringify(uniqueArtgramsWithTags),
+      JSON.stringify(uniqueResults),
       "EX",
       120
     );
@@ -259,6 +266,12 @@ class SearchRepositroy extends searchHistory {
     }
 
     const rows = await Exhibitions.findAll({
+      include: [
+        {
+          model: ExhibitionAddress,
+          attributes: ["address"],
+        },
+      ],
       attributes: [
         "exhibitionId",
         "exhibitionEngTitle",
@@ -266,7 +279,7 @@ class SearchRepositroy extends searchHistory {
         "startDate",
         "endDate",
         "createdAt",
-        "location",
+        "postImage",
       ],
       where: {
         exhibition_status: {
@@ -278,15 +291,6 @@ class SearchRepositroy extends searchHistory {
           { exhibitionEngTitle: { [Sequelize.Op.and]: engTitleConditions } },
         ],
       },
-      include: [
-        {
-          model: ExhibitionImg,
-          attributes: ["imgUrl"],
-          where: {
-            imgOrder: 1,
-          },
-        },
-      ],
       order: [["createdAt", "DESC"]],
     });
 
@@ -294,8 +298,16 @@ class SearchRepositroy extends searchHistory {
       rows.map(async (exhibition) => {
         const exhibitionId = exhibition.exhibitionId;
 
-        const { "ExhibitionImgs.imgUrl": imgUrl, ...rest } =
-          exhibition.dataValues;
+        let address = "";
+
+        if (exhibition.ExhibitionAddress !== null) {
+          address = exhibition.ExhibitionAddress.address
+            .split(" ")
+            .slice(0, 2)
+            .join(" ");
+        }
+
+        const { ExhibitionAddress, ...rest } = exhibition.dataValues;
 
         const likedByCurrentUser =
           myuserEmail !== "guest" && myuserEmail !== undefined
@@ -319,10 +331,9 @@ class SearchRepositroy extends searchHistory {
 
         const exhibitionObject = {
           ...rest,
+          detailRouter: `/exhibition/view/${exhibitionId}`,
+          address,
           type: "exhibition",
-          imgUrl,
-          // likeCount,
-          // scrapCount,
           liked: !!likedByCurrentUser,
           scrap: !!scrapByCurrentUser,
           createdAt: dayjs(exhibition.createdAt)
@@ -462,10 +473,10 @@ class SearchRepositroy extends searchHistory {
    * @returns
    */
   recentSearchHistory = async (userEmail) => {
-    const findRecentHistory = await searchHistory.findAll({
+    const findRecentHistory = await SearchHistory.findAll({
       where: { userEmail },
       attributes: ["keyWord", "type", "createdAt"],
-      limit: 10,
+      limit: 15,
       order: [["createdAt", "DESC"]],
     });
     return findRecentHistory;
@@ -475,11 +486,11 @@ class SearchRepositroy extends searchHistory {
    * 인기검색어 TOP10
    */
   searchByRank = async () => {
-    const findByRank = await searchHistory.findAll({
+    const findByRank = await SearchHistory.findAll({
       attributes: [
         "keyWord",
         "type",
-        [Sequelize.fn("COUNT", Sequelize.col("key-word")), "count"],
+        [Sequelize.fn("COUNT", Sequelize.col("key_word")), "count"],
       ],
       group: ["keyWord", "type"],
       order: [[Sequelize.literal("count"), "DESC"]],

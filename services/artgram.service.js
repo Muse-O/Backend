@@ -84,11 +84,14 @@ class ArtgramService {
    * @returns 수정결과반환
    */
   ArtgramToModify = async (artgramId, artgramReq) => {
-    const { artgramTitle, artgramDesc } = artgramReq;
+    const { artgramTitle, artgramDesc, artgramImgs, hashtag } = artgramReq;
+    const imgUrlArray = artgramImgs.map((imgObj) => imgObj.imgUrl);
     const patchartgram = await this.artgramRepository.ArtgramToModify(
       artgramId,
       artgramTitle,
-      artgramDesc
+      artgramDesc,
+      imgUrlArray,
+      hashtag
     );
     if (patchartgram[0] === 0) {
       throw Boom.notFound(
@@ -132,8 +135,8 @@ class ArtgramService {
       const noti_sender = await this.notiRepository.findNotiSenderProfile(
         userEmail
       );
-      if (noti_receiver == userEmail){
-        return likeartgram
+      if (noti_receiver == userEmail) {
+        return likeartgram;
       }
       const notiData = {
         noti_sender: userEmail,
