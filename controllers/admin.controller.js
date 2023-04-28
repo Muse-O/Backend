@@ -45,11 +45,32 @@ class AdminController {
   processReport = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user;
-      const {exhibitionId,reportUserEmail, artgramId, commentId,commentParent} = req.body
-      const reportSuccess = await this.adminService.processReport(userEmail);
-      res.status(200).json({ reportSuccess });
-    } catch (err) {
-      next(err);
+      const {
+        reportEmail,
+        exhibitionId,
+        exhibitionReviewId,
+        reportUserEmail,
+        artgramId,
+        commentId,
+        commentParent,
+        articleType,
+      } = req.body;
+      const reportSuccess = await this.adminService.processReport(
+        userEmail,
+        reportEmail,
+        exhibitionId,
+        exhibitionReviewId,
+        reportUserEmail,
+        artgramId,
+        commentId,
+        commentParent,
+        articleType
+      );
+      res
+        .status(200)
+        .json({ reportSuccess, message: "신고글이 처리되었습니다." });
+    } catch (error) {
+      next(error);
     }
   };
 

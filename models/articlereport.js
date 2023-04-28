@@ -76,6 +76,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         field: "comment_id",
       },
+      reportEmail: {
+        allowNull: true,
+        type: DataTypes.STRING,
+        field: "report_email",
+      },
       articleType: {
         allowNull: false,
         type: DataTypes.STRING,

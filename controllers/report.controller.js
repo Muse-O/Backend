@@ -12,6 +12,7 @@ class ReportController {
       const { userEmail } = res.locals.user;
       const {
         artgramId,
+        reportEmail,
         exhibitionId,
         commentId,
         exhibitionReviewId,
@@ -22,6 +23,7 @@ class ReportController {
       const report = await this.reportService.reportAll(
         userEmail,
         artgramId,
+        reportEmail,
         exhibitionId,
         commentId,
         exhibitionReviewId,
