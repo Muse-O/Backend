@@ -40,9 +40,12 @@ class UserController {
     // res.redirect("http://localhost:4000");
     // res.setHeader('Set-Cookie', 'authorization='+`Bearer ${token}`+'; Path=/; HttpOnly');
     // return res.redirect(301, 'http://localhost:3000');
+    // key = Math.random()
+    // redis.set(key, token)
+    // redis.get(key)
     res
-      .cookie("authorization", `Bearer ${token}`)
-      .redirect(301, 'http://localhost:3000');
+      // .cookie("authorization", `Bearer ${token}`)
+      .redirect(301, `http://localhost:3000?token=${token}`);
     } catch (error){
     logger.error(error.message);
     next(error);
