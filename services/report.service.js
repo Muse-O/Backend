@@ -6,6 +6,7 @@ const targetTypeMap = {
   exhibition: "exhibition",
   comment: "comment",
   exhibitionReview: "exhibitionReview",
+  reportEmail: "userEmail",
 };
 
 class ReportService {
@@ -27,6 +28,7 @@ class ReportService {
   reportAll = async (
     userEmail,
     artgramId,
+    reportEmail,
     exhibitionId,
     commentId,
     exhibitionReviewId,
@@ -40,6 +42,7 @@ class ReportService {
         commentId,
         commentParent,
         userEmail,
+        reportEmail,
         reportMessage
       );
       console.log(target);
@@ -58,6 +61,9 @@ class ReportService {
         target = await this.reportRepository.findExhibitionReviewById(
           exhibitionReviewId
         );
+      } else if (reportEmail) {
+        targetType = targetTypeMap.reportEmail;
+        tatget = await this.reportRepository.findReportUserId(reportEmail);
       }
     }
     if (!target) {
