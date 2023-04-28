@@ -7,6 +7,7 @@ const {
   ExhibitionReviews,
   ArtgramsComment,
 } = require("../models");
+const { Op } = require("sequelize");
 
 class AdminRepository extends Users {
   constructor() {
@@ -24,7 +25,7 @@ class AdminRepository extends Users {
         "postImage",
         "exhibitionStatus",
       ],
-      where: { exhibitionStatus: "ES05", [Op.ne]: "ES" },
+      where: { exhibitionStatus: "ES05" },
     });
     return exhibitionApprove;
   };
