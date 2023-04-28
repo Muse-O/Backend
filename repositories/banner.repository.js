@@ -26,11 +26,11 @@ class BannerRepository {
         e.start_date AS startDate,
         e.end_date AS endDate,
         e.post_image AS postImage,
-        CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS location,
+        CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS address,
         get_code_name(e.exhibition_kind) AS exhibitionKind,
         l.like_cnt,
         GROUP_CONCAT(ea.authorName ORDER BY ea.author_order ASC) AS author,
-        a.address
+        a.address AS tmpAddress
       FROM exhibitions e
       LEFT JOIN (
         SELECT
@@ -58,12 +58,12 @@ class BannerRepository {
 
     result.forEach((row) => {
       row.index = cnt++;
-      row.sido = row.address ? row.address.split(' ')[0] : "";
+      row.sido = row.tmpAddress ? row.tmpAddress.split(' ')[0] : "";
       row.detailRouter = '/exhibition/detail/'+row.exhibitionId;
       row.author = row.author ? row.author.split(',') : [];
       
       delete row.like_cnt
-      delete row.address
+      delete row.tmpAddress
     })
 
     const exhibitionList = {
@@ -91,10 +91,10 @@ class BannerRepository {
         e.start_date AS startDate,
         e.end_date AS endDate,
         e.post_image AS postImage,
-        CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS location,
+        CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS address,
         get_code_name(e.exhibition_kind) AS exhibitionKind,
         l.like_cnt,
-        a.address
+        a.address AS tmpAddress
       FROM exhibitions e
       LEFT JOIN (
         SELECT
@@ -117,10 +117,10 @@ class BannerRepository {
 
     result.forEach((row) => {
       row.index = cnt++;
-      row.sido = row.address ? row.address.split(' ')[0] : "";
+      row.sido = row.tmpAddress ? row.tmpAddress.split(' ')[0] : "";
       row.detailRouter = '/exhibition/detail/'+row.exhibitionId;
       delete row.like_cnt
-      delete row.address
+      delete row.tmpAddress
     })
 
 
@@ -151,10 +151,10 @@ class BannerRepository {
       e.start_date AS startDate,
       e.end_date AS endDate,
       e.post_image AS postImage,
-      CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS location,
+      CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS address,
       get_code_name(e.exhibition_kind) AS exhibitionKind,
       l.like_cnt,
-      a.address
+      a.address AS tmpAddress
       FROM exhibitions e
       LEFT JOIN (
         SELECT
@@ -177,10 +177,10 @@ class BannerRepository {
 
     result.forEach((row) => {
       row.index = cnt++;
-      row.sido = row.address ? row.address.split(' ')[0] : "";
+      row.sido = row.tmpAddress ? row.tmpAddress.split(' ')[0] : "";
       row.detailRouter = '/exhibition/detail/'+row.exhibitionId;
       delete row.like_cnt
-      delete row.address
+      delete row.tmpAddress
     })
 
     const exhibitionList = {
@@ -207,10 +207,10 @@ class BannerRepository {
       e.start_date AS startDate,
       e.end_date AS endDate,
       e.post_image AS postImage,
-      CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS location,
+      CONCAT(SUBSTRING_INDEX(address,' ', 2),' ',e.location) AS address,
       get_code_name(e.exhibition_kind) AS exhibitionKind,
       l.like_cnt,
-      a.address
+      a.address AS tmpAddress
       FROM exhibitions e
       LEFT JOIN (
         SELECT
@@ -232,10 +232,10 @@ class BannerRepository {
 
     result.forEach((row) => {
       row.index = cnt++;
-      row.sido = row.address ? row.address.split(' ')[0] : "";
+      row.sido = row.tmpAddress ? row.tmpAddress.split(' ')[0] : "";
       row.detailRouter = '/exhibition/detail/'+row.exhibitionId;
       delete row.like_cnt
-      delete row.address
+      delete row.tmpAddress
     })
 
     const exhibitionList = {
