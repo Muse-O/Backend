@@ -35,10 +35,10 @@ class UserController {
     const email = req.user.userEmail
     const token = await this.userService.generateToken(email);
     // res.set("Authorization", `${token}`);
-    res.cookie("authorization", `Bearer ${token}`);
+    // res.cookie("authorization", `Bearer ${token}`);
     console.log("strategy 성공시", email)
     // res.redirect("http://localhost:4000");
-    // res.setHeader('Set-Cookie', 'authorization='+`Bearer ${token}`+'; Path=/; HttpOnly');
+    res.setHeader('Set-Cookie', 'authorization='+`Bearer ${token}`+'; Path=/; HttpOnly');
     return res.redirect(302, 'http://localhost:3000');
     } catch (error){
     logger.error(error.message);

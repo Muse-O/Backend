@@ -95,7 +95,7 @@ app.use(
     origin: "*", //origin 확인 필요
     credentials: true,
     optionsSuccessStatus: 200,
-    exposedHeaders: ["Authorization"], //클라이언트가 응답에서 액세스할 수 있는 헤더 목록
+    exposedHeaders: ["Authorization", 'Set-Cookie'], //클라이언트가 응답에서 액세스할 수 있는 헤더 목록
     allowedHeaders: ["Authorization", "Content-Type"], //허용되는 요청 헤더 목록
   })
 );
