@@ -21,7 +21,6 @@ class AdminController {
     try {
       const { userEmail } = res.locals.user;
       const { exhibitionId } = req.body;
-      console.log("exhibitionId", exhibitionId);
       const approved = await this.adminService.approveExhibition(
         userEmail,
         exhibitionId
@@ -49,7 +48,6 @@ class AdminController {
         reportEmail,
         exhibitionId,
         exhibitionReviewId,
-        reportUserEmail,
         artgramId,
         commentId,
         commentParent,
@@ -60,7 +58,6 @@ class AdminController {
         reportEmail,
         exhibitionId,
         exhibitionReviewId,
-        reportUserEmail,
         artgramId,
         commentId,
         commentParent,
