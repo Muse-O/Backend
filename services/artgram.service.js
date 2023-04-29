@@ -96,11 +96,6 @@ class ArtgramService {
     }
 
     const imgUrlArray = artgramImgs.map((imgObj) => imgObj.imgUrl);
-    console.log("artgramTitle", artgramTitle);
-    console.log("artgramDesc", artgramDesc);
-    console.log("artgramImgs", artgramImgs);
-    console.log("imgUrlArray", imgUrlArray);
-    console.log("hashtag", hashtag);
     const patchartgram = await this.artgramRepository.ArtgramToModify(
       artgramId,
       artgramTitle,
