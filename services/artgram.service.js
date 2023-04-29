@@ -85,7 +85,22 @@ class ArtgramService {
    */
   ArtgramToModify = async (artgramId, artgramReq) => {
     const { artgramTitle, artgramDesc, artgramImgs, hashtag } = artgramReq;
+    if (artgramTitle === null) {
+      throw new Error("artgramTitle이 null 값이므로 수정할 수 없습니다.");
+    }
+    if (artgramDesc === null) {
+      throw new Error("artgramDesc이 null 값이므로 수정할 수 없습니다.");
+    }
+    if (hashtag === null) {
+      throw new Error("hashtag이 null 값이므로 수정할 수 없습니다.");
+    }
+
     const imgUrlArray = artgramImgs.map((imgObj) => imgObj.imgUrl);
+    console.log("artgramTitle", artgramTitle);
+    console.log("artgramDesc", artgramDesc);
+    console.log("artgramImgs", artgramImgs);
+    console.log("imgUrlArray", imgUrlArray);
+    console.log("hashtag", hashtag);
     const patchartgram = await this.artgramRepository.ArtgramToModify(
       artgramId,
       artgramTitle,
@@ -93,11 +108,11 @@ class ArtgramService {
       imgUrlArray,
       hashtag
     );
-    if (patchartgram[0] === 0) {
-      throw Boom.notFound(
-        "게시글 삭제에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다."
-      );
-    }
+    // if (patchartgram.artgramId !== artgramId) {
+    //   throw Boom.notFound(
+    //     "게시글 삭제에 수정에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다."
+    //   );
+    // }
     return patchartgram;
   };
 
