@@ -51,12 +51,15 @@ class SearchRepositroy extends SearchHistory {
    */
   autocompleteArtgrams = async (searchText, userEmail) => {
     const myuserEmail = userEmail;
-    const hasSpecialCharcters = /[<>]/.test(searchText);
+    const removeSpecialCharacters = (searchText) => {
+      // 모든 특수문자를 제거하는 정규식
+      const regex = /[^\u3131-\u314e\u314f-\u3163\uac00-\ud7a3\w\s]/g;
+      return searchText.replace(regex, "");
+    };
     //특수문자를 제거해주는 코드
-    const SearchText = hasSpecialCharcters
-      ? removeSpecialCharacters(searchText)
-      : searchText;
-    //레디스에 저장된값이 있는지 확인 있다면 바로 출력해줌
+    const SearchText = removeSpecialCharacters(searchText);
+
+    // 레디스에 저장된 값이 있는지 확인하고 있다면 바로 출력해줌
     const cachedArtgrams = await this.redisClient.get(
       `search:artgram:${SearchText}`
     );
@@ -201,15 +204,16 @@ class SearchRepositroy extends SearchHistory {
    */
   autocompleteExhibition = async (searchText, userEmail) => {
     const myuserEmail = userEmail;
-    const hasSpecialCharcters = /[<>]/.test(searchText);
+    const removeSpecialCharacters = (searchText) => {
+      // 모든 특수문자를 제거하는 정규식
+      const regex = /[^\u3131-\u314e\u314f-\u3163\uac00-\ud7a3\w\s]/g;
+      return searchText.replace(regex, "");
+    };
     //특수문자를 제거해주는 코드
-    const SearchText = hasSpecialCharcters
-      ? removeSpecialCharacters(searchText)
-      : searchText;
+    const SearchText = removeSpecialCharacters(searchText);
     const cachedExhibitions = await this.redisClient.get(
       `search:exhibition:${SearchText}`
     );
-
     if (cachedExhibitions) {
       return JSON.parse(cachedExhibitions);
     }
@@ -264,7 +268,6 @@ class SearchRepositroy extends SearchHistory {
       descConditions.push({ [Sequelize.Op.regexp]: engText });
       engTitleConditions.push({ [Sequelize.Op.regexp]: engText });
     }
-
     const rows = await Exhibitions.findAll({
       include: [
         {
@@ -358,13 +361,20 @@ class SearchRepositroy extends SearchHistory {
    * 유저검색
    */
   findUsers = async (searchText) => {
-    const cachedUsers = await this.redisClient.get(`search:user:${searchText}`);
+    const removeSpecialCharacters = (searchText) => {
+      // 모든 특수문자를 제거하는 정규식
+      const regex = /[^\u3131-\u314e\u314f-\u3163\uac00-\ud7a3\w\s]/g;
+      return searchText.replace(regex, "");
+    };
+    //특수문자를 제거해주는 코드
+    const SearchText = removeSpecialCharacters(searchText);
+    const cachedUsers = await this.redisClient.get(`search:user:${SearchText}`);
     if (cachedUsers || cachedUsers !== null) {
       return JSON.parse(cachedUsers);
     }
 
     //입력된 문자열을 문자 단위로 분해한다
-    let characters = searchText.split("");
+    let characters = SearchText.split("");
 
     // 한글과 영어,기타로 문자를 분리한다.
     const koreanChars = characters.filter(ch2pattern);
@@ -458,7 +468,7 @@ class SearchRepositroy extends SearchHistory {
 
     // 검색한 text를 저장해줌
     await this.redisClient.set(
-      `search:user:${searchText}`,
+      `search:user:${SearchText}`,
       JSON.stringify(userSearch),
       "EX",
       120
