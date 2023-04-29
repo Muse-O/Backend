@@ -101,7 +101,8 @@ app.use(morgan("dev"));
 // cors
 app.use(
   cors({
-    origin: "http://hanghae99-9-muse-o.s3-website.ap-northeast-2.amazonaws.com", //origin 확인 필요
+    //origin: "http://hanghae99-9-muse-o.s3-website.ap-northeast-2.amazonaws.com", //origin 확인 필요
+    origin: "*",
     credentials: true,
     optionsSuccessStatus: 200,
     exposedHeaders: ["Authorization"], //클라이언트가 응답에서 액세스할 수 있는 헤더 목록
