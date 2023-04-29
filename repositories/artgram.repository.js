@@ -8,6 +8,7 @@ const {
   ArtgramHashtag,
   ArtgramsComment,
 } = require("../models");
+const artgramModify = require("../modules/artgramModify");
 const { Op, Sequelize } = require("sequelize");
 const dayjs = require("dayjs");
 
@@ -19,12 +20,13 @@ class ArtgramRepository extends Artgrams {
    * 로그인시 아트그램 전체조회
    * @param {number} limit 요청할 아트그램 게시글 수
    * @param {number} offset 조회 아트그램 게시글 시작점
-   * @returns artgrams
+   * @param {local.user} userEmail or "guest"
+   * @returns sortedArtgramList AS04제외 조회 스크랩/좋아요 유무확인가능
    */
 
-  allArtgrams = async (limit, offset, userEmail) => {
+  getAllArtgram = async (limit, offset, userEmail) => {
     const myuserEmail = userEmail;
-    const artgrams = await Artgrams.findAll({
+    const findAllArtgrams = await Artgrams.findAll({
       raw: true,
       attributes: ["artgramId", "artgramTitle", "userEmail", "createdAt"],
       include: [
@@ -46,7 +48,7 @@ class ArtgramRepository extends Artgrams {
       order: [["createdAt", "DESC"]],
     });
     const findArtgrmas = await Promise.all(
-      artgrams.map(async (artgram) => {
+      findAllArtgrams.map(async (artgram) => {
         const userEmail = artgram.userEmail;
         const user = await Users.findOne({
           where: { userEmail: userEmail },
@@ -86,6 +88,8 @@ class ArtgramRepository extends Artgrams {
           where: { artgramId: artgramId },
         });
 
+        //객체분해할당 원래 객체의 속성이름과 동일한 변수이름을 사용
+        //하지만 특수문자가 들어간 경우엔 ""나 []를 사용해서 변수이름으로 사용가능
         const { "ArtgramImgs.imgUrl": _, ...rest } = artgram;
 
         return {
@@ -99,6 +103,7 @@ class ArtgramRepository extends Artgrams {
           liked: !!likedByCurrentUser,
           scrap: !!scrapByCurrentUser,
           createdAt: dayjs(artgram.createdAt)
+            //locale은 지역또는 언어설정을 의미함.
             .locale("en")
             .format("YYYY-MM-DD HH:mm:ss"),
         };
@@ -121,7 +126,7 @@ class ArtgramRepository extends Artgrams {
 
     return {
       sortedArtgramList: {
-        count: artgrams.count,
+        count: findAllArtgrams.count,
         findArtgrmas,
       },
       paginationInfo,
@@ -130,12 +135,13 @@ class ArtgramRepository extends Artgrams {
 
   /**
    * 비로그인시 전체조회
-   * @param {*} limit
-   * @param {*} offset
-   * @returns
+   * @param {Number} limit
+   * @param {Number} offset
+   * @param {local.user} userEmail or "guest"
+   * @returns sortedArtgramList AS04제외 조회 스크랩/좋아요 유무제외
    */
-  publicAllArtgrams = async (limit, offset) => {
-    const artgrams = await Artgrams.findAll({
+  getPublicAllArtgram = async (limit, offset) => {
+    const findAllArtgrams = await Artgrams.findAll({
       raw: true,
       include: [
         {
@@ -158,7 +164,7 @@ class ArtgramRepository extends Artgrams {
     });
 
     const findArtgrmas = await Promise.all(
-      artgrams.map(async (artgram) => {
+      findAllArtgrams.map(async (artgram) => {
         const userEmail = artgram.userEmail;
         const user = await Users.findOne({
           where: { userEmail: userEmail },
@@ -215,7 +221,7 @@ class ArtgramRepository extends Artgrams {
 
     return {
       sortedArtgramList: {
-        count: artgrams.count,
+        count: findAllArtgrams.count,
         findArtgrmas,
       },
       paginationInfo,
@@ -224,9 +230,11 @@ class ArtgramRepository extends Artgrams {
 
   /**
    * 로그인시 상세조회
-   * @returns
+   * @param {Locals.user} userEmail
+   * @param {params} artgramId
+   * @returns detailArtgram AS04제외 좋아요/스크랩유무확인가능
    */
-  detailArtgram = async (artgramId, userEmail) => {
+  loadDetailArtgram = async (artgramId, userEmail) => {
     const myuserEmail = userEmail;
     const thisArtgram = await Artgrams.findOne({
       where: {
@@ -322,7 +330,7 @@ class ArtgramRepository extends Artgrams {
       liked: !!likedByCurrentUser,
       scrap: !!scrapByCurrentUser,
       createdAt: dayjs(thisArtgram.createdAt)
-        // .locale("en")
+        .locale("en")
         .format("YYYY-MM-DD HH:mm:ss"),
     };
 
@@ -331,10 +339,11 @@ class ArtgramRepository extends Artgrams {
 
   /**
    * 비로그인 상세정보
-   * @param {*} artgramId
-   * @returns
+   * @param {Locals.user} userEmail
+   * @param {params} artgramId
+   * @returns detailArtgram AS04제외 좋아요/스크랩유무제외
    */
-  publicDetailArtgram = async (artgramId) => {
+  loadPublicDetailArtgram = async (artgramId) => {
     const artgram = await Artgrams.findOne({
       where: {
         artgramId,
@@ -424,7 +433,7 @@ class ArtgramRepository extends Artgrams {
    * @param {string} imgUrl
    * @returns 아트그램 작성결과 createArtgram, artgramImgs
    */
-  postArtgram = async (
+  creatingAnArtgram = async (
     userEmail,
     artgramTitle,
     artgramDesc,
@@ -438,45 +447,37 @@ class ArtgramRepository extends Artgrams {
       artgramTitle,
       artgramDesc,
     });
+    //trim() 양쪽끝 공백제거
     if (hashtag) {
       const tags = Array.isArray(hashtag)
         ? hashtag
         : hashtag.split(/[\[\],]+/).filter((tag) => tag.trim().length > 0);
 
-      for (let i = 0; i < tags.length; i++) {
-        if (tags.length > 0) {
+      hashTag = await Promise.all(
+        tags.map(async (tag) => {
           const tagname = await ArtgramHashtag.create({
             artgramId: createArtgram.artgramId,
-            tagName: tags[i].trim(),
+            tagName: tag.trim(),
           });
-          hashTag.push(tagname);
-        }
-      }
+          return tagname;
+        })
+      );
     }
 
-    if (!imgUrl || imgUrl.length === 0) {
-      return createArtgram;
-    } else if (Array.isArray(imgUrl)) {
-      for (let i = 0; i < imgUrl.length; i++) {
-        const artgramImg = await ArtgramImg.create({
-          artgramId: createArtgram.artgramId,
-          imgUrl: imgUrl[i].trim(),
-          imgOrder: i + 1,
-          hashtag: hashTag.tagName,
-        });
-        artgramImgs.push(artgramImg);
-      }
-    } else {
-      let splitImg = imgUrl.split(",");
-      for (let i = 0; i < splitImg.length; i++) {
-        const artgramImg = await ArtgramImg.create({
-          artgramId: createArtgram.artgramId,
-          imgUrl: splitImg[i].trim(),
-          imgOrder: i + 1,
-          hashtag: hashTag.tagName,
-        });
-        artgramImgs.push(artgramImg);
-      }
+    if (imgUrl && imgUrl.length > 0) {
+      const images = Array.isArray(imgUrl) ? imgUrl : imgUrl.split(",");
+
+      artgramImgs = await Promise.all(
+        images.map(async (image, index) => {
+          const artgramImg = await ArtgramImg.create({
+            artgramId: createArtgram.artgramId,
+            imgUrl: image.trim(),
+            imgOrder: index + 1,
+            hashtag: hashTag.tagName,
+          });
+          return artgramImg;
+        })
+      );
     }
 
     return [createArtgram, artgramImgs, hashTag];
@@ -489,8 +490,14 @@ class ArtgramRepository extends Artgrams {
    * @param {string} artgramDesc
    * @returns 수정결과반환 cngArtgram
    */
-  modifyArtgram = async (artgramId, artgramTitle, artgramDesc) => {
-    const cngArtgram = await Artgrams.update(
+  ArtgramToModify = async (
+    artgramId,
+    artgramTitle,
+    artgramDesc,
+    imgUrlArray,
+    hashtag
+  ) => {
+    const changeArtgram = await Artgrams.update(
       {
         artgramTitle,
         artgramDesc,
@@ -499,7 +506,74 @@ class ArtgramRepository extends Artgrams {
         where: { artgramId },
       }
     );
-    return cngArtgram;
+
+    const modify = await artgramModify(artgramId, imgUrlArray, hashtag);
+    // // 1. 기존 해시태그 가져오기
+    // const existingHashtags = await ArtgramHashtag.findAll({
+    //   where: { artgramId },
+    // });
+
+    // // 2. 새 해시태그를 기준으로 추가 및 업데이트 수행
+    // for (let newHashtag of hashtag) {
+    //   const existingHashtag = existingHashtags.find(
+    //     (h) => h.tagName === newHashtag
+    //   );
+
+    //   if (existingHashtag) {
+    //     // 해시태그가 이미 존재하면 업데이트
+    //     await ArtgramHashtag.update(
+    //       { tagName: newHashtag },
+    //       { where: { artgramTagId: existingHashtag.artgramTagId } }
+    //     );
+    //   } else {
+    //     // 해시태그가 존재하지 않으면 추가
+    //     await ArtgramHashtag.create({ tagName: newHashtag, artgramId });
+    //   }
+    // }
+
+    // // 3. 기존 해시태그를 기준으로 삭제 수행
+    // for (let existingHashtag of existingHashtags) {
+    //   if (!hashtag.includes(existingHashtag.tagName)) {
+    //     // 새 해시태그에 없는 경우 삭제
+    //     await ArtgramHashtag.destroy({
+    //       where: { artgramTagId: existingHashtag.artgramTagId },
+    //     });
+    //   }
+    // }
+    // // 1. 기존 이미지 가져오기
+    // const existingImgs = await ArtgramImg.findAll({
+    //   where: { artgramId },
+    // });
+
+    // // 2. 새 이미지를 기준으로 추가 및 업데이트 수행
+    // let imgOrder = 1;
+    // for (let newImg of imgUrlArray) {
+    //   const existingImg = existingImgs.find((h) => h.tagName === newImg);
+
+    //   if (existingImg) {
+    //     // 이미지가 이미 존재하면 업데이트
+    //     await ArtgramImg.update(
+    //       { imgUrl: newImg, imgOrder },
+    //       { where: { artgramImgId: existingImg.artgramImgId } }
+    //     );
+    //   } else {
+    //     // 이미지가 존재하지 않으면 추가
+    //     await ArtgramImg.create({ imgOrder, imgUrl: newImg, artgramId });
+    //   }
+    //   imgOrder++; // imgOrder 속성 값 증가
+    // }
+
+    // // 3. 기존 이미지를 기준으로 삭제 수행
+    // for (let existingImg of existingImgs) {
+    //   if (!imgUrlArray.includes(existingImg.tagName)) {
+    //     // 새 이미지에 없는 경우 삭제
+    //     await ArtgramImg.destroy({
+    //       where: { artgramImgId: existingImg.artgramImgId },
+    //     });
+    //   }
+    // }
+
+    return changeArtgram;
   };
 
   /**
@@ -521,7 +595,7 @@ class ArtgramRepository extends Artgrams {
    * @param {string} userEmail
    * @returns 좋아요등록/취소여부 반환 likeartgram
    */
-  likeArtgram = async (artgramId, userEmail) => {
+  artgramWithLike = async (artgramId, userEmail) => {
     const likeartgram = await ArtgramLike.findOrCreate({
       where: {
         [Op.and]: [{ artgramId }, { userEmail }],
@@ -542,14 +616,16 @@ class ArtgramRepository extends Artgrams {
 
   /**
    * 아트그램 게시글 좋아요 시 작성자에게 알림 발송하기 위해 작성자 조회
-   * @param {string} artgramId 
+   * @param {string} artgramId
    * @returns 아트그램 게시글 작성자 이메일
    */
   findNotiReceiver = async (artgramId) => {
-    const author = await Artgrams.findByPk(artgramId,{attributes:['user_email']})
+    const author = await Artgrams.findByPk(artgramId, {
+      attributes: ["user_email"],
+    });
 
     return author.dataValues.user_email;
-  }
+  };
 
   /**
    * 아트그램 스크랩등록/취소
@@ -557,7 +633,7 @@ class ArtgramRepository extends Artgrams {
    * @param {string} userEmail
    * @returns 아트그램 스크랩등록/취소여부 반환 scrapArtgram
    */
-  scrapArtgram = async (artgramId, userEmail) => {
+  artgramWithScrap = async (artgramId, userEmail) => {
     const scrapArtgram = await ArtgramScrap.findOrCreate({
       where: {
         [Op.and]: [{ artgramId }, { userEmail }],

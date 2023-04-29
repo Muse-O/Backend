@@ -12,7 +12,11 @@ class UserService {
   userRepository = new UserRepository();
   notiRepository = new NotiRepository();
   
-  //로그인
+  /**
+   * 일반 로그인
+   * @param {string} email 
+   * @param {string} password 
+   */
   userLogin = async (email, password) => {
     const user = await this.userRepository.findByEmail(email);
 
@@ -27,16 +31,23 @@ class UserService {
     }
   };
 
-  //토큰 생성
+  /**
+   * 토큰 생성
+   * @param {string} email 
+   * @returns 토큰
+   */
   generateToken = async (email) => {
     const token = jwt.sign({ email }, process.env.SECRET_KEY, {
-      expiresIn: "60m",
+      expiresIn: "4h",
     });
 
     return token;
   };
 
-  // 회원가입 전 이메일 중복확인
+  /**
+   * 회원가입 전 이메일 중복확인
+   * @param {string} email 
+   */
   findByEmail = async (email) => {
     const existingUser = await this.userRepository.findByEmail(email);
     
@@ -45,7 +56,11 @@ class UserService {
     }
   }
 
-  // 이메일 인증 번호 발송
+  /**
+   * 이메일 인증 번호 발송
+   * @param {string} email 
+   * @returns 이메일 전송
+   */
   sendMail = async (email) => {
     const randomNumber = Math.floor(Math.random() * 900000) + 100000;
     console.log("인증번호 콘솔창에 찍어보아용",randomNumber)
@@ -83,7 +98,12 @@ class UserService {
     return result
   }
 
-  // 인증번호 검증
+  /**
+   * 인증번호 검증
+   * @param {string} email 
+   * @param {number} code 
+   * @returns 성공 메시지
+   */
   emailValidateNumCheck = async(email, code) => {
     const token = await this.redisClient.get(email);
     if (!token){
@@ -98,7 +118,13 @@ class UserService {
     return { message: '이메일 인증에 성공하였습니다' }
   }
 
-  // 회원가입
+  /**
+   * 회원가입
+   * @param {string} email 
+   * @param {string} nickname 
+   * @param {string} password 
+   * @param {string} author 
+   */
   userSignup = async (email, nickname, password, author) => {
     const hashedPassword = await createHashPassword(password);
 

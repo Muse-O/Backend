@@ -1,5 +1,5 @@
 const { Redis } = require('ioredis');
-const { Users, UserProfile } = require("../models");
+const { UserProfile } = require("../models");
 const logger = require("../middlewares/logger");
 const Boom = require("boom");
 
@@ -17,34 +17,43 @@ class NotiRepository {
         this.redis = redis;
     }
 
-    // 알림창 정보 가져오기
-    // or result랑 pending ID 주면 프론트에서 pendingId만 강조표시? 안읽음표시처리
+    /**
+     * 알림창 정보 가져오기
+     * @param {string} userEmail 
+     * @returns 
+     */
     getNotiList = async (userEmail) => {
-        // 최신순으로 모든 메시지 가져오기
-        const result = await this.redis.xrevrange(userEmail,'+','-');
-      
-        // 처리하지 않은 메시지의 ID들 가져오기
-        const pending = await this.redis.xpending(userEmail, `noti_receiver_${userEmail}`, '-', '+', '1000000');
-        const pendingIds = pending.map(entry => entry[0]);
-        console.log('pendingIds======', pendingIds)
-      
-        // 처리하지 않은 메시지만 최신순으로 추출하여 반환하기
-        const parsedData = result.filter(entry => pendingIds.includes(entry[0])).map(entry => {
-          const [notiId, values] = entry;
-          const data = {};
-          for (let i = 0; i < values.length; i += 2) {
-            data[values[i]] = values[i + 1];
-          }
-          return {
-            notiId,
-            ...data
-          };
-        });
-      
-        return parsedData;
-      }
+      // 최신순으로 모든 메시지 가져오기
+      const result = await this.redis.xrevrange(userEmail,'+','-');
+    
+      // 처리하지 않은 메시지의 ID들 가져오기
+      const pending = await this.redis.xpending(userEmail, `noti_receiver_${userEmail}`, '-', '+', '1000000');
+      const pendingIds = pending.map(entry => entry[0]);
+      console.log('pendingIds======', pendingIds)
+    
+      // 처리하지 않은 메시지만 최신순으로 추출하여 반환하기
+      const parsedData = result.map(entry => {
+        const [notiId, values] = entry;
+        const data = {};
+        for (let i = 0; i < values.length; i += 2) {
+          data[values[i]] = values[i + 1];
+        }
+        const seen = pendingIds.includes(notiId) ? false : true;
+        return {
+          notiId,
+          seen,
+          ...data
+        };
+      });
+    
+      return parsedData;
+    }
 
-    // 메인에 띄울만한 알림 카운트
+    /**
+     * 메인에 띄울만한 알림 카운트
+     * @param {string} userEmail 
+     * @returns 알림 갯수
+     */
     getNotiCount = async (userEmail) => {
         const result = await this.redis.xpending(userEmail, `noti_receiver_${userEmail}`);
         console.log('result', result)
@@ -53,7 +62,12 @@ class NotiRepository {
         return { count: count ? Number(count[1]) : 0 };
       };
 
-    // 확인한건 처리해서 알림창에서 없앰
+    /**
+     * 확인한건 처리해서 알림창에서 없앰
+     * @param {string} userEmail 
+     * @param {string} notiId 
+     * @returns 확인 처리
+     */
     confirmNoti = async (userEmail, notiId) => {
         
         const result = await this.redis.xack(userEmail, `noti_receiver_${userEmail}`, notiId)
@@ -66,7 +80,10 @@ class NotiRepository {
         return
     }
 
-    // userEmail이 회원 가입 시 스트림을 만든다
+    /**
+     * userEmail이 회원 가입 시 스트림을 만든다
+     * @param {string} userEmail 
+     */
     createStream = async(userEmail) => {
         const streamKey = userEmail;
         const consumerGroup = `noti_receiver_${userEmail}`;
@@ -79,8 +96,11 @@ class NotiRepository {
         } 
     }
 
-
-     // 좋아요, 스크랩, 멘션 시 작성자의 스트림에 데이터를 추가한다
+    /**
+     * 좋아요, 스크랩, 멘션 시 작성자의 스트림에 데이터를 추가한다
+     * @param {string} userEmail 
+     * @param {string} notiData 
+     */
     saveToStream = async (userEmail, notiData) => {
         const streamKey = userEmail;
 
@@ -101,15 +121,23 @@ class NotiRepository {
         }
     }
 
+    /**
+     * 알림 발신자 프로필 조회
+     * @param {string} userEmail 
+     * @returns 닉네임, 프로필 이미지
+     */
     findNotiSenderProfile = async (userEmail) =>{
       const sender = await UserProfile.findOne({
         where: { user_email: userEmail },
-        attributes: ['profile_nickname', 'profile_img']
+        attributes: ['profile_nickname']
       });
       return sender.dataValues;
     };
 
-    // 회원 탈퇴 시
+    /**
+     * 탈퇴시 스트림 삭제
+     * @param {string} userEmail 
+     */
     deleteStream = async (userEmail) => {
         const streamKey = userEmail;
         const consumerGroup = `noti_receiver_${userEmail}`;

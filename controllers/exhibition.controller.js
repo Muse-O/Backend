@@ -17,7 +17,7 @@ class ExhibitionController {
     try {
       const { userEmail = ""} = res.locals.user;
       
-      const { limit = 10, offset = 0 } = await pageQuerySchema
+      const { limit = 10, offset = 0, ...filter } = await pageQuerySchema
         .validateAsync(req.query)
         .catch((err) => {
           res.status(400).json({ message: err.message });
@@ -27,7 +27,8 @@ class ExhibitionController {
       const exhibitionItem = await this.exhibitionService.getExhibitionList(
         Number(limit),
         Number(offset),
-        userEmail
+        userEmail,
+        filter
       );
 
       return res.status(200).json({
@@ -249,6 +250,24 @@ class ExhibitionController {
         .json({
           searchExhibition,
           message: "전시회 정보를 정상적으로 가져왔습니다.",
+        });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * TOP 10 태그 조회
+   */
+  getTopTags = async (req, res, next) => {
+    try {
+      const topTags = await this.exhibitionService.getTopTags();
+
+      return res
+        .status(200)
+        .json({
+          topTags,
+          message: "전시 TOP 10 태그를 정상적으로 가져왔습니다.",
         });
     } catch (error) {
       next(error);

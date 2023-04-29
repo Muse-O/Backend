@@ -19,6 +19,7 @@ const swaggerUi = require("swagger-ui-express");
 const glob = require("glob");
 const passport = require("passport");
 const passportConfig = require("./passport");
+const { description } = require("./schemas/mypageReqSchema");
 
 const webSocketController = require("./controllers/websocket.cntroller");
 const errorHandlerByWs = require("./middlewares/errorHandlerByWs.js");
@@ -40,6 +41,10 @@ const swaggerOptions = {
         description: "유저등록",
       },
       {
+        name: "search",
+        description: "검색기능 로그인필요x",
+      },
+      {
         name: "artgram",
         description: "아트그램 CRUD",
       },
@@ -51,6 +56,10 @@ const swaggerOptions = {
       {
         name: "artgramReply",
         description: "아트그램 답글 CRUD",
+      },
+      {
+        name: "notification",
+        description: "알림기능",
       },
     ],
     securityDefinitions: {
@@ -92,7 +101,7 @@ app.use(morgan("dev"));
 // cors
 app.use(
   cors({
-    origin: "http://localhost:3001", //origin 확인 필요
+    origin: "http://hanghae99-9-muse-o.s3-website.ap-northeast-2.amazonaws.com", //origin 확인 필요
     credentials: true,
     optionsSuccessStatus: 200,
     exposedHeaders: ["Authorization"], //클라이언트가 응답에서 액세스할 수 있는 헤더 목록

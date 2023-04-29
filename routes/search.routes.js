@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const publicAuthMiddleware = require("../middlewares/authMiddleware_public");
 
 const SearchContorller = require("../controllers/search.controller");
 const searchController = new SearchContorller();
@@ -12,7 +13,7 @@ const searchController = new SearchContorller();
  *       - search
  *     summary: "기본검색"
  *     parameters:
- *       - name: keyWord
+ *       - name: searchText
  *         in: query
  *         type: string
  *         require: true
@@ -23,10 +24,12 @@ const searchController = new SearchContorller();
  *         schema:
  *          type: object
  *          properties:
- *            keyWord:
+ *            searchText:
  *              type: string
+ *     security:
+ *       - jwt: []
  *   post:
- *     summary: Saves search history for a given title and type
+ *     summary: 검색후 유저가 선택한 게시글저장
  *     tags: [search]
  *     requestBody:
  *       required: true
@@ -58,34 +61,13 @@ const searchController = new SearchContorller();
  *                 message:
  *                   type: string
  *                   description: "type(아트그램, 전시회)을 입력해주는 부분"
- *               example:
- *                 selectKeyword: Example keyword
- *                 message: Your search history has been saved
-
- * /search/auto:
- *   get:
- *     tags:
- *      - search
- *     summary: "검색자동완성"
- *     parameters:
- *       - name: searchText
- *         in: query
- *         type: string
- *         required: true
- *         description: "받아온 키워드들로 자동완성을 해줍니다."
- *     responses:
- *       "200":
- *          description: OK
- *          schema:
- *            type: object
- *            properties:
- *              autoSearch:
- *                type: string
+ *     security:
+ *        - jwt: []
  * /search/recent:
  *   get:
  *     tags:
  *      - search
- *     summary: "최근 검색기록 TOP 5"
+ *     summary: "최근 검색기록 TOP 10"
  *     responses:
  *       200:
  *         description: 최근 검색기록을 조회
@@ -108,10 +90,34 @@ const searchController = new SearchContorller();
  *                       createdAt:
  *                         type: string
  *                         description: 최근 저장된 키워드의 시간을 조회합니다.
- *                     example:
- *                       keyWord: Example keyWord
- *                       type: exhibition
- *                       createdAt: 2022-01-01T00:00:00Z
+ *     security:
+ *       - jwt: []
+ * /search/rank:
+ *   get:
+ *     tags:
+ *      - search
+ *     summary: "인기검색어 TOP 10"
+ *     responses:
+ *       200:
+ *         description: 가장많이 검색된 검색어조회
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 searchRank:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       keyWord:
+ *                         type: string
+ *                         description: 가장 많이 검색된 순으로 조회
+ *                       count:
+ *                         type: string
+ *                         description: 조회된 count갯수
+ *     security:
+ *       - jwt: []
  * /search/category:
  *   get:
  *     tags:
@@ -123,7 +129,7 @@ const searchController = new SearchContorller();
  *         type: string
  *         required: true
  *         description: "검색할 카테고리입력 exhibition or artgram"
- *       - name: keyWord
+ *       - name: searchText
  *         in: query
  *         type: string
  *         required: true
@@ -139,44 +145,50 @@ const searchController = new SearchContorller();
  *                 items:
  *                   type: object
  *                   properties:
- *                     keyWord:
+ *                     searchText:
  *                       type: string
  *                     type:
  *                       type: stirng
  *                     createdAt:
  *                       type: string
  *                   example:
- *                     keyWord: 테스트
+ *                     searchText: 테스트
  *                     type: artgram
+ *     security:
+ *       - jwt: []
  */
 
 /**
  * 검색기능
  */
-router.get("/", searchController.search);
+router.get("/", publicAuthMiddleware, searchController.search);
 
 /**
  * 검색기록저장
  */
-router.post("/", searchController.selectResult);
+router.post("/", publicAuthMiddleware, searchController.selectResult);
 
 /**
- * 자동완성기능
+ * 유저의 최근검색기록 10개조회
  */
-router.get("/auto", searchController.autocomplete);
-
-/**
- * 최근검색기록
- */
-router.get("/recent", searchController.recentSearchHistory);
+router.get(
+  "/recent",
+  publicAuthMiddleware,
+  searchController.recentSearchHistory
+);
 
 /**
  * 메뉴별 검색 구분기능
  */
-router.get("/category", searchController.searchByType);
+router.get("/category", publicAuthMiddleware, searchController.searchByType);
 
 /**
- * 연관 검색어 기능
+ * 인기검색어 TOP10
+ */
+router.get("/rank", publicAuthMiddleware, searchController.searchByRank);
+
+/**
+ * 연관 검색어 기능(미구현)
  */
 // router.get("/related", searchController.searchTerms);
 

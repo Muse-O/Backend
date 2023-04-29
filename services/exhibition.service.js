@@ -1,11 +1,10 @@
 const Boom = require("boom");
 const ExhibitionRepository = require("../repositories/exhibition.repository");
-const NotiRepository = require("../repositories/notification.repository")
+const { isNotNull }  = require("../modules/isNotNull.js");
 
 class ExhibitionService {
   constructor() {
     this.exhibitionRepository = new ExhibitionRepository();
-    this.notiRepository = new NotiRepository();
   }
 
   /**
@@ -13,13 +12,15 @@ class ExhibitionService {
    * @param {number} limit 요청할 전시 게시글 수
    * @param {number} offset 조회 전시 게시글 시작점
    * @param {string} userEmail 유저 이메일
+   * @param {object} filter 검색 필터링
    * @returns exhibitionItem
    */
-  getExhibitionList = async (limit, offset, userEmail) => {
+  getExhibitionList = async (limit, offset, userEmail, filter) => {
     const exhibitionItem = await this.exhibitionRepository.getExhibitionList(
       limit,
       offset,
-      userEmail
+      userEmail,
+      filter
     );
 
     if (!exhibitionItem) {
@@ -108,8 +109,9 @@ class ExhibitionService {
       // 이미지 수정 정보
       updateInfo.imgUpdate = writeImageStatus;
     }
-    if (exhibitionCategoty.length > 0) {
+    if (isNotNull(exhibitionCategoty)) {
       // 카테고리
+
       const writeExhibitionCategories =
         await this.exhibitionRepository.updateExhibitionCategory(
           mode,
@@ -211,20 +213,6 @@ class ExhibitionService {
       );
     }
 
-    if (updateExhibitionLike=="create"){
-      const noti_receiver = await this.exhibitionRepository.findNotiReceiver(exhibitionId);
-      const noti_sender = await this.notiRepository.findNotiSenderProfile(userEmail);
-      const notiData = {
-        noti_sender : userEmail,
-        noti_sender_nickname: noti_sender.profile_nickname,
-        noti_sender_profileImg: noti_sender.profile_img,
-        noti_type: 'like',
-        noti_content: 'exhibition',
-        noti_content_id: exhibitionId
-      };
-      await this.notiRepository.saveToStream(noti_receiver, notiData)
-    }
-
     return updateExhibitionLike;
   };
 
@@ -246,6 +234,20 @@ class ExhibitionService {
     }
 
     return searchExhibition;
+  };
+
+  /**
+   * 3개월간 가장 많은 태그 TOP 10
+   * @returns tagTags TOP 10 태그
+   */
+  getTopTags = async () => {
+    const topTags = await this.exhibitionRepository.getTopTags();
+
+    if (!topTags.length > 0) {
+      throw Boom.notFound("최근 3개월간 작성된 태그가 없습니다.");
+    }
+
+    return topTags;
   };
 }
 module.exports = ExhibitionService;
