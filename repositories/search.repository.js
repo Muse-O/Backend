@@ -36,7 +36,7 @@ class SearchRepositroy extends SearchHistory {
    * @returns
    */
   selectResult = async (title, type, userEmail) => {
-    const savedResult = await searchHistory.create({
+    const savedResult = await SearchHistory.create({
       keyWord: title,
       type: type,
       userEmail: userEmail,
@@ -334,7 +334,7 @@ class SearchRepositroy extends SearchHistory {
 
         const exhibitionObject = {
           ...rest,
-          detailRouter: `/exhibition/view/${exhibitionId}`,
+          detailRouter: `/exhibition/detail/${exhibitionId}`,
           address,
           type: "exhibition",
           liked: !!likedByCurrentUser,
