@@ -84,6 +84,18 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'userEmail'// ExhibitionReview 모델에 userEmail컬럼으로 연결합니다.
       })
 
+      // Users ChatMessages 1:N
+      this.hasMany(models.ChatMessages, {
+        sourceKey: 'userEmail',// 현재 모델의 userEmail 컬럼을
+        foreignKey: 'userEmail'// ExhibitionReview 모델에 userEmail컬럼으로 연결합니다.
+      })
+
+      // Users ChatParticipants 1:N
+      this.hasMany(models.ChatParticipants, {
+        sourceKey: 'userEmail',// 현재 모델의 userEmail 컬럼을
+        foreignKey: 'userEmail'// ExhibitionReview 모델에 userEmail컬럼으로 연결합니다.
+      })
+
     }
   }
   Users.init({

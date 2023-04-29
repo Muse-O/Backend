@@ -7,14 +7,16 @@ const {
   ExhibitionLike,
   ExhibitionScrap,
   ExhibitionReviews,
+  ExhibitionHashtag,
   UserProfile,
   sequelize,
 } = require("../models");
 const { Op } = require("sequelize");
 
-const { isNotNull } = require("../modules/isNotNull.js")
+const { isNotNull } = require("../modules/isNotNull.js");
 
 const dayjs = require("dayjs");
+const { subtract } = require("lodash");
 require("dayjs/locale/ko"); // 현재 지역에 해당하는 locale 로드 현재 국내 서비스이므로 한국 시간 설정
 
 class ExhibitionRepository {
@@ -23,15 +25,19 @@ class ExhibitionRepository {
    * @param {number} limit 요청할 전시 게시글 수
    * @param {number} offset 조회 전시 게시글 시작점
    * @param {string} userEmail 유저 이메일
+   * @param {object} filter 검색 필터링
    * @returns exhibitionItem
    */
-  getExhibitionList = async (limit, offset, userEmail) => {
+  getExhibitionList = async (limit, offset, userEmail, filter) => {
     const now = dayjs(); // 현재 지역별 시간 데이터를 가져옴
     const formatted = now.locale("ko").format("YYYY-MM-DD HH:mm:ss");
 
-    const result = await sequelize
-      .query(
-        `
+    const { startDate, endDate, category, tag, where, searchTitle } = filter;
+
+    console.log('\n\n filter => ',startDate, endDate, category, tag, where, searchTitle)
+
+    const result = await sequelize.query(
+      `
       SELECT
       e.exhibition_id AS exhibitionId,
       e.user_email AS userEmail,
@@ -44,6 +50,8 @@ class ExhibitionRepository {
       e.post_image AS postImage,
       e.art_work_cnt AS artWorkCnt,
       e.location,
+      SUBSTRING_INDEX(a.address,' ', 2) AS sigungu,
+      a.address,
       e.contact,
       e.exhibition_host AS exhibitionHost,
       get_code_name(e.exhibition_host) AS exhibitionHostName,
@@ -124,26 +132,36 @@ class ExhibitionRepository {
             profile_intro
         FROM user_profile
       ) AS p ON e.user_email = p.user_email 
+      LEFT JOIN exhibition_address a ON e.exhibition_id = a.exhibition_id
       WHERE e.exhibition_status != 'ES04'
+      ${startDate ? `AND e.start_date >= '${startDate}'` : ""} ${endDate ? `AND e.end_date <= '${endDate}'` : ""}
+      ${category ? `AND ec.exhibition_code IN ('${category}')` : ""}
+      ${tag ? `AND h.tag_name IN ('${tag}')` : ""}
+      ${where ? `AND a.address LIKE '%${where}%'` : ""}
+      ${searchTitle ? `AND e.exhibition_title LIKE '%${searchTitle}%'` : ""}
       GROUP BY e.exhibition_id
       ORDER BY e.created_at DESC
       LIMIT ${limit}
       OFFSET ${offset};
       `,
-        { type: sequelize.QueryTypes.SELECT }
-      );
+      { type: sequelize.QueryTypes.SELECT }
+    ).catch(err => {
+      console.log(err);
+    });
 
-      result.forEach((row, idx) => {
-        const {tagName, categoryCode, categoryCodeName} = row;
-      
-        const tagNames = tagName ? tagName.split(',') : [];
-        const categoryCodes = categoryCode ? categoryCode.split(',') : [];
-        const categoryCodeNames = categoryCodeName ? categoryCodeName.split(',') : [];
+    result.forEach((row, idx) => {
+      const { tagName, categoryCode, categoryCodeName } = row;
 
-        result[idx].tagName = tagNames
-        result[idx].categoryCode = categoryCodes
-        result[idx].categoryCodeName = categoryCodeNames
-      });
+      const tagNames = tagName ? tagName.split(",") : [];
+      const categoryCodes = categoryCode ? categoryCode.split(",") : [];
+      const categoryCodeNames = categoryCodeName
+        ? categoryCodeName.split(",")
+        : [];
+
+      result[idx].tagName = tagNames;
+      result[idx].categoryCode = categoryCodes;
+      result[idx].categoryCodeName = categoryCodeNames;
+    });
 
     const exhibitionList = {
       rows: result,
@@ -174,7 +192,7 @@ class ExhibitionRepository {
   getExhibitionInfo = async (exhibitionId, userEmail) => {
     const now = dayjs(); // 현재 지역별 시간 데이터를 가져옴
     const formatted = now.locale("ko").format("YYYY-MM-DD HH:mm:ss");
-    
+
     const exhibitionItem = await Exhibitions.findOne({
       include: [
         {
@@ -231,16 +249,12 @@ class ExhibitionRepository {
         "exhibitionDesc",
         "exhibitionKind",
         [
-          sequelize.literal(
-            "get_code_name(Exhibitions.exhibition_kind)"
-          ),
+          sequelize.literal("get_code_name(Exhibitions.exhibition_kind)"),
           "exhibitionKindName",
         ],
         "exhibitionHost",
         [
-          sequelize.literal(
-            "get_code_name(Exhibitions.exhibition_host)"
-          ),
+          sequelize.literal("get_code_name(Exhibitions.exhibition_host)"),
           "exhibitionHostName",
         ],
         "exhibitionLink",
@@ -260,54 +274,80 @@ class ExhibitionRepository {
         "createdAt",
       ],
       where: { exhibitionId, exhibition_status: { [Op.ne]: ["ES04"] } },
-    }).catch(err => console.log(err));
+    }).catch((err) => console.log(err));
 
     const userProfile = await UserProfile.findOne({
       where: { userEmail: exhibitionItem.userEmail },
     });
 
     const likeCnt = await ExhibitionLike.count({
-      where: { exhibitionId }
-    })
+      where: { exhibitionId },
+    });
 
     const scrapCnt = await ExhibitionScrap.count({
-      where: { exhibitionId }
-    })
+      where: { exhibitionId },
+    });
 
     const reviewStatus = await ExhibitionReviews.findAll({
       attributes: [
         [
-          sequelize.fn('COUNT', sequelize.col('exhibition_review_id')), 'reviewCnt'
+          sequelize.fn("COUNT", sequelize.col("exhibition_review_id")),
+          "reviewCnt",
         ],
         [
-          sequelize.fn('ROUND', sequelize.fn('AVG', sequelize.col('review_rating')), 2), 'reviewAvgRating'
+          sequelize.fn(
+            "ROUND",
+            sequelize.fn("AVG", sequelize.col("review_rating")),
+            2
+          ),
+          "reviewAvgRating",
         ],
         [
-          sequelize.fn('SUM', sequelize.where(sequelize.col('review_rating'), 1)), 'ratingOneCnt'
+          sequelize.fn(
+            "SUM",
+            sequelize.where(sequelize.col("review_rating"), 1)
+          ),
+          "ratingOneCnt",
         ],
         [
-          sequelize.fn('SUM', sequelize.where(sequelize.col('review_rating'), 2)), 'ratingTwoCnt'
+          sequelize.fn(
+            "SUM",
+            sequelize.where(sequelize.col("review_rating"), 2)
+          ),
+          "ratingTwoCnt",
         ],
         [
-          sequelize.fn('SUM', sequelize.where(sequelize.col('review_rating'), 3)), 'ratingThreeCnt'
+          sequelize.fn(
+            "SUM",
+            sequelize.where(sequelize.col("review_rating"), 3)
+          ),
+          "ratingThreeCnt",
         ],
         [
-          sequelize.fn('SUM', sequelize.where(sequelize.col('review_rating'), 4)), 'ratingFourCnt'
+          sequelize.fn(
+            "SUM",
+            sequelize.where(sequelize.col("review_rating"), 4)
+          ),
+          "ratingFourCnt",
         ],
         [
-          sequelize.fn('SUM', sequelize.where(sequelize.col('review_rating'), 5)), 'ratingFiveCnt'
-        ]
+          sequelize.fn(
+            "SUM",
+            sequelize.where(sequelize.col("review_rating"), 5)
+          ),
+          "ratingFiveCnt",
+        ],
       ],
-      where: {exhibitionId}
-    })
+      where: { exhibitionId },
+    });
 
     const liked = await ExhibitionLike.findOne({
-      where: { exhibitionId, user_email: userEmail }
-    })
+      where: { exhibitionId, user_email: userEmail },
+    });
 
     const scraped = await ExhibitionScrap.findOne({
-      where: { exhibitionId, user_email: userEmail }
-    })
+      where: { exhibitionId, user_email: userEmail },
+    });
 
     const exhibitionInfo = exhibitionItem.toJSON();
 
@@ -321,7 +361,12 @@ class ExhibitionRepository {
     const endDate = new Date(exhibitionInfo.endDate);
     const targetDate = new Date(formatted);
 
-    exhibitionInfo.exhibitionStatus = startDate.getTime() > targetDate.getTime() ? '전시 예정' : endDate.getTime() < targetDate.getTime() ? '전시 종료' : '전시 진행'
+    exhibitionInfo.exhibitionStatus =
+      startDate.getTime() > targetDate.getTime()
+        ? "전시 예정"
+        : endDate.getTime() < targetDate.getTime()
+        ? "전시 종료"
+        : "전시 진행";
 
     if (userProfile) {
       exhibitionInfo.authorProfile = userProfile.toJSON();
@@ -422,22 +467,22 @@ class ExhibitionRepository {
    * @param {array[string]} categories 추가할 카테고리
    * @returns deleteCategoriesCnt: number, updateCategoriesCnt: number 카테고리 수정 정보
    */
-  updateExhibitionCategory = async (mode, exhibitionId, categories) => {
+  updateExhibitionCategory = async (mode, exhibitionId, category) => {
     let updateCategoryStatus = {
       deleteCategoriesCnt: 0,
       updateCategoriesCnt: 0,
     };
     let updateExhibitionCategories = null;
 
-    const rowToCategories = categories.map((categoryCode) => ({
+    const rowToCategory = {
       exhibitionId,
-      categoryCode,
-    }));
+      categoryCode: category,
+    };
 
     if (mode === "C") {
       // 카테고리 추가
-      updateExhibitionCategories = await ExhibitionCategory.bulkCreate(
-        rowToCategories
+      updateExhibitionCategories = await ExhibitionCategory.create(
+        rowToCategory
       );
 
       updateCategoryStatus.updateCategoriesCnt =
@@ -449,8 +494,8 @@ class ExhibitionRepository {
       });
       updateCategoryStatus.deleteCategoriesCnt = deleteCategoriesCnt;
       // 카테고리 추가
-      updateExhibitionCategories = await ExhibitionCategory.bulkCreate(
-        rowToCategories
+      updateExhibitionCategories = await ExhibitionCategory.create(
+        rowToCategory
       );
 
       updateCategoryStatus.updateCategoriesCnt =
@@ -617,17 +662,6 @@ class ExhibitionRepository {
   };
 
   /**
-   * 전시 게시글 좋아요 시 작성자에게 알림 발송하기 위해 작성자 조회
-   * @param {string} exhibitionId 
-   * @returns 전시회 게시글 작성자 이메일
-   */
-  findNotiReceiver = async (exhibitionId) => {
-    const author = await Exhibitions.findByPk(exhibitionId,{attributes:['user_email']})
-
-    return author.dataValues.user_email;
-  }
-
-  /**
    * 전시 게시글 카테고리별 검색
    * @param {array[string]} categories
    * @returns 검색된 게시글 리스트
@@ -645,6 +679,29 @@ class ExhibitionRepository {
     });
 
     return exhibitionList;
+  };
+
+  /**
+   * 3개월간 가장 많은 태그 TOP 10
+   * @returns tagTags TOP 10 태그
+   */
+  getTopTags = async () => {
+    
+    const tagTags = await ExhibitionHashtag.findAll({
+      attributes: ['tagName', [sequelize.fn('COUNT', sequelize.col('tag_name')),'tagCount']],
+      where: {
+        createdAt: {
+          [Op.gt]: dayjs().subtract(3, 'month').toDate(),
+          [Op.lte]: dayjs().toDate()
+        }
+      },
+      group: ['tagName'],
+      order: [[sequelize.literal('tagCount'), 'DESC']],
+      limit:10,
+      raw: true
+    }).catch(err => console.log(err));
+
+    return tagTags;
   };
 }
 
