@@ -42,7 +42,7 @@ class UserController {
     // return res.redirect(301, 'http://localhost:3000');
     res
       .cookie("authorization", `Bearer ${token}`)
-      .redirect(301, `http://localhost:3000?token=${token}`);
+      .redirect(301, `http://hanghae99-9-muse-o.s3-website.ap-northeast-2.amazonaws.com`);
     } catch (error){
     logger.error(error.message);
     next(error);
