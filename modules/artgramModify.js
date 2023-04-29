@@ -3,35 +3,37 @@ const Boom = require("boom");
 
 artgramModify = async (artgramId, imgUrlArray, hashtag) => {
   try {
+    console.log("hashtag", hashtag);
     // 1. 기존 해시태그 가져오기
     const existingHashtags = await ArtgramHashtag.findAll({
       where: { artgramId },
     });
+    console.log("existingHashtags", existingHashtags);
     if (hashtag) {
-      if (Array.isArray(hashtag)) {
-        // ... 이전 코드와 동일 ...
-      } else {
-        for (let existingHashtag of existingHashtags) {
-          if (existingHashtag.tagName === hashtag) {
-            // 해시태그가 이미 존재하면 업데이트
-            await ArtgramHashtag.update(
-              { tagName: hashtag },
-              { where: { artgramTagId: existingHashtag.artgramTagId } }
-            );
-          } else {
-            // 새 해시태그에 없는 경우 삭제
-            await ArtgramHashtag.destroy({
-              where: { artgramTagId: existingHashtag.artgramTagId },
-            });
-          }
+      const newHashtags = Array.isArray(hashtag) ? hashtag : [hashtag];
+      const existingHashtagsSet = new Set(
+        existingHashtags.map((existingHashtag) => existingHashtag.tagName)
+      );
+
+      // 기존 해시태그 중 새 해시태그에 없는 것을 삭제
+      for (let existingHashtag of existingHashtags) {
+        if (!newHashtags.includes(existingHashtag.tagName)) {
+          await ArtgramHashtag.destroy({
+            where: { artgramTagId: existingHashtag.artgramTagId },
+          });
         }
       }
-    } else {
-      return;
+
+      // 새 해시태그 중 기존 해시태그에 없는 것을 추가
+      for (let newHashtag of newHashtags) {
+        if (!existingHashtagsSet.has(newHashtag)) {
+          await ArtgramHashtag.create({ tagName: newHashtag, artgramId });
+        }
+      }
     }
   } catch {
     await this.rollback();
-    throw Boom.badRequest("해시태그수정에 실패했습니다.");
+    throw Boom.badRequest("해시태그 수정에 실패했습니다.");
   }
 
   try {
