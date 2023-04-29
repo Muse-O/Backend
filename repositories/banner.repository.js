@@ -1,9 +1,5 @@
 const { ExhibitionAuthor, sequelize } = require("../models");
 
-const {
-  getKeyObjectFromRows,
-} = require("../modules/sequelizeQueryTranslateUtils");
-
 const dayjs = require("dayjs");
 require("dayjs/locale/ko"); // 현재 지역에 해당하는 locale 로드 현재 국내 서비스이므로 한국 시간 설정
 
