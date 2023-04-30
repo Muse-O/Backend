@@ -17,6 +17,14 @@ class UserRepository {
     return findEmail;
   };
 
+  findProfileByEmail = async (userEmail) => {
+    const profile = await UserProfile.findOne({
+      attributes: ["profileImg", "profileNickname", "profileIntro"],
+      where: [{ user_email: userEmail }],
+    });
+    return profile;
+  };
+
   /**
    * user정보 생성(회원가입)
    * @param {string} email 
