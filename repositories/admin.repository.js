@@ -164,6 +164,33 @@ class AdminRepository extends Users {
     );
     return user;
   };
+
+  /**
+   * "UR02"로 작가 권한부여
+   * @param {*} approvingEmail 승인처리할 사용자 이메일
+   */
+  updateRoleToAuthor = async (approvingEmail) => {
+    await Users.update(
+      { userRole: "UR02"},
+      { where: { user_email: approvingEmail } }
+    )
+  }
+
+  /**
+   * "UR04"인 작가 승인대기자 명단조회
+   * @returns 작가 승인대기자 명단
+   */
+  getPendingRoles = async () => {
+    const result = await Users.findAll({
+      attributes: ["userEmail", "userRole", "updatedAt"],
+      where: {
+        userRole: "UR04",
+        userStatus: "US01"   
+      }
+    })
+
+    return result
+  }
 }
 
 module.exports = AdminRepository;
