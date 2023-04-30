@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
+const authAdminMiddleware = require("../middlewares/authMiddleware_admin")
 
 const AdminController = require("../controllers/admin.controller");
 const adminController = new AdminController();
@@ -86,8 +87,9 @@ router.patch(
 router.get("/reportList", authMiddleware, adminController.getAllReports);
 router.patch("/reportList", authMiddleware, adminController.processReport);
 
-// router.patch("/role", adminController.updateRole)
-
-// router.get("/role", adminController.getPendingRoles)
+// "UR02"로 작가 권한부여
+router.patch("/role", authAdminMiddleware, adminController.updateRole)
+// "UR04"인 작가 승인대기자 명단조회
+router.get("/role", authAdminMiddleware, adminController.getPendingRoles)
 
 module.exports = router;

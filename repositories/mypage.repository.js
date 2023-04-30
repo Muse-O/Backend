@@ -11,9 +11,14 @@ const {
   sequelize,
 } = require("../models");
 const { parseModelToFlatObject } = require("../modules/parseModelToFlatObject");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 class MypageRepository {
+  /**
+   * UserRole 조회
+   * @param {*} userEmail userRole 조회할 사용자 이메일
+   * @returns userRole
+   */
   findUserRoleByEmail = async (userEmail) => {
     const findEmail = await Users.findOne({
       attributes: ["userRole"],
@@ -55,6 +60,17 @@ class MypageRepository {
 
     const updatedProfile = await this.findProfileByEmail(userEmail);
     return updatedProfile;
+  };
+
+  /**
+   * "UR04" 작가승인대기로 변경
+   * @param {*} userEmail 로그인된 사용자 이메일
+   */
+  updateRoleToPending = async (userEmail) =>{
+    await Users.update(
+      { userRole: "UR04"},
+      { where: { user_email: userEmail } }
+    )
   };
 
   /**
