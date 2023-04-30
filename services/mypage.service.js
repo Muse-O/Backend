@@ -10,11 +10,18 @@ class MypageService {
    * @returns 프로필
    */
   getMyProfile = async (userEmail) => {
+    const role = await this.mypageRepository.findUserRoleByEmail(userEmail);
     const profile = await this.mypageRepository.findProfileByEmail(userEmail);
     if (!profile) {
       throw Boom.notFound("서버 측 오류로 프로필이 존재하지 않습니다.");
     }
-    return profile;
+    const result = {
+      profileImg: profile.profileImg,
+      nickname: profile.profileNickname,
+      introduction: profile.profileIntro,
+      role: role,
+    };
+    return result;
   };
 
   /**

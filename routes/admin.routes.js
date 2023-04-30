@@ -86,4 +86,8 @@ router.patch(
 router.get("/reportList", authMiddleware, adminController.getAllReports);
 router.patch("/reportList", authMiddleware, adminController.processReport);
 
+// router.patch("/role", adminController.updateRole)
+
+// router.get("/role", adminController.getPendingRoles)
+
 module.exports = router;

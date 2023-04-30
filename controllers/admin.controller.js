@@ -1,4 +1,5 @@
 const AdminService = require("../services/admin.service");
+const logger = require("../middlewares/logger.js");
 
 class AdminController {
   constructor() {
@@ -79,13 +80,31 @@ class AdminController {
   //     }
   //   }
 
-  //   exhibitionApproval = async(req, res, next) => {
-  //     try{
+  // exhibitionApproval = async(req, res, next) => {
+  //   try{
 
-  //     }catch(err){
-  //         next(err)
-  //     }
+  //   }catch(err){
+  //       next(err)
   //   }
+  // }
+
+  updateRole = async(req, res, next) => {
+    try{
+      
+    }catch(error){
+      logger.error(error.message);
+      next(error);
+    }
+  }
+
+  getPendingRoles = async(req, res, next) => {
+    try{
+
+    }catch(error){
+      logger.error(error.message);
+      next(error);
+    }
+  }
 }
 
 module.exports = AdminController;
