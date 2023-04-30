@@ -1,4 +1,5 @@
 const {
+  Users,
   UserProfile,
   Exhibitions,
   ExhibitionLike,
@@ -13,6 +14,14 @@ const { parseModelToFlatObject } = require("../modules/parseModelToFlatObject");
 const { Op } = require("sequelize");
 
 class MypageRepository {
+  findUserRoleByEmail = async (userEmail) => {
+    const findEmail = await Users.findOne({
+      attributes: ["userRole"],
+      where: { userEmail },
+    });
+    return findEmail.dataValues.userRole;
+  };
+
   /**
    *이메일과 일치하는 프로필 조회
    * @param {string} userEmail
@@ -23,7 +32,7 @@ class MypageRepository {
       attributes: ["profileImg", "profileNickname", "profileIntro"],
       where: [{ user_email: userEmail }],
     });
-    return profile;
+    return profile.dataValues;
   };
 
   /**

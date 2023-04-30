@@ -15,11 +15,7 @@ class MypageController {
       const { userEmail } = res.locals.user;
       const result = await this.mypageService.getMyProfile(userEmail);
 
-      return res.status(200).json({
-        profileImg: result.profileImg,
-        nickname: result.profileNickname,
-        introduction: result.profileIntro,
-      });
+      return res.status(200).json(result);
     } catch (error) {
       logger.error(error.message);
       next(error);
