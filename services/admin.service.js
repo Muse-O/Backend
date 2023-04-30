@@ -1,10 +1,13 @@
 const AdminRepository = require("../repositories/admin.repository");
+const MypageRepository = require("../repositories/mypage.repository");
 const adminPermission = require("../modules/findAdmin");
 const Boom = require("boom");
+
 
 class AdminService {
   constructor() {
     this.adminRepository = new AdminRepository();
+    this.mypageRepository = new MypageRepository();
   }
 
   getPendingExhibitions = async (userEmail) => {
@@ -119,6 +122,28 @@ class AdminService {
       throw new Error("삭제할 게시글이 존재하지 않습니다.");
     }
   };
+
+  /**
+   * "UR02"로 작가 권한부여
+   * @param {*} approvingEmail 승인처리할 사용자 이메일
+   * @returns 
+   */
+  updateRoleToAuthor = async (approvingEmail) => {
+    const beforeRole = await this.mypageRepository.findUserRoleByEmail(approvingEmail);
+    if (beforeRole == 'UR02'){
+      throw Boom.badRequest("이미 작가 승인 처리되어 있는 ID입니다.")
+    }
+    await this.adminRepository.updateRoleToAuthor(approvingEmail);
+  }
+
+  /**
+   * "UR04"인 작가 승인대기자 명단조회
+   * @returns 작가 승인대기자 명단
+   */
+  getPendingRoles = async () => {
+    const pendingList = await this.adminRepository.getPendingRoles();
+    return pendingList
+  }
 }
 
 module.exports = AdminService;

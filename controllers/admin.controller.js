@@ -88,18 +88,28 @@ class AdminController {
   //   }
   // }
 
+  /**
+   * "UR02"로 작가 권한부여
+   */
   updateRole = async(req, res, next) => {
     try{
-      
+      const { approvingEmail } = req.body;
+      const result = await this.adminService.updateRoleToAuthor(approvingEmail)
+
+      return res.status(200).json({message: "작가 승인 처리되었습니다. userRole이 UR02로 변경되었습니다"});
     }catch(error){
       logger.error(error.message);
       next(error);
     }
   }
-
-  getPendingRoles = async(req, res, next) => {
+  /**
+   * "UR04"인 작가 승인대기자 명단조회
+   */
+  getPendingRoles = async (req, res, next) => {
     try{
+      const pendingRoleList = await this.adminService.getPendingRoles()
 
+      return res.status(200).json({pendingRoleList});
     }catch(error){
       logger.error(error.message);
       next(error);

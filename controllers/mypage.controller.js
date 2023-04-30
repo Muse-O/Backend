@@ -23,6 +23,22 @@ class MypageController {
   };
 
   /**
+   * "UR04" 작가승인대기로 변경
+   */
+  updateRoleToPending = async (req, res, next) => {
+    try {
+      const { userEmail } = res.locals.user;
+
+      await this.mypageService.updateRoleToPending(userEmail)
+      
+      return res.status(200).json({message: "작가 승인대기 처리되었습니다. userRole이 UR04로 변경되었습니다."});
+    } catch (error) {
+      logger.error(error.message);
+      next(error);
+    }
+  }
+
+  /**
    * 내 프로필 수정
    */
   updateMyProfile = async (req, res, next) => {

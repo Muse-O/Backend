@@ -5,9 +5,14 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const MypageController = require("../controllers/mypage.controller");
 const mypageController = new MypageController();
 
+// 내 프로필 조회
 router.get("/", authMiddleware, mypageController.getMyProfile);
 
+// 내 프로필 수정
 router.patch("/", authMiddleware, mypageController.updateMyProfile);
+
+// "UR04" 작가 승인대기로 수정
+router.patch("/role", authMiddleware, mypageController.updateRoleToPending);
 
 // 작성한 전시회 조회
 router.get("/exhibition", authMiddleware, mypageController.getMyExhibition);
