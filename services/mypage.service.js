@@ -45,6 +45,18 @@ class MypageService {
     );
     return updatedProfile;
   };
+  /**
+   * "UR04" 작가승인대기로 변경
+   * @param {*} userEmail 로그인된 사용자 이메일
+   * @returns 처리 결과에 따른 메시지
+   */
+  updateRoleToPending = async (userEmail) => {
+    const beforeRole = await this.mypageRepository.findUserRoleByEmail(userEmail);
+    if (beforeRole == 'UR04'){
+      throw Boom.badRequest("이미 작가 승인대기 처리되어 있는 ID입니다.")
+    }
+    await this.mypageRepository.updateRoleToPending(userEmail);
+  }
 
   /**
    * 내가 작성한 전시회 조회
