@@ -34,15 +34,12 @@ class UserController {
     try {
     const email = req.user.userEmail
     const token = await this.userService.generateToken(email);
-    // res.set("Authorization", `${token}`);
-    // res.cookie("authorization", `Bearer ${token}`);
+
     console.log("strategy 성공시", email)
-    // res.redirect("http://localhost:4000");
-    // res.setHeader('Set-Cookie', 'authorization='+`Bearer ${token}`+'; Path=/; HttpOnly');
-    // return res.redirect(301, 'http://localhost:3000');
+    
     res
       .cookie("authorization", `Bearer ${token}`)
-      .redirect(301, `http://hanghae99-9-muse-o.s3-website.ap-northeast-2.amazonaws.com`);
+      .redirect(301, `http://localhost:3000`);
     } catch (error){
     logger.error(error.message);
     next(error);
