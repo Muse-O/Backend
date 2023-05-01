@@ -52,6 +52,7 @@ class UserService {
         userRole: user.userRole,
         nickname: userProfile.profileNickname,
         profileImg: userProfile.profileImg,
+        profileIntro: userProfile.profileIntro,
       },
       process.env.SECRET_KEY,
       {
