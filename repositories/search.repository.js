@@ -45,6 +45,20 @@ class SearchRepositroy extends SearchHistory {
   };
 
   /**
+   * 유저가 검색후 선택한 게시글저장
+   * @param {string} title
+   * @param {string} type
+   * @returns
+   */
+  selectResult = async (title, type, userEmail) => {
+    const savedResult = await SearchHistory.create({
+      keyWord: title,
+      type: type,
+      userEmail: userEmail,
+    });
+    return savedResult;
+  };
+  /**
    * 아트그램 검색
    * @param {string} searchText
    * @returns
@@ -67,10 +81,8 @@ class SearchRepositroy extends SearchHistory {
     const otherChars = characters
       .filter((char) => !isKorean(char))
       .filter((char) => !isEnglish(char));
-
     let chosungText = "";
     let engText = "";
-
     //한글문자가 있다면 초성검색 패턴을 생성한다.
     if (koreanChars.length > 0) {
       chosungText = createFuzzyMatcherKor(koreanChars.join(""));
@@ -86,26 +98,22 @@ class SearchRepositroy extends SearchHistory {
         engText = "";
       }
     }
-
     //기타문자를 하나의 문자열로 연결
     const otherCharsText = otherChars.join("");
     const titleConditions = [];
     const descConditions = [];
     const hashtagConditions = [];
-
     //데이터 베이스에서 일치하는 결과를 검색
     if (otherCharsText) {
       titleConditions.push({ [Sequelize.Op.regexp]: otherCharsText });
       descConditions.push({ [Sequelize.Op.regexp]: otherCharsText });
       hashtagConditions.push({ [Sequelize.Op.regexp]: otherCharsText });
     }
-
     if (chosungText) {
       titleConditions.push({ [Sequelize.Op.regexp]: chosungText });
       descConditions.push({ [Sequelize.Op.regexp]: chosungText });
       hashtagConditions.push({ [Sequelize.Op.regexp]: chosungText });
     }
-
     if (engText) {
       titleConditions.push({ [Sequelize.Op.regexp]: engText });
       descConditions.push({ [Sequelize.Op.regexp]: engText });
