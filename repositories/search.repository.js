@@ -305,7 +305,7 @@ class SearchRepositroy extends SearchHistory {
                   exhibitionId,
                 },
               })
-            : null;
+            : undefined;
 
         const scrapByCurrentUser =
           myuserEmail !== "guest" && myuserEmail !== undefined
@@ -315,7 +315,7 @@ class SearchRepositroy extends SearchHistory {
                   exhibitionId,
                 },
               })
-            : null;
+            : undefined;
 
         let exhibitionObject = {
           ...rest,
@@ -328,11 +328,11 @@ class SearchRepositroy extends SearchHistory {
         };
 
         if (likedByCurrentUser !== undefined) {
-          artgramObject.liked = likedByCurrentUser;
+          exhibitionObject.liked = likedByCurrentUser;
         }
 
         if (scrapByCurrentUser !== undefined) {
-          artgramObject.scrap = scrapByCurrentUser;
+          exhibitionObject.scrap = scrapByCurrentUser;
         }
 
         return exhibitionObject;
