@@ -305,7 +305,7 @@ class SearchRepositroy extends SearchHistory {
                   exhibitionId,
                 },
               })
-            : null;
+            : undefined;
 
         const scrapByCurrentUser =
           myuserEmail !== "guest" && myuserEmail !== undefined
@@ -315,19 +315,25 @@ class SearchRepositroy extends SearchHistory {
                   exhibitionId,
                 },
               })
-            : null;
+            : undefined;
 
-        const exhibitionObject = {
+        let exhibitionObject = {
           ...rest,
           detailRouter: `/exhibition/detail/${exhibitionId}`,
           address,
           type: "exhibition",
-          liked: !!likedByCurrentUser,
-          scrap: !!scrapByCurrentUser,
           createdAt: dayjs(exhibition.createdAt)
             .locale("en")
             .format("YYYY-MM-DD HH:mm:ss"),
         };
+
+        if (likedByCurrentUser !== undefined) {
+          exhibitionObject.liked = likedByCurrentUser;
+        }
+
+        if (scrapByCurrentUser !== undefined) {
+          exhibitionObject.scrap = scrapByCurrentUser;
+        }
 
         return exhibitionObject;
       })
