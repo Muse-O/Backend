@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
-const authAdminMiddleware = require("../middlewares/authMiddleware_admin")
+const authAdminMiddleware = require("../middlewares/authMiddleware_admin");
 
 const AdminController = require("../controllers/admin.controller");
 const adminController = new AdminController();
@@ -76,22 +76,37 @@ const adminController = new AdminController();
  *       - jwt: []
  */
 
+/**
+ * 전시회 승인리스트
+ */
 router.get(
   "/approvalList",
-  authMiddleware,
+  authAdminMiddleware,
   adminController.getPendingExhibitions
 );
+
+/**
+ * 전시회 승인
+ */
 router.patch(
   "/approvalList",
-  authMiddleware,
+  authAdminMiddleware,
   adminController.approveExhibition
 );
-router.get("/reportList", authMiddleware, adminController.getAllReports);
-router.patch("/reportList", authMiddleware, adminController.processReport);
+
+/**
+ * 신고 리스트
+ */
+router.get("/reportList", authAdminMiddleware, adminController.getAllReports);
+
+/**
+ * 신고 처리
+ */
+router.patch("/reportList", authAdminMiddleware, adminController.processReport);
 
 // "UR02"로 작가 권한부여
-router.patch("/role", authAdminMiddleware, adminController.updateRole)
+router.patch("/role", authAdminMiddleware, adminController.updateRole);
 // "UR04"인 작가 승인대기자 명단조회
-router.get("/role", authAdminMiddleware, adminController.getPendingRoles)
+router.get("/role", authAdminMiddleware, adminController.getPendingRoles);
 
 module.exports = router;

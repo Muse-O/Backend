@@ -9,10 +9,8 @@ const {
 } = require("../models");
 const { Op } = require("sequelize");
 
-class AdminRepository extends Users {
-  constructor() {
-    super();
-  }
+class AdminRepository {
+  constructor() {}
 
   getPendingExhibitions = async () => {
     const exhibitionApprove = await Exhibitions.findAll({
@@ -171,10 +169,10 @@ class AdminRepository extends Users {
    */
   updateRoleToAuthor = async (approvingEmail) => {
     await Users.update(
-      { userRole: "UR02"},
+      { userRole: "UR02" },
       { where: { user_email: approvingEmail } }
-    )
-  }
+    );
+  };
 
   /**
    * "UR04"인 작가 승인대기자 명단조회
@@ -185,12 +183,12 @@ class AdminRepository extends Users {
       attributes: ["userEmail", "userRole", "updatedAt"],
       where: {
         userRole: "UR04",
-        userStatus: "US01"   
-      }
-    })
+        userStatus: "US01",
+      },
+    });
 
-    return result
-  }
+    return result;
+  };
 }
 
 module.exports = AdminRepository;

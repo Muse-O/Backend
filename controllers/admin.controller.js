@@ -6,45 +6,56 @@ class AdminController {
     this.adminService = new AdminService();
   }
 
+  /**
+   * 전시회 승인요청 리스트
+   * ES5 전시회조회
+   */
   getPendingExhibitions = async (req, res, next) => {
     try {
-      const { userEmail } = res.locals.user;
-      const findApprovalList = await this.adminService.getPendingExhibitions(
-        userEmail
-      );
+      const findApprovalList = await this.adminService.getPendingExhibitions();
       res.status(200).json({ findApprovalList });
     } catch (err) {
       next(err);
     }
   };
 
+  /**
+   * 전시회 승인
+   * ES05 -> ES01 로 변경
+   * @param {exhibitionId} req.body
+   */
   approveExhibition = async (req, res, next) => {
     try {
-      const { userEmail } = res.locals.user;
       const { exhibitionId } = req.body;
-      const approved = await this.adminService.approveExhibition(
-        userEmail,
-        exhibitionId
-      );
+      const approved = await this.adminService.approveExhibition(exhibitionId);
       res.status(200).json({ message: "전시글이 승인되었습니다." });
     } catch (err) {
       next(err);
     }
   };
 
+  /**
+   * 신고목록 조회
+   * 신고DB 목록전체 조회
+   * @param {userEmail} res.local.user
+   */
   getAllReports = async (req, res, next) => {
     try {
-      const { userEmail } = res.locals.user;
-      const reportList = await this.adminService.getAllReports(userEmail);
+      const reportList = await this.adminService.getAllReports();
       res.status(200).json({ reportList });
     } catch (err) {
       next(err);
     }
   };
 
+  /**
+   * 신고 처리
+   * 처리되면 reportComplete => clear 로변경
+   * @param {userEmail} res.local.user
+   * @param {AllId} req.body
+   */
   processReport = async (req, res, next) => {
     try {
-      const { userEmail } = res.locals.user;
       const {
         reportEmail,
         exhibitionId,
@@ -55,7 +66,6 @@ class AdminController {
         articleType,
       } = req.body;
       const reportSuccess = await this.adminService.processReport(
-        userEmail,
         reportEmail,
         exhibitionId,
         exhibitionReviewId,
@@ -72,49 +82,35 @@ class AdminController {
     }
   };
 
-  //   exhibitionApproval = async(req, res, next) => {
-  //     try{
-
-  //     }catch(err){
-  //         next(err)
-  //     }
-  //   }
-
-  // exhibitionApproval = async(req, res, next) => {
-  //   try{
-
-  //   }catch(err){
-  //       next(err)
-  //   }
-  // }
-
   /**
    * "UR02"로 작가 권한부여
    */
-  updateRole = async(req, res, next) => {
-    try{
+  updateRole = async (req, res, next) => {
+    try {
       const { approvingEmail } = req.body;
-      const result = await this.adminService.updateRoleToAuthor(approvingEmail)
+      const result = await this.adminService.updateRoleToAuthor(approvingEmail);
 
-      return res.status(200).json({message: "작가 승인 처리되었습니다. userRole이 UR02로 변경되었습니다"});
-    }catch(error){
+      return res.status(200).json({
+        message: "작가 승인 처리되었습니다. userRole이 UR02로 변경되었습니다",
+      });
+    } catch (error) {
       logger.error(error.message);
       next(error);
     }
-  }
+  };
   /**
    * "UR04"인 작가 승인대기자 명단조회
    */
   getPendingRoles = async (req, res, next) => {
-    try{
-      const pendingRoleList = await this.adminService.getPendingRoles()
+    try {
+      const pendingRoleList = await this.adminService.getPendingRoles();
 
-      return res.status(200).json({pendingRoleList});
-    }catch(error){
+      return res.status(200).json({ pendingRoleList });
+    } catch (error) {
       logger.error(error.message);
       next(error);
     }
-  }
+  };
 }
 
 module.exports = AdminController;
