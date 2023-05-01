@@ -8,18 +8,15 @@
     "dev": "nodemon app start",
     "prettify": "prettier --write *.js **/*.js",
     "coverage": "jest --coverage",
-
     "test:init": "NODE_ENV=test sequelize db:create --config=./config/config.js && NODE_ENV=test sequelize db:migrate --config=./config/config.js --model-path=./model",
     "window:test:init": "set sequelize db:create --env test --config=./config/config.js && sequelize db:migrate --env test --config=./config/config.js",
     "new:init": "sequelize db:create --env test --config=./config/config.js && sequelize db:migrate --env test --config=./config/config.js --migrations-path ./models",
-    "sync-test":"set NODE_ENV=test node ./modules/sync-sequelize-model-testsync.js",
-
+    "sync-test": "set NODE_ENV=test node ./modules/sync-sequelize-model-testsync.js",
     "test": "NODE_ENV=test jest --forceExit",
     "test:silent": "NODE_ENV=test jest --silent --forceExit",
     "test:coverage": "NODE_ENV=test jest --coverage --forceExit",
     "test:unit": "NODE_ENV=test jest test/unit --forceExit",
     "test:integration": "NODE_ENV=test jest test/integration --forceExit",
-
     "window:test": "set NODE_ENV=test && jest --forceExit --detectOpenHandles",
     "window:test:silent": "set NODE_ENV=test && jest --silent --forceExit",
     "window:test:coverage": "set NODE_ENV=test && jest --coverage --forceExit --detectOpenHandles",
@@ -42,6 +39,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-fileupload": "^1.4.0",
+    "http-proxy-middleware": "^2.0.6",
     "joi": "^17.9.1",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
