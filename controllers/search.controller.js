@@ -14,6 +14,9 @@ class SearchContorller {
     try {
       const { searchText } = req.query;
       const { userEmail } = res.locals.user || "guest";
+      console.log("userEmail", userEmail);
+      console.log("userEmail", userEmail);
+      console.log("userEmail", userEmail);
       const result = searchSchema.validate(searchText);
       const search = await this.searchService.search(result, userEmail);
       res.status(200).json({ search });
