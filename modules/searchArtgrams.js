@@ -40,14 +40,14 @@ const searchArtgram = async (searchResults, myuserEmail) => {
       const scrapCount = scrapCountData.count;
 
       const likedByCurrentUser =
-        myuserEmail && myuserEmail !== "guest"
+        myuserEmail && myuserEmail !== "guest" && myuserEmail !== undefined
           ? likeCountData.rows.some((like) => like.userEmail === myuserEmail)
-          : false;
+          : undefined;
 
       const scrapByCurrentUser =
-        myuserEmail && myuserEmail !== "guest"
+        myuserEmail && myuserEmail !== "guest" && myuserEmail !== undefined
           ? scrapCountData.rows.some((scrap) => scrap.userEmail === myuserEmail)
-          : false;
+          : undefined;
 
       const imgUrl = artgram.ArtgramImgs[0].dataValues.imgUrl;
       const { ArtgramImgs, ...rest } = artgram.dataValues;
@@ -61,12 +61,18 @@ const searchArtgram = async (searchResults, myuserEmail) => {
         likeCount,
         imgCount: artgram.ArtgramImgs.length, // 이미 포함된 ArtgramImg를 사용하도록 수정
         scrapCount,
-        liked: likedByCurrentUser,
-        scrap: scrapByCurrentUser,
         createdAt: dayjs(artgram.createdAt)
           .locale("en")
           .format("YYYY-MM-DD HH:mm:ss"),
       };
+
+      if (likedByCurrentUser !== undefined) {
+        artgramObject.liked = likedByCurrentUser;
+      }
+
+      if (scrapByCurrentUser !== undefined) {
+        artgramObject.scrap = scrapByCurrentUser;
+      }
       return artgramObject;
     })
   );
