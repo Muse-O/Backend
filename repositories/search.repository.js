@@ -297,25 +297,25 @@ class SearchRepositroy extends SearchHistory {
 
         const { ExhibitionAddress, ...rest } = exhibition.dataValues;
 
-        const likedByCurrentUser =
-          myuserEmail !== "guest" && myuserEmail !== undefined
-            ? await ExhibitionLike.findOne({
-                where: {
-                  userEmail: myuserEmail,
-                  exhibitionId,
-                },
-              })
-            : undefined;
+        const validEmail = myuserEmail && myuserEmail !== "guest";
 
-        const scrapByCurrentUser =
-          myuserEmail !== "guest" && myuserEmail !== undefined
-            ? await ExhibitionScrap.findOne({
-                where: {
-                  userEmail: myuserEmail,
-                  exhibitionId,
-                },
-              })
-            : undefined;
+        const likedByCurrentUser = validEmail
+          ? await ExhibitionLike.findOne({
+              where: {
+                userEmail: myuserEmail,
+                exhibitionId,
+              },
+            }).then((result) => result !== null)
+          : undefined;
+
+        const scrapByCurrentUser = validEmail
+          ? await ExhibitionScrap.findOne({
+              where: {
+                userEmail: myuserEmail,
+                exhibitionId,
+              },
+            }).then((result) => result !== null)
+          : undefined;
 
         let exhibitionObject = {
           ...rest,

@@ -1,7 +1,4 @@
-// //사용하기전에 mockReq를 초기화해줌
-// //독립적인 실행이 가능해짐
-// beforeEach(() => {
-const mockReq = {
+exports.mockReq = {
   body: {
     reportEmail: "ekqls6812@dd.com",
     exhibitionId: "170ef333-6518-486b-94aa-dcfec533b574",
@@ -17,9 +14,8 @@ const mockReq = {
     articleType: "RP000006",
   },
 };
-// });
 
-const mockRes = {
+exports.mockRes = {
   locals: {
     user: {
       userEmail: "ekqls6812@dd.com",
@@ -29,9 +25,9 @@ const mockRes = {
   json: jest.fn(),
 };
 
-const mockNext = jest.fn();
+exports.mockNext = jest.fn();
 
-const mockPendingExhibitionsData = [
+exports.mockPendingExhibitionsData = [
   {
     exhibitionId: "170ef333-6518-486b-94aa-dcfec533b574",
     userEmail: "back@naver.com",
@@ -46,7 +42,7 @@ const mockPendingExhibitionsData = [
   },
 ];
 
-const mockGetAllReports = [
+exports.mockGetAllReports = [
   {
     reportId: "7d0e1c47-b653-4292-b57e-91ae74cf4c4e",
     userEmail: "ekqls6812@dd.com",
@@ -64,17 +60,38 @@ const mockGetAllReports = [
   },
 ];
 
-const userRoles = [
+exports.userRoles = [
   { role: "UR01", description: "관리자아이디로만 접근이 가능합니다." },
   { role: "UR02", description: "관리자아이디로만 접근이 가능합니다." },
   { role: "UR03", description: "어드민입니다." },
 ];
 
-module.exports = {
-  mockReq,
-  mockRes,
-  mockNext,
-  mockPendingExhibitionsData,
-  mockGetAllReports,
-  userRoles,
+exports.getPendingExhibitionsSchemaByService = {
+  exhibitionId: "170ef333-6518-486b-94aa-dcfec533b574",
+};
+
+exports.processReportMockdata = {
+  reportEmail: "report@repot.com",
+  exhibitionId: "170ef333-6518-486b-94aa-dcfec533b574",
+  exhibitionReviewId: "0aec8369-f455-45c2-8c23-ea7fc1520b96e",
+  artgramId: "01312afb-cfee-4e8d-ae51-2a438fd5b423",
+  commentId: "08d8c17e-a36f-40bb-9a10-724bd674bbd9",
+  commentParent: "2e86cccb-f2d0-453a-b2a1-8ea065198f23",
+  articleType: "RP000001",
+};
+
+exports.mockExhibitions = {
+  findAll: jest.fn(),
+  update: jest.fn(),
+  findOne: jest.fn(),
+};
+
+exports.mockArticleReport = {
+  findAll: jest.fn(),
+  update: jest.fn(),
+};
+
+exports.mockExhibitionSchema = {
+  findOne: jest.fn(),
+  update: jest.fn(),
 };
