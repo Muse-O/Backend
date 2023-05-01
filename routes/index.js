@@ -13,6 +13,7 @@ const notiRouter = require("./notification.routes");
 const reportRouter = require("./report.routes");
 const adminRouter = require("./admin.routes");
 const chatRouter = require("./chat.routes");
+const uploadRouter = require("./upload.routes");
 
 router.use("/auth", userRouter);
 router.use("/artgram", [artgramRouter, artgramCommentRouter]);
@@ -24,5 +25,6 @@ router.use("/notification", notiRouter);
 router.use("/report", reportRouter);
 router.use("/admin", adminRouter);
 router.use("/chat", chatRouter);
+router.use("/upload", uploadRouter);
 
 module.exports = router;
