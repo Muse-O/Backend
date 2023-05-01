@@ -27,7 +27,6 @@ const {
 class SearchRepositroy extends SearchHistory {
   constructor() {
     super();
-    this.redisClient = RedisClient.getClient();
   }
   /**
    * 유저가 검색후 선택한 게시글저장
@@ -329,6 +328,7 @@ class SearchRepositroy extends SearchHistory {
             .locale("en")
             .format("YYYY-MM-DD HH:mm:ss"),
         };
+
         return exhibitionObject;
       })
     );
