@@ -1,20 +1,16 @@
-const {
-  ArtgramImg,
-  ArtgramLike,
-  ArtgramScrap,
-  Users,
-  UserProfile,
-} = require("../models");
+const { Users, UserProfile, ArtgramLike, ArtgramScrap } = require("../models");
 const dayjs = require("dayjs");
 
-const searchArtgram = async (search, myuserEmail) => {
-  const filteredSearch = search.filter(
+const searchArtgram = async (searchResults, myuserEmail) => {
+  const filteredSearch = searchResults.filter(
     (artgram) => artgram.artgramStatus !== "AS04"
   );
 
   const searchResult = await Promise.all(
     filteredSearch.map(async (artgram) => {
       const userEmail = artgram.userEmail;
+      const artgramId = artgram.artgramId;
+
       const user = await Users.findOne({
         where: { userEmail: userEmail },
         include: [
@@ -25,40 +21,36 @@ const searchArtgram = async (search, myuserEmail) => {
         ],
       });
       const userProfile = user.UserProfile;
-      const artgramId = artgram.artgramId;
 
-      const likeCount = await ArtgramLike.count({
-        where: { artgramId: artgramId },
-      });
-      const imgCount = await ArtgramImg.count({
-        where: { artgramId: artgramId },
-      });
-      const scrapCount = await ArtgramScrap.count({
-        where: { artgramId: artgramId },
-      });
+      // Get likeCount, scrapCount, likedByCurrentUser, and scrapByCurrentUser in a single query
+      const [likeCountData, scrapCountData] = await Promise.all([
+        ArtgramLike.findAndCountAll({
+          where: { artgramId: artgramId },
+          attributes: ["userEmail"],
+          raw: true,
+        }),
+        ArtgramScrap.findAndCountAll({
+          where: { artgramId: artgramId },
+          attributes: ["userEmail"],
+          raw: true,
+        }),
+      ]);
+
+      const likeCount = likeCountData.count;
+      const scrapCount = scrapCountData.count;
+
+      const likedByCurrentUser =
+        myuserEmail && myuserEmail !== "guest"
+          ? likeCountData.rows.some((like) => like.userEmail === myuserEmail)
+          : false;
+
+      const scrapByCurrentUser =
+        myuserEmail && myuserEmail !== "guest"
+          ? scrapCountData.rows.some((scrap) => scrap.userEmail === myuserEmail)
+          : false;
 
       const imgUrl = artgram.ArtgramImgs[0].dataValues.imgUrl;
       const { ArtgramImgs, ...rest } = artgram.dataValues;
-
-      const likedByCurrentUser =
-        myuserEmail !== "guest" && myuserEmail !== undefined
-          ? await ArtgramLike.findOne({
-              where: {
-                userEmail: myuserEmail,
-                artgramId: artgramId,
-              },
-            })
-          : null;
-
-      const scrapByCurrentUser =
-        myuserEmail !== "guest" && myuserEmail !== undefined
-          ? await ArtgramScrap.findOne({
-              where: {
-                userEmail: myuserEmail,
-                artgramId: artgramId,
-              },
-            })
-          : null;
 
       const artgramObject = {
         ...rest,
@@ -67,10 +59,10 @@ const searchArtgram = async (search, myuserEmail) => {
         profileImg: userProfile.profileImg,
         imgUrl,
         likeCount,
-        imgCount,
+        imgCount: artgram.ArtgramImgs.length, // 이미 포함된 ArtgramImg를 사용하도록 수정
         scrapCount,
-        liked: !!likedByCurrentUser,
-        scrap: !!scrapByCurrentUser,
+        liked: likedByCurrentUser,
+        scrap: scrapByCurrentUser,
         createdAt: dayjs(artgram.createdAt)
           .locale("en")
           .format("YYYY-MM-DD HH:mm:ss"),
