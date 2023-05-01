@@ -317,17 +317,23 @@ class SearchRepositroy extends SearchHistory {
               })
             : null;
 
-        const exhibitionObject = {
+        let exhibitionObject = {
           ...rest,
           detailRouter: `/exhibition/detail/${exhibitionId}`,
           address,
           type: "exhibition",
-          liked: !!likedByCurrentUser,
-          scrap: !!scrapByCurrentUser,
           createdAt: dayjs(exhibition.createdAt)
             .locale("en")
             .format("YYYY-MM-DD HH:mm:ss"),
         };
+
+        if (likedByCurrentUser !== undefined) {
+          artgramObject.liked = likedByCurrentUser;
+        }
+
+        if (scrapByCurrentUser !== undefined) {
+          artgramObject.scrap = scrapByCurrentUser;
+        }
 
         return exhibitionObject;
       })
