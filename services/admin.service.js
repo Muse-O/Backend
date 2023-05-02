@@ -2,7 +2,7 @@ const AdminRepository = require("../repositories/admin.repository");
 const MypageRepository = require("../repositories/mypage.repository");
 const adminPermission = require("../modules/findAdmin");
 const Boom = require("boom");
-
+const { ScanStream } = require("ioredis");
 
 class AdminService {
   constructor() {
@@ -10,38 +10,25 @@ class AdminService {
     this.mypageRepository = new MypageRepository();
   }
 
-  getPendingExhibitions = async (userEmail) => {
-    const findAdmin = await adminPermission(userEmail);
-    if (findAdmin !== "UR03") {
-      throw Boom.notFound("관리자아이디로만 접근이 가능합니다.");
-    }
+  getPendingExhibitions = async () => {
     const approvalRequestList =
       await this.adminRepository.getPendingExhibitions();
     return approvalRequestList;
   };
 
-  approveExhibition = async (userEmail, exhibitionId) => {
-    const findAdmin = await adminPermission(userEmail);
-    if (findAdmin !== "UR03") {
-      throw Boom.notFound("관리자아이디로만 접근이 가능합니다.");
-    }
+  approveExhibition = async (exhibitionId) => {
     const exhibitionApproval = await this.adminRepository.approveExhibition(
       exhibitionId
     );
     return exhibitionApproval;
   };
 
-  getAllReports = async (userEmail) => {
-    const findAdmin = await adminPermission(userEmail);
-    if (findAdmin !== "UR03") {
-      throw Boom.notFound("관리자아이디로만 접근이 가능합니다.");
-    }
+  getAllReports = async () => {
     const reportList = await this.adminRepository.getAllReports();
     return reportList;
   };
 
   processReport = async (
-    userEmail,
     reportEmail,
     exhibitionId,
     exhibitionReviewId,
@@ -50,11 +37,6 @@ class AdminService {
     commentParent,
     articleType
   ) => {
-    const findAdmin = await adminPermission(userEmail);
-    if (findAdmin !== "UR03") {
-      throw Boom.notFound("관리자아이디로만 접근이 가능합니다.");
-    }
-
     const selectId = [
       reportEmail,
       exhibitionId,
@@ -126,15 +108,17 @@ class AdminService {
   /**
    * "UR02"로 작가 권한부여
    * @param {*} approvingEmail 승인처리할 사용자 이메일
-   * @returns 
+   * @returns
    */
   updateRoleToAuthor = async (approvingEmail) => {
-    const beforeRole = await this.mypageRepository.findUserRoleByEmail(approvingEmail);
-    if (beforeRole == 'UR02'){
-      throw Boom.badRequest("이미 작가 승인 처리되어 있는 ID입니다.")
+    const beforeRole = await this.mypageRepository.findUserRoleByEmail(
+      approvingEmail
+    );
+    if (beforeRole == "UR02") {
+      throw Boom.badRequest("이미 작가 승인 처리되어 있는 ID입니다.");
     }
     await this.adminRepository.updateRoleToAuthor(approvingEmail);
-  }
+  };
 
   /**
    * "UR04"인 작가 승인대기자 명단조회
@@ -142,8 +126,8 @@ class AdminService {
    */
   getPendingRoles = async () => {
     const pendingList = await this.adminRepository.getPendingRoles();
-    return pendingList
-  }
+    return pendingList;
+  };
 }
 
 module.exports = AdminService;

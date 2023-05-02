@@ -46,8 +46,6 @@ class SearchService {
     let saveResult;
     if (userEmail !== "guest" && userEmail !== undefined) {
       saveResult = this.searchRepositroy.selectResult(title, type, userEmail);
-    } else {
-      throw Boom.notFound("유저정보가 없으면 저장할 수 없습니다.");
     }
     return saveResult;
   };

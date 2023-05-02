@@ -27,7 +27,6 @@ const {
 class SearchRepositroy extends SearchHistory {
   constructor() {
     super();
-    this.redisClient = RedisClient.getClient();
   }
   /**
    * 유저가 검색후 선택한 게시글저장
@@ -45,6 +44,20 @@ class SearchRepositroy extends SearchHistory {
   };
 
   /**
+   * 유저가 검색후 선택한 게시글저장
+   * @param {string} title
+   * @param {string} type
+   * @returns
+   */
+  selectResult = async (title, type, userEmail) => {
+    const savedResult = await SearchHistory.create({
+      keyWord: title,
+      type: type,
+      userEmail: userEmail,
+    });
+    return savedResult;
+  };
+  /**
    * 아트그램 검색
    * @param {string} searchText
    * @returns
@@ -58,15 +71,6 @@ class SearchRepositroy extends SearchHistory {
     };
     //특수문자를 제거해주는 코드
     const SearchText = removeSpecialCharacters(searchText);
-
-    // 레디스에 저장된 값이 있는지 확인하고 있다면 바로 출력해줌
-    const cachedArtgrams = await this.redisClient.get(
-      `search:artgram:${SearchText}`
-    );
-
-    if (cachedArtgrams) {
-      return JSON.parse(cachedArtgrams);
-    }
     //입력된 문자열을 문자 단위로 분해한다
     let characters = SearchText.split("");
 
@@ -76,10 +80,8 @@ class SearchRepositroy extends SearchHistory {
     const otherChars = characters
       .filter((char) => !isKorean(char))
       .filter((char) => !isEnglish(char));
-
     let chosungText = "";
     let engText = "";
-
     //한글문자가 있다면 초성검색 패턴을 생성한다.
     if (koreanChars.length > 0) {
       chosungText = createFuzzyMatcherKor(koreanChars.join(""));
@@ -95,42 +97,39 @@ class SearchRepositroy extends SearchHistory {
         engText = "";
       }
     }
-
     //기타문자를 하나의 문자열로 연결
     const otherCharsText = otherChars.join("");
     const titleConditions = [];
     const descConditions = [];
     const hashtagConditions = [];
-
     //데이터 베이스에서 일치하는 결과를 검색
     if (otherCharsText) {
       titleConditions.push({ [Sequelize.Op.regexp]: otherCharsText });
       descConditions.push({ [Sequelize.Op.regexp]: otherCharsText });
       hashtagConditions.push({ [Sequelize.Op.regexp]: otherCharsText });
     }
-
     if (chosungText) {
       titleConditions.push({ [Sequelize.Op.regexp]: chosungText });
       descConditions.push({ [Sequelize.Op.regexp]: chosungText });
       hashtagConditions.push({ [Sequelize.Op.regexp]: chosungText });
     }
-
     if (engText) {
       titleConditions.push({ [Sequelize.Op.regexp]: engText });
       descConditions.push({ [Sequelize.Op.regexp]: engText });
       hashtagConditions.push({ [Sequelize.Op.regexp]: engText });
     }
 
-    const rows = await Artgrams.findAll({
+    const artgramResults = await Artgrams.findAll({
       attributes: [
         "artgramId",
         "userEmail",
         "artgramTitle",
         "artgramDesc",
         "createdAt",
+        "artgramStatus",
       ],
       where: {
-        artgram_status: {
+        artgramStatus: {
           [Op.ne]: "AS04",
         },
         [Sequelize.Op.or]: [
@@ -146,23 +145,30 @@ class SearchRepositroy extends SearchHistory {
             imgOrder: 1,
           },
         },
-        {
-          model: ArtgramHashtag,
-          attributes: ["tagName"],
-        },
       ],
       order: [["createdAt", "DESC"]],
     });
 
-    const hashTag = await Artgrams.findAll({
-      attributes: ["artgramId", "userEmail", "artgramTitle", "createdAt"],
+    const hashtagResults = await ArtgramHashtag.findAll({
+      attributes: ["artgramId"],
+      where: {
+        tagName: { [Sequelize.Op.or]: hashtagConditions },
+      },
+    });
+
+    const hashtagArtgramIds = hashtagResults.map(
+      (hashtag) => hashtag.artgramId
+    );
+    const combinedArtgramIds = [
+      ...new Set([
+        ...artgramResults.map((artgram) => artgram.artgramId),
+        ...hashtagArtgramIds,
+      ]),
+    ];
+
+    const searchResults = await Artgrams.findAll({
+      where: { artgramId: { [Sequelize.Op.in]: combinedArtgramIds } },
       include: [
-        {
-          model: ArtgramHashtag,
-          attributes: ["tagName"],
-          required: true,
-          where: { tag_name: { [Sequelize.Op.or]: hashtagConditions } },
-        },
         {
           model: ArtgramImg,
           attributes: ["imgUrl"],
@@ -170,30 +176,15 @@ class SearchRepositroy extends SearchHistory {
             imgOrder: 1,
           },
         },
-      ],
-      where: {
-        artgram_status: {
-          [Op.ne]: "AS04",
+        {
+          model: ArtgramHashtag,
+          attributes: ["tagName"],
         },
-      },
-      order: [["createdAt", "DESC"]],
+      ],
     });
 
-    const searchTitle = await searchArtgram(rows, myuserEmail);
-    const searchHashtag = await searchArtgram(hashTag, myuserEmail);
-    const combinedResults = [...searchTitle, ...searchHashtag];
-    const uniqueResults = combinedResults.filter(
-      (artgram, index, self) =>
-        index === self.findIndex((t) => t.artgramId === artgram.artgramId)
-    );
+    const uniqueResults = await searchArtgram(searchResults, myuserEmail);
 
-    //검색한 text를 저장해줌
-    await this.redisClient.set(
-      `search:artgram:${SearchText}`,
-      JSON.stringify(uniqueResults),
-      "EX",
-      120
-    );
     return uniqueResults;
   };
 
@@ -211,12 +202,6 @@ class SearchRepositroy extends SearchHistory {
     };
     //특수문자를 제거해주는 코드
     const SearchText = removeSpecialCharacters(searchText);
-    const cachedExhibitions = await this.redisClient.get(
-      `search:exhibition:${SearchText}`
-    );
-    if (cachedExhibitions) {
-      return JSON.parse(cachedExhibitions);
-    }
     let characters = SearchText.split("");
 
     // 한글과 기타로 문자를 분리한다.
@@ -312,46 +297,46 @@ class SearchRepositroy extends SearchHistory {
 
         const { ExhibitionAddress, ...rest } = exhibition.dataValues;
 
-        const likedByCurrentUser =
-          myuserEmail !== "guest" && myuserEmail !== undefined
-            ? await ExhibitionLike.findOne({
-                where: {
-                  userEmail: myuserEmail,
-                  exhibitionId,
-                },
-              })
-            : null;
+        const validEmail = myuserEmail && myuserEmail !== "guest";
 
-        const scrapByCurrentUser =
-          myuserEmail !== "guest" && myuserEmail !== undefined
-            ? await ExhibitionScrap.findOne({
-                where: {
-                  userEmail: myuserEmail,
-                  exhibitionId,
-                },
-              })
-            : null;
+        const likedByCurrentUser = validEmail
+          ? await ExhibitionLike.findOne({
+              where: {
+                userEmail: myuserEmail,
+                exhibitionId,
+              },
+            }).then((result) => result !== null)
+          : undefined;
 
-        const exhibitionObject = {
+        const scrapByCurrentUser = validEmail
+          ? await ExhibitionScrap.findOne({
+              where: {
+                userEmail: myuserEmail,
+                exhibitionId,
+              },
+            }).then((result) => result !== null)
+          : undefined;
+
+        let exhibitionObject = {
           ...rest,
           detailRouter: `/exhibition/detail/${exhibitionId}`,
           address,
           type: "exhibition",
-          liked: !!likedByCurrentUser,
-          scrap: !!scrapByCurrentUser,
           createdAt: dayjs(exhibition.createdAt)
             .locale("en")
             .format("YYYY-MM-DD HH:mm:ss"),
         };
+
+        if (likedByCurrentUser !== undefined) {
+          exhibitionObject.liked = likedByCurrentUser;
+        }
+
+        if (scrapByCurrentUser !== undefined) {
+          exhibitionObject.scrap = scrapByCurrentUser;
+        }
+
         return exhibitionObject;
       })
-    );
-
-    await this.redisClient.set(
-      `search:exhibition:${SearchText}`,
-      JSON.stringify(searchExhibition),
-      "EX",
-      120
     );
 
     return searchExhibition;
@@ -368,10 +353,6 @@ class SearchRepositroy extends SearchHistory {
     };
     //특수문자를 제거해주는 코드
     const SearchText = removeSpecialCharacters(searchText);
-    const cachedUsers = await this.redisClient.get(`search:user:${SearchText}`);
-    if (cachedUsers || cachedUsers !== null) {
-      return JSON.parse(cachedUsers);
-    }
 
     //입력된 문자열을 문자 단위로 분해한다
     let characters = SearchText.split("");
@@ -465,14 +446,6 @@ class SearchRepositroy extends SearchHistory {
         profileImg: row.UserProfile.profileImg,
       }));
     }
-
-    // 검색한 text를 저장해줌
-    await this.redisClient.set(
-      `search:user:${SearchText}`,
-      JSON.stringify(userSearch),
-      "EX",
-      120
-    );
 
     return userSearch;
   };
