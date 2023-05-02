@@ -14,14 +14,14 @@ function getApiName(apiSegments) {
       if (apiSegments[4] === "reply") {
         return "reply";
       } else {
-        return "comments";
+        return "exclude";
       }
     } else if (apiSegments[2] === "likes") {
       return "artgramLike";
     } else if (apiSegments[2] === "scrap") {
       return "artgramScrap";
     } else {
-      return "artgram";
+      return "exclude";
     }
   } else if (apiSegments[0] === "exhibition") {
     if (apiSegments[1] === "scrap") {
@@ -43,7 +43,7 @@ function getApiName(apiSegments) {
     } else if (apiSegments[1] === "reportList") {
       return "adminReportList";
     } else {
-      return "admin";
+      return "exclude";
     }
   } else if (apiSegments[0] === "banner") {
     if (apiSegments[1].startsWith("getPersonalExhibitionsByRecent")) {
