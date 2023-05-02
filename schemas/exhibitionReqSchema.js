@@ -36,10 +36,7 @@ const exhibitionSchema = Joi.object({
   entranceFee: Joi.string().allow(null, '').default('미지정'),
   artWorkCnt: Joi.string().allow(null, '').default('미지정'),
   agencyAndSponsor: Joi.string().allow(null, '').default('미지정'),
-  location: Joi.string().required().messages({
-    'string.empty': 'location(장소)를 입력해주세요.',
-    'any.required': 'location(장소)값이 요청 파라미터로 전달되지 않았습니다.'
-  }),
+  location: Joi.string().allow(null, '').default('미지정'),
   contact: Joi.string().allow(null, '').default('미지정'),
   exhibitionCategoty: Joi.string().required().messages({
     'string.empty': 'exhibitionCategoty(카테고리)를 입력해주세요.',

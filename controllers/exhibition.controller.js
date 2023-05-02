@@ -84,6 +84,13 @@ class ExhibitionController {
         if(!validatedData.openTime && !validatedData.closeTime){
           throw Boom.badRequest("오픈 시간(openTime)/종료 시간(closeTime)을 입력해주세요.");
         }
+        if(!validatedData.location){
+          throw Boom.badRequest("location(장소)를 입력해주세요.");
+        }
+      }else if(validatedData.exhibitionKind === 'EK0002'){
+        if(!validatedData.exhibitionLink){
+          throw Boom.badRequest("온라인 전시의 경우 전시 링크는 필수값입니다.");
+        }
       }
 
       if(validatedData.startDate > validatedData.endDate){
