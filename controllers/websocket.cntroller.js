@@ -16,7 +16,6 @@ const handleSocketConnection = (socket, io) => {
     );
     socket.join(chatInfo.chatRoomId);
 
-    console.log("\n\n 채팅접속", chatInfo.chatRoomId);
     io.to(chatInfo.chatRoomId).emit(
       "userJoined",
       chatInfo.user.profileNickname + " 님이 대화에 참여합니다."
