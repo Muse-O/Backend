@@ -31,6 +31,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       field: 'exhibition_id'
     },
+    authorOrder: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      field: 'author_order',
+      defaultValue: 1
+    },
     authorName: {
       allowNull: true,
       type: DataTypes.STRING,
@@ -42,6 +48,12 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW,
       field: 'created_at'
     },
+    updatedAt: {
+      allowNull: true,
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      field: 'updated_at'
+    }
   }, {
     sequelize,
     modelName: 'ExhibitionAuthor',
