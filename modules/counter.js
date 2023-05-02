@@ -18,7 +18,7 @@ function getApiName(apiSegments) {
   } else if (apiSegments[0] === "exhibition") {
     return "exhibition";
   } else {
-    return "undifined";
+    return "unknown";
   }
 }
 
