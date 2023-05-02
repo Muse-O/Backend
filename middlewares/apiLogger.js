@@ -5,11 +5,6 @@ const DailyRotateFile = require("winston-daily-rotate-file");
 const fs = require("fs");
 const path = require("path");
 
-// 로그 형식 설정
-const logFormat = printf(({ level, message, timestamp }) => {
-  return `[${timestamp}] [${level}]: ${message}`;
-});
-
 // API별 로그 폴더 생성 함수
 function createLogDir(apiName) {
   const logsDir = path.join(__dirname, "..", "logs");

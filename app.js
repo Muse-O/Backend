@@ -31,11 +31,12 @@ const {
   isArtgramDetail,
   shouldAddDetail,
 } = require("./modules/counter");
+const { logglyWinston } = require("./middlewares/loggly");
 
 const webSocketController = require("./controllers/websocket.cntroller");
 const errorHandlerByWs = require("./middlewares/errorHandlerByWs.js");
 
-const PORT = process.env.SERVER_PORT;
+const PORT = process.env.SERVER_PORT || 3000;
 
 const swaggerOptions = {
   definition: {
@@ -113,7 +114,7 @@ app.use(
     stream: {
       write: (message) => {
         const method = message.split(" ")[0];
-        let apiPath = message.split(" ")[1].split("?")[0]; // API 경로 추출 및 쿼리 파라미터 제거
+        let apiPath = message.split(" ")[1].split("?")[0];
         const apiSegments = apiPath
           .split("/")
           .filter((segment) => segment && segment !== "api");
@@ -126,11 +127,9 @@ app.use(
 
         incrementCounter(apiName, method);
         const apiRequestCount = getCounter(apiName, method);
-        const logger = apiLogger(apiName);
 
         const displayName = isDetail ? `${apiName} Detail` : apiName;
-
-        logger.info(
+        logglyWinston.info(
           `API Request (${displayName} - ${method}) #${apiRequestCount}: ${message.trim()}`
         );
       },
