@@ -138,7 +138,7 @@ app.use(
 // cors
 app.use(
   cors({
-    origin: "*", //origin 확인 필요
+    origin: "https://muse-oh.vercel.app", //origin 확인 필요
     credentials: true,
     optionsSuccessStatus: 200,
     exposedHeaders: ["Authorization"], //클라이언트가 응답에서 액세스할 수 있는 헤더 목록
@@ -166,7 +166,7 @@ passportConfig(); // 패스포트 설정
 app.use(
   '/',
   createProxyMiddleware({
-    target: 'http://hanghae99-9-muse-o.s3-website.ap-northeast-2.amazonaws.com/',
+    target: 'https://muse-oh.vercel.app',
     changeOrigin: true,
   })
 );
