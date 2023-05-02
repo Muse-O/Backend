@@ -138,7 +138,7 @@ class AdminRepository {
     );
     const deletePost = await ArtgramsComment.update(
       { commentStatus: "CS04" },
-      { where: { commentId: commentId } }
+      { where: { commentId: commentId, commentParent: commentParent } }
     );
     return cocoment;
   };
@@ -147,7 +147,6 @@ class AdminRepository {
     const user = await Users.findOne({
       where: { userEmail: userEmail },
     });
-    console.log("user", user);
     const reportPost = await ArticleReport.update(
       {
         reportComplete: "clear",
