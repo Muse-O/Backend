@@ -47,7 +47,7 @@ class BannerController {
    */
   getOpenExhibitionsSortedByMostLike = async (req, res, next) => {
     try {
-      const { reqCnt = 6 } = await reqQuerySchema
+      const { reqCnt = 10 } = await reqQuerySchema
         .validateAsync(req.query)
         .catch((err) => {
           res.status(400).json({ message: err.message });
