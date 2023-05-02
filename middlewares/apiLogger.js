@@ -24,7 +24,12 @@ function apiLogger(apiName) {
   const logFileName = `./logs/${apiName}.log`;
   return createLogger({
     level: "info",
-    format: combine(timestamp(), printf(({ timestamp, level, message }) => `${timestamp} [${level}]: ${message}`)),
+    format: combine(
+      timestamp(),
+      printf(
+        ({ timestamp, level, message }) => `${timestamp} [${level}]: ${message}`
+      )
+    ),
     transports: [
       new transports.Console(),
       new transports.File({ filename: logFileName, level: "info" }),
@@ -37,6 +42,7 @@ function apiLogger(apiName) {
       }),
     ],
   });
+}
 
 const counters = {
   GET: {},
