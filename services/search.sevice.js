@@ -56,6 +56,7 @@ class SearchService {
    * @returns
    */
   recentSearchHistory = async (userEmail) => {
+    console.log("userEmail", userEmail);
     let findHistory;
     if (userEmail !== "guest" && userEmail !== undefined) {
       findHistory = this.searchRepositroy.recentSearchHistory(userEmail);
