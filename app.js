@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const app = express();
 const server = http.createServer(app);
@@ -164,9 +164,10 @@ passportConfig(); // 패스포트 설정
 
 // frontend proxy
 app.use(
-  '/',
+  "/",
   createProxyMiddleware({
-    target: 'http://hanghae99-9-muse-o.s3-website.ap-northeast-2.amazonaws.com/',
+    target:
+      "http://hanghae99-9-muse-o.s3-website.ap-northeast-2.amazonaws.com/",
     changeOrigin: true,
   })
 );

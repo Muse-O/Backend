@@ -15,6 +15,10 @@ function getApiName(apiSegments) {
     } else {
       return "artgram";
     }
+  } else if (apiSegments[0] === "exhibition") {
+    return "exhibition";
+  } else {
+    return "undifined";
   }
 }
 
