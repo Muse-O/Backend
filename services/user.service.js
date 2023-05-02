@@ -150,7 +150,7 @@ class UserService {
           <div>Copyright 2023. muse-o, Co., Ltd. All rights reserved</div>
         </div>
       </div>
-    <img width="1px" height="1px" alt="" src="http://email.mail.bucketplace.net/o/eJwEwE2uhCAMAODTyA6DUCpdcJaXQks0_pCHmfH680lWchST0bxgcgm8W9FsGdmxqAphZe8RVlmoNECUFBpTMntG8I0kcolro78l1FBAApCPpUzg-vbYV4t9dHx1WEGQGlO1x_8dy3zxfpqR336LjvY596YTuIMP7nPt1y8AAP__kC4tvQ">`,
+    <img width="1px" height="1px" alt="" src="">`,
     };
 
     const result = transport.sendMail(mailContent, (err, info) => {
