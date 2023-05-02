@@ -460,7 +460,7 @@ class SearchRepositroy extends SearchHistory {
     const findRecentHistory = await SearchHistory.findAll({
       where: { userEmail },
       attributes: ["keyWord", "type", "createdAt"],
-      limit: 15,
+      limit: 10,
       order: [["createdAt", "DESC"]],
     });
     return findRecentHistory;
