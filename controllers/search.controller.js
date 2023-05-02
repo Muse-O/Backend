@@ -53,6 +53,7 @@ class SearchContorller {
   recentSearchHistory = async (req, res, next) => {
     try {
       const { userEmail } = res.locals.user || "guest";
+      console.log("userEmail", userEmail);
       const findHistory = await this.searchService.recentSearchHistory(
         userEmail
       );

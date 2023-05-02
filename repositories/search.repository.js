@@ -456,6 +456,7 @@ class SearchRepositroy extends SearchHistory {
    * @returns
    */
   recentSearchHistory = async (userEmail) => {
+    console.log("userEmail", userEmail);
     const findRecentHistory = await SearchHistory.findAll({
       where: { userEmail },
       attributes: ["keyWord", "type", "createdAt"],
