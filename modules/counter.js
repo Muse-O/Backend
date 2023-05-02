@@ -1,4 +1,12 @@
 function getApiName(apiSegments) {
+  if (
+    apiSegments[0] === "banner" ||
+    apiSegments[0] === "admin" ||
+    apiSegments[0] === "notification" ||
+    apiSegments[0] === "search"
+  ) {
+    return "exclude";
+  }
   if (apiSegments[0] === "auth") {
     return apiSegments[1];
   } else if (apiSegments[0] === "artgram") {
@@ -54,7 +62,7 @@ function getApiName(apiSegments) {
       return "banner";
     }
   } else {
-    return `${apiSegments[0]}-${apiSegments[1] || "undefinedAPI"}`;
+    return "exclude";
   }
 }
 
