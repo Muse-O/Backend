@@ -79,6 +79,16 @@ class ExhibitionController {
           res.status(400).json({ message: err.message });
           throw Boom.badRequest(err.message);
         });
+      // 오프라인의 경우 오픈시간, 종료시간 입력
+      if(validatedData.exhibitionKind === 'EK0001'){
+        if(!validatedData.openTime && !validatedData.closeTime){
+          throw Boom.badRequest("오픈 시간(openTime)/종료 시간(closeTime)을 입력해주세요.");
+        }
+      }
+
+      if(validatedData.startDate > validatedData.endDate){
+        throw Boom.badRequest("운영 날짜를 확인해 주세요. 종료일은 시작일보다 뒤 날짜이어야 합니다.");
+      }
 
       const writeExhibitionInfo = await this.exhibitionService.updateExhibition(
         "C",
