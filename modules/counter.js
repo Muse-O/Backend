@@ -61,6 +61,8 @@ function getApiName(apiSegments) {
     } else {
       return "banner";
     }
+  } else if (apiSegments[0] === "mypage" && apiSegments[1] === "artgram") {
+    return "mypage-artgram";
   } else {
     return "exclude";
   }
