@@ -17,25 +17,25 @@ class ExhibitionReviewRepository {
   getChatList = async (userEmail) => {
     // 입력 받을 데이터
     // userEmail
-
+    console.log(userEmail);
     // Inner Join 후 현재 사용자 이메일의 활성 채팅방 추출
     const getMyChatList = await ChatRooms.findAll({
       include: [
         {
           model: ChatParticipants,
           where: { userEmail: userEmail },
-          attributes: ['chatRoomId']
+          attributes: ["chatRoomId"],
         },
         {
           model: ChatMessages,
-          order: [['createdAt', 'DESC']],
+          order: [["createdAt", "DESC"]],
           limit: 1,
-          attributes: ['messageContent', 'createdAt', 'userEmail']
-        }
+          attributes: ["messageContent", "createdAt", "userEmail"],
+        },
       ],
-      where: { chatRoomStatus: { [Op.ne]: 'RS0003' } },
-      attributes: ['chatRoomReceiver'],
-    });
+      where: { chatRoomStatus: { [Op.ne]: "RS0003" } },
+      attributes: ["chatRoomReceiver"],
+    }).catch((err) => console.log(err));
 
     return getMyChatList;
   };
@@ -48,7 +48,7 @@ class ExhibitionReviewRepository {
   getOtherList = async (userEmail) => {
     const getOtherList = await ChatParticipants.findAll({
       where: { userEmail: { [Op.ne]: userEmail } },
-      attributes: ['userEmail'],
+      attributes: ["userEmail"],
     });
 
     return getOtherList;
@@ -56,32 +56,31 @@ class ExhibitionReviewRepository {
 
   /**
    * 해당 채팅방에 속한 참여자인지 확인
-   * @param {string} userEmail 
-   * @param {string} chatRoomId 
+   * @param {string} userEmail
+   * @param {string} chatRoomId
    * @returns getIsParticipant 채팅방 소속 확인
    */
   getIsParticipant = async (userEmail, chatRoomId) => {
-    console.log('\n\n음..\n\n',userEmail, chatRoomId);
     const getIsParticipant = await ChatParticipants.findOne({
-      where: {[Op.and]: [{userEmail}, {chatRoomId}]},
-    }).catch(err => console.log(err));
+      where: { [Op.and]: [{ userEmail }, { chatRoomId }] },
+    }).catch((err) => console.log(err));
 
     return getIsParticipant;
-  }
+  };
 
   /**
    * 이전 채팅 목록
-   * @param {string} chatRoomId 
+   * @param {string} chatRoomId
    * @returns getHistory 이전 채팅 목록
    */
   getHistory = async (chatRoomId) => {
     const getHistory = await ChatMessages.findAll({
       where: { chatRoomId },
-      order: [['createdAt', 'ASC']],
+      order: [["createdAt", "ASC"]],
     });
 
     return getHistory;
-  }
+  };
 
   /**
    * 채팅방 상대방 정보
@@ -98,7 +97,7 @@ class ExhibitionReviewRepository {
     });
 
     return getReceiverInfoList;
-  }
+  };
 
   /**
    * 채팅 사용자 검색
@@ -135,10 +134,12 @@ class ExhibitionReviewRepository {
     // receiver 대화 수신자
 
     const getSameChat = await ChatRooms.findAll({
-      where: { [Op.and]: [{ chatRoomSender: sender }, { chatRoomReceiver: receiver }] }
+      where: {
+        [Op.and]: [{ chatRoomSender: sender }, { chatRoomReceiver: receiver }],
+      },
     });
     return getSameChat;
-  }
+  };
 
   /**
    * 닉네임 추출
@@ -150,8 +151,8 @@ class ExhibitionReviewRepository {
     // userEmail
 
     const searchNickname = await UserProfile.findOne({
-      attributes: ['profileNickname'],
-      where: { userEmail: userEmail }
+      attributes: ["profileNickname"],
+      where: { userEmail: userEmail },
     });
 
     return searchNickname;
@@ -164,18 +165,13 @@ class ExhibitionReviewRepository {
    * @returns searchChatUser 생성된 채팅방 정보
    */
   createChat = async (sender, receiver, receiverNickname) => {
-    // 입력 받을 데이터
-    // sender 대화 요청자
-    // receiver 대화 수신자
-
     const createChat = await ChatRooms.create({
       chatRoomSender: sender,
       chatRoomReceiver: receiver,
-      chatRoomName: 'Chat with '+receiverNickname,
-      chatRoomStatus: 'RS0001',
-      chatRoomKind: 'RK0001'
+      chatRoomName: `Chat with ${receiverNickname}`,
+      chatRoomStatus: "RS0001",
+      chatRoomKind: "RK0001",
     });
-
     return createChat;
   };
 
@@ -186,28 +182,33 @@ class ExhibitionReviewRepository {
    */
   createParticipants = async (chatInfo) => {
     // 입력 받을 데이터
-    // chatInfo 채팅방 정보
-
     // 채팅방 참여자 정보 생성
     await ChatParticipants.bulkCreate([
-      { userEmail: chatInfo.chatRoomSender, chatRoomId: chatInfo.chatRoomId, chatRoomRole: 'CR0001' },
-      { userEmail: chatInfo.chatRoomReceiver, chatRoomId: chatInfo.chatRoomId, chatRoomRole: 'CR0002' }
+      {
+        userEmail: chatInfo.chatRoomSender,
+        chatRoomId: chatInfo.chatRoomId,
+        chatRoomRole: "CR0001",
+      },
+      {
+        userEmail: chatInfo.chatRoomReceiver,
+        chatRoomId: chatInfo.chatRoomId,
+        chatRoomRole: "CR0002",
+      },
     ]);
   };
 
   /**
    * 채팅방 검색
-   * @param {string} chatRoomId 
+   * @param {string} chatRoomId
    * @returns selectChat 검색된 채팅방 정보
    */
   selectChat = async (chatRoomId) => {
     const selectChat = await ChatRooms.findAll({
-      where: chatRoomId
-    })
+      where: chatRoomId,
+    });
 
-    return selectChat
-  }
-
+    return selectChat;
+  };
 }
 
 module.exports = ExhibitionReviewRepository;
