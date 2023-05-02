@@ -89,7 +89,7 @@ class NotiRepository {
         const consumerGroup = `noti_receiver_${userEmail}`;
 
         try {
-            const res1 = await this.redis.xgroup("CREATE", streamKey, consumerGroup, '$', 'MKSTREAM');
+            const res1 = await this.redis.xgroup("CREATE", `notification:id${userEmail}`, consumerGroup, '$', 'MKSTREAM');
             console.log(`Consumer Group ${consumerGroup} created on Stream ${streamKey}`);
         } catch (error) {
             logger.error(error.message);
