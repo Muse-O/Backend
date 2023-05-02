@@ -357,7 +357,12 @@ class ExhibitionRepository {
           "ratingFiveCnt",
         ],
       ],
-      where: { exhibitionId },
+      where: {
+        [Op.and]: [
+          { exhibitionId },
+          { exhibition_status: { [Op.ne]: ["ES04"] } },
+        ],
+      },
     });
 
     const liked = await ExhibitionLike.findOne({
