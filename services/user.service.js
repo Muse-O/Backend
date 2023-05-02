@@ -93,8 +93,8 @@ class UserService {
     );
 
     try {
-      await this.redisClient.set(email, randomNumToken);
-      await this.redisClient.expire(email, 240);
+      await this.redisClient.set(`emailtoken:${email}`, randomNumToken);
+      await this.redisClient.expire(`emailtoken:${email}`, 240);
       console.log("Data stored in Redis");
     } catch (err) {
       console.error(err);
@@ -129,7 +129,7 @@ class UserService {
    * @returns 성공 메시지
    */
   emailValidateNumCheck = async (email, code) => {
-    const token = await this.redisClient.get(email);
+    const token = await this.redisClient.get(`emailtoken:${email}`);
     if (!token) {
       throw Boom.unauthorized("인증 시간이 만료되었습니다.");
     }
