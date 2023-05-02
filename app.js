@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const app = express();
 const server = http.createServer(app);
@@ -119,6 +119,9 @@ app.use(
           .filter((segment) => segment && segment !== "api");
 
         const apiName = getApiName(apiSegments);
+        if (apiName === "exclude") {
+          return;
+        }
         const isDetail = shouldAddDetail(apiName, apiSegments);
 
         incrementCounter(apiName, method);
@@ -164,7 +167,7 @@ passportConfig(); // 패스포트 설정
 
 // frontend proxy
 app.use(
-  '/',
+  "/",
   createProxyMiddleware({
     target: 'https://muse-oh.vercel.app',
     changeOrigin: true,

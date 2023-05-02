@@ -20,11 +20,19 @@ function createLogDir(apiName) {
   return apiDir;
 }
 
-const apiLogger = (apiName) =>
-  createLogger({
-    format: combine(timestamp(), logFormat),
+function apiLogger(apiName) {
+  const logFileName = `./logs/${apiName}.log`;
+  return createLogger({
+    level: "info",
+    format: combine(
+      timestamp(),
+      printf(
+        ({ timestamp, level, message }) => `${timestamp} [${level}]: ${message}`
+      )
+    ),
     transports: [
       new transports.Console(),
+      new transports.File({ filename: logFileName, level: "info" }),
       new DailyRotateFile({
         filename: `${createLogDir(apiName)}/%DATE%.log`,
         datePattern: "YYYY-MM-DD",
@@ -34,6 +42,7 @@ const apiLogger = (apiName) =>
       }),
     ],
   });
+}
 
 const counters = {
   GET: {},
