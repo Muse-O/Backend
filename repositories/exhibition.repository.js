@@ -360,7 +360,7 @@ class ExhibitionRepository {
       where: {
         [Op.and]: [
           { exhibitionId },
-          { exhibition_status: { [Op.ne]: ["ES04"] } },
+          { reviewStatus: { [Op.ne]: ["RS04"] } },
         ],
       },
     });
