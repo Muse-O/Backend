@@ -20,6 +20,16 @@ const glob = require("glob");
 const passport = require("passport");
 const passportConfig = require("./passport");
 const { description } = require("./schemas/mypageReqSchema");
+const {
+  apiLogger,
+  incrementCounter,
+  getCounter,
+} = require("./middlewares/apiLogger");
+const {
+  getApiName,
+  isArtgramDetail,
+  shouldAddDetail,
+} = require("./modules/counter");
 
 const webSocketController = require("./controllers/websocket.cntroller");
 const errorHandlerByWs = require("./middlewares/errorHandlerByWs.js");
@@ -95,8 +105,34 @@ const swaggerSpec = yamlFiles.reduce((acc, filePath) => {
   return { ...acc, ...spec };
 }, swaggerJSDoc(swaggerOptions));
 
-// morgan
-app.use(morgan("dev"));
+//winston api호출횟수로깅
+app.use(
+  morgan("dev"),
+  morgan("tiny", {
+    stream: {
+      write: (message) => {
+        const method = message.split(" ")[0];
+        let apiPath = message.split(" ")[1].split("?")[0]; // API 경로 추출 및 쿼리 파라미터 제거
+        const apiSegments = apiPath
+          .split("/")
+          .filter((segment) => segment && segment !== "api");
+
+        const apiName = getApiName(apiSegments);
+        const isDetail = shouldAddDetail(apiName, apiSegments);
+
+        incrementCounter(apiName, method);
+        const apiRequestCount = getCounter(apiName, method);
+        const logger = apiLogger(apiName);
+
+        const displayName = isDetail ? `${apiName} Detail` : apiName;
+
+        logger.info(
+          `API Request (${displayName} - ${method}) #${apiRequestCount}: ${message.trim()}`
+        );
+      },
+    },
+  })
+);
 
 // cors
 app.use(
@@ -130,10 +166,20 @@ app.use((err, req, res, next) => {
   errorHandler(err, req, res, next);
 });
 
+// // API 성능 테스트 결과를 로깅하는 함수
+// function logApiPerformanceTestResult(apiName, testResult) {
+//   apiLogger.info(
+//     `API Performance Test Result (${apiName}): ${JSON.stringify(testResult)}`
+//   );
+// }
 // socket.request.cookie/socket.request.session 객체를 사용 가능
 io.use((socket, next) => {
-	// 외부모듈 미들웨어를 안에다 쓰일수 있다. 미들웨어 확장 원칙에 따라 res, req인자를 준다
-  cookieParser(process.env.COOKIE_SECRET)(socket.request, socket.request.res || {}, next);
+  // 외부모듈 미들웨어를 안에다 쓰일수 있다. 미들웨어 확장 원칙에 따라 res, req인자를 준다
+  cookieParser(process.env.COOKIE_SECRET)(
+    socket.request,
+    socket.request.res || {},
+    next
+  );
 });
 
 // websoket
