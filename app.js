@@ -119,6 +119,9 @@ app.use(
           .filter((segment) => segment && segment !== "api");
 
         const apiName = getApiName(apiSegments);
+        if (apiName === "exclude") {
+          return;
+        }
         const isDetail = shouldAddDetail(apiName, apiSegments);
 
         incrementCounter(apiName, method);
