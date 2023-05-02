@@ -129,6 +129,7 @@ app.use(
         const apiRequestCount = getCounter(apiName, method);
 
         const displayName = isDetail ? `${apiName} Detail` : apiName;
+        console.log("로글리 동작해!!!!!!!!!!!!!!!");
         logglyWinston.info(
           `API Request (${displayName} - ${method}) #${apiRequestCount}: ${message.trim()}`
         );
