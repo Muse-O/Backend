@@ -10,6 +10,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
       - name: Deploy to Server 2
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_SERVER2 }}
@@ -17,10 +20,10 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER_SERVER2 }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH_SERVER2 }}
         run: |
-          echo "export secrets.SSH_PRIVATE_KEY_SERVER2" >> env_vars.sh
-          echo "export secrets.DEPLOY_HOST_SERVER2" >> env_vars.sh
-          echo "export secrets.DEPLOY_USER_SERVER2" >> env_vars.sh
-          echo "export secrets.DEPLOY_PATH_SERVER2" >> env_vars.sh
+          echo "export SSH_PRIVATE_KEY_SERVER2" >> env_vars.sh
+          echo "export DEPLOY_HOST_SERVER2" >> env_vars.sh
+          echo "export DEPLOY_USER_SERVER2" >> env_vars.sh
+          echo "export DEPLOY_PATH_SERVER2" >> env_vars.sh
           # ... 나머지 환경 변수 추가
           chmod +x env_vars.sh
           # 배포 스크립트 실행
