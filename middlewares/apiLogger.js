@@ -4,6 +4,8 @@ const { combine, timestamp, printf } = format;
 const DailyRotateFile = require("winston-daily-rotate-file");
 const fs = require("fs");
 const path = require("path");
+const dayjs = require("dayjs");
+const { createLogglyTransport } = require("../middlewares/loggly");
 
 // API별 로그 폴더 생성 함수
 function createLogDir(apiName) {
@@ -20,7 +22,9 @@ function apiLogger(apiName) {
   return createLogger({
     level: "info",
     format: combine(
-      timestamp(),
+      timestamp({
+        format: () => dayjs().locale("en").format("YYYY-MM-DD HH:mm:ss"),
+      }),
       printf(
         ({ timestamp, level, message }) => `${timestamp} [${level}]: ${message}`
       )
@@ -28,6 +32,7 @@ function apiLogger(apiName) {
     transports: [
       new transports.Console(),
       new transports.File({ filename: logFileName, level: "info" }),
+      createLogglyTransport(apiName), // Add Loggly transport with apiName as tag
       new DailyRotateFile({
         filename: `${createLogDir(apiName)}/%DATE%.log`,
         datePattern: "YYYY-MM-DD",
