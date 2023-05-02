@@ -31,14 +31,8 @@ const exhibitionSchema = Joi.object({
   exhibitionOnlineLink: Joi.string().allow(null, '').default('미지정'),
   exhibitionLink: Joi.string().allow(null, '').default('미지정'),
   significant: Joi.string().allow(null, '').empty('').default(''),
-  openTime: Joi.string().required().messages({
-    'date.empty': 'openTime(시작 시간)을 날짜형식의 문자열로 입력해주세요.',
-    'any.required': 'openTime(시작 시간)값이 요청 파라미터로 전달되지 않았습니다.'
-  }),
-  closeTime: Joi.string().required().messages({
-    'date.empty': 'closeTime(시작 시간)을 날짜형식의 문자열로 입력해주세요.',
-    'any.required': 'closeTime(시작 시간)값이 요청 파라미터로 전달되지 않았습니다.'
-  }),
+  openTime: Joi.string().allow(null, ''),
+  closeTime: Joi.string().allow(null, ''),
   entranceFee: Joi.string().allow(null, '').default('미지정'),
   artWorkCnt: Joi.string().allow(null, '').default('미지정'),
   agencyAndSponsor: Joi.string().allow(null, '').default('미지정'),
