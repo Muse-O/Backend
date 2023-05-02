@@ -39,7 +39,7 @@ class UserController {
     
     res
       .cookie("authorization", `Bearer ${token}`)
-      .redirect(301, `http://localhost:3000`);
+      .redirect(301, `https://museoh.shop/`);
     } catch (error){
     logger.error(error.message);
     next(error);
