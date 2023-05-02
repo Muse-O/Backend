@@ -170,7 +170,7 @@ class ExhibitionRepository {
       if (len === 1) {
         authorOutput = authors[0];
       } else if (len === 2) {
-        authorOutput = `${authors[0]} 외 $1명`;
+        authorOutput = `${authors[0]} 외 1명`;
       } else if (len > 2) {
         authorOutput = `${authors[0]} 외 ${len - 1}명`;
       }
