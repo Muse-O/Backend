@@ -262,7 +262,8 @@ class BannerRepository {
           LIMIT 1
         ) AS imgUrl,
         up.profile_nickname AS authorNickName,
-        up.profile_img AS authorProfileImg
+        up.profile_img AS authorProfileImg,
+        l.like_cnt AS artgramLike
       FROM artgrams a
       LEFT JOIN (
         SELECT
@@ -280,12 +281,12 @@ class BannerRepository {
         FROM user_profile
       ) AS up ON a.user_email = up.user_email
       WHERE a.artgram_status != 'AS04'
-      ORDER BY a.created_at DESC
+      AND a.created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+      ORDER BY l.like_cnt DESC, a.created_at DESC
       LIMIT ${reqCnt};
       `,
       { type: sequelize.QueryTypes.SELECT }
     );
-
     
     let cnt = 1;
 

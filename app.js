@@ -31,12 +31,11 @@ const {
   isArtgramDetail,
   shouldAddDetail,
 } = require("./modules/counter");
-const { logglyWinston } = require("./middlewares/loggly");
 
 const webSocketController = require("./controllers/websocket.cntroller");
 const errorHandlerByWs = require("./middlewares/errorHandlerByWs.js");
 
-const PORT = process.env.SERVER_PORT || 3000;
+const PORT = process.env.SERVER_PORT;
 
 const swaggerOptions = {
   definition: {
@@ -114,7 +113,7 @@ app.use(
     stream: {
       write: (message) => {
         const method = message.split(" ")[0];
-        let apiPath = message.split(" ")[1].split("?")[0];
+        let apiPath = message.split(" ")[1].split("?")[0]; // API 경로 추출 및 쿼리 파라미터 제거
         const apiSegments = apiPath
           .split("/")
           .filter((segment) => segment && segment !== "api");
@@ -127,11 +126,11 @@ app.use(
 
         incrementCounter(apiName, method);
         const apiRequestCount = getCounter(apiName, method);
+        const logger = apiLogger(apiName);
 
         const displayName = isDetail ? `${apiName} Detail` : apiName;
-        console.log("로글리 동작해!!!!!!!!!!!!!!!");
-        const logglyWinston = apiLogger(apiName);
-        logglyWinston.info(
+
+        logger.info(
           `API Request (${displayName} - ${method}) #${apiRequestCount}: ${message.trim()}`
         );
       },
@@ -142,7 +141,7 @@ app.use(
 // cors
 app.use(
   cors({
-    origin: "*", //origin 확인 필요
+    origin: "https://muse-oh.vercel.app", //origin 확인 필요
     credentials: true,
     optionsSuccessStatus: 200,
     exposedHeaders: ["Authorization"], //클라이언트가 응답에서 액세스할 수 있는 헤더 목록
@@ -170,8 +169,7 @@ passportConfig(); // 패스포트 설정
 app.use(
   "/",
   createProxyMiddleware({
-    target:
-      "http://hanghae99-9-muse-o.s3-website.ap-northeast-2.amazonaws.com/",
+    target: 'https://muse-oh.vercel.app',
     changeOrigin: true,
   })
 );

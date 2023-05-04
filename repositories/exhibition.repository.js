@@ -90,7 +90,8 @@ class ExhibitionRepository {
       p.profile_id AS authorProfileId,
       p.profile_nickname AS authorNickName,
       p.profile_img AS authorProfileImg,
-      p.profile_intro AS authorProfileIntro
+      p.profile_intro AS authorProfileIntro,
+      GROUP_CONCAT(ea.authorName ORDER BY ea.author_order ASC) AS author
       FROM exhibitions e
       LEFT JOIN (
         SELECT
@@ -122,6 +123,10 @@ class ExhibitionRepository {
         WHERE is_use = 'Y'
         GROUP BY exhibition_id, tag_name
       ) AS h ON e.exhibition_id = h.exhibition_id
+      LEFT JOIN (
+        SELECT exhibition_id, author_name AS authorName, author_order
+        FROM exhibition_author
+      ) AS ea ON e.exhibition_id = ea.exhibition_id
       LEFT JOIN exhibition_category ec ON e.exhibition_id = ec.exhibition_id
       LEFT JOIN (
         SELECT
@@ -150,17 +155,31 @@ class ExhibitionRepository {
     });
 
     result.forEach((row, idx) => {
-      const { tagName, categoryCode, categoryCodeName } = row;
+      const { tagName, categoryCode, categoryCodeName, author } = row;
 
       const tagNames = tagName ? tagName.split(",") : [];
       const categoryCodes = categoryCode ? categoryCode.split(",") : [];
       const categoryCodeNames = categoryCodeName
         ? categoryCodeName.split(",")
         : [];
+      const authors = author ? author.split(",") : "";
+
+      const len = authors.length;
+      let authorOutput = "";
+      
+      if (len === 1) {
+        authorOutput = authors[0];
+      } else if (len === 2) {
+        authorOutput = `${authors[0]} 외 1명`;
+      } else if (len > 2) {
+        authorOutput = `${authors[0]} 외 ${len - 1}명`;
+      }
 
       result[idx].tagName = tagNames;
       result[idx].categoryCode = categoryCodes;
       result[idx].categoryCodeName = categoryCodeNames;
+      result[idx].authorNickName = authorOutput;
+      delete row.author;
     });
 
     const exhibitionList = {
@@ -338,7 +357,12 @@ class ExhibitionRepository {
           "ratingFiveCnt",
         ],
       ],
-      where: { exhibitionId },
+      where: {
+        [Op.and]: [
+          { exhibitionId },
+          { reviewStatus: { [Op.ne]: ["RS04"] } },
+        ],
+      },
     });
 
     const liked = await ExhibitionLike.findOne({

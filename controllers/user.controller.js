@@ -38,8 +38,8 @@ class UserController {
     console.log("strategy 성공시", email)
     
     res
-      .cookie("authorization", `Bearer ${token}`)
-      .redirect(301, `http://localhost:3000`);
+      .cookie("access_token", token)
+      .redirect(301, `https://museoh.shop/`);
     } catch (error){
     logger.error(error.message);
     next(error);

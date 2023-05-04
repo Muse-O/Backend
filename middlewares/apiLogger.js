@@ -4,8 +4,11 @@ const { combine, timestamp, printf } = format;
 const DailyRotateFile = require("winston-daily-rotate-file");
 const fs = require("fs");
 const path = require("path");
-const dayjs = require("dayjs");
-const { createLogglyTransport } = require("../middlewares/loggly");
+
+// 로그 형식 설정
+const logFormat = printf(({ level, message, timestamp }) => {
+  return `[${timestamp}] [${level}]: ${message}`;
+});
 
 // API별 로그 폴더 생성 함수
 function createLogDir(apiName) {
@@ -22,9 +25,7 @@ function apiLogger(apiName) {
   return createLogger({
     level: "info",
     format: combine(
-      timestamp({
-        format: () => dayjs().locale("en").format("YYYY-MM-DD HH:mm:ss"),
-      }),
+      timestamp(),
       printf(
         ({ timestamp, level, message }) => `${timestamp} [${level}]: ${message}`
       )
@@ -32,7 +33,6 @@ function apiLogger(apiName) {
     transports: [
       new transports.Console(),
       new transports.File({ filename: logFileName, level: "info" }),
-      createLogglyTransport(apiName), // Add Loggly transport with apiName as tag
       new DailyRotateFile({
         filename: `${createLogDir(apiName)}/%DATE%.log`,
         datePattern: "YYYY-MM-DD",
@@ -45,34 +45,21 @@ function apiLogger(apiName) {
 }
 
 const counters = {
-  auth: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
-  login: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
-  artgram: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
-  artgramDetail: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
-  artgramLike: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
-  artgramScrap: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
-  comments: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
-  reply: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  GET: {},
+  POST: {},
+  PATCH: {},
+  DELETE: {},
 };
 
 function incrementCounter(apiName, method) {
-  if (counters[apiName] && counters[apiName][method]) {
-    counters[apiName][method]++;
-  } else {
-    // 새로운 API가 발견되면 초기값을 설정합니다.
-    counters[apiName] = { GET: 0, POST: 0, PUT: 0, DELETE: 0 };
-    counters[apiName][method]++;
+  if (!counters[method][apiName]) {
+    counters[method][apiName] = 0;
   }
+  counters[method][apiName]++;
 }
 
 function getCounter(apiName, method) {
-  if (counters[apiName] && counters[apiName][method]) {
-    return counters[apiName][method];
-  } else {
-    // 새로운 API가 발견되면 초기값을 설정합니다.
-    counters[apiName] = { GET: 0, POST: 0, PUT: 0, DELETE: 0 };
-    return counters[apiName][method];
-  }
+  return counters[method][apiName] || 0;
 }
 
 module.exports = {
