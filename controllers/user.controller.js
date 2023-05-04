@@ -39,7 +39,7 @@ class UserController {
     
     res
       .cookie("access_token", token)
-      .redirect(301, `https://museoh.shop/api/`);
+      .redirect(301, `https://museoh.shop/`);
     } catch (error){
     logger.error(error.message);
     next(error);
