@@ -133,6 +133,7 @@ const swaggerSpec = yamlFiles.reduce((acc, filePath) => {
 //winston api호출횟수로깅
 app.use(
   morgan("dev"),
+
   morgan("tiny", {
     stream: {
       write: (message) => {
@@ -147,10 +148,6 @@ app.use(
         if (apiName === "exclude" || apiName === undefined) {
           return;
         }
-
-  //       incrementCounter(apiName, method);
-  //       const apiRequestCount = getCounter(apiName, method);
-  //       const logger = apiLogger(apiName);
 
         const logglyWinston = apiLogger(apiName);
         logglyWinston.info(
@@ -194,7 +191,9 @@ passportConfig(); // 패스포트 설정
 app.use(
   "/",
   createProxyMiddleware({
+
     target: 'https://museoh.art',
+
     changeOrigin: true,
   })
 );
