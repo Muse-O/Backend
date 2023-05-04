@@ -38,7 +38,8 @@ class UserController {
     console.log("strategy 성공시", email)
     
     res
-      .cookie("access_token", token, {
+      .cookie("auth_token", token, {
+        secure: true, 
         httpOnly: true
       })
       .redirect(301, `https://museoh.shop/`);
