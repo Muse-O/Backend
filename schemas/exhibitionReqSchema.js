@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const exhibitionSchema = Joi.object({
-  exhibitionId: Joi.string().allow(null).default(null),
+  exhibitionId: Joi.string().allow(null, '').default(null),
   exhibitionTitle: Joi.string().required().messages({
     'string.empty': 'exhibitionTitle(제목)을 문자열로 입력해주세요.',
     'any.required': 'exhibitionTitle(제목)값이 요청 파라미터로 전달되지 않았습니다.'
@@ -31,22 +31,13 @@ const exhibitionSchema = Joi.object({
   exhibitionOnlineLink: Joi.string().allow(null, '').default('미지정'),
   exhibitionLink: Joi.string().allow(null, '').default('미지정'),
   significant: Joi.string().allow(null, '').empty('').default(''),
-  openTime: Joi.string().required().messages({
-    'date.empty': 'openTime(시작 시간)을 날짜형식의 문자열로 입력해주세요.',
-    'any.required': 'openTime(시작 시간)값이 요청 파라미터로 전달되지 않았습니다.'
-  }),
-  closeTime: Joi.string().required().messages({
-    'date.empty': 'closeTime(시작 시간)을 날짜형식의 문자열로 입력해주세요.',
-    'any.required': 'closeTime(시작 시간)값이 요청 파라미터로 전달되지 않았습니다.'
-  }),
-  entranceFee: Joi.string().allow(null).default('미지정'),
-  artWorkCnt: Joi.string().allow(null).default('미지정'),
-  agencyAndSponsor: Joi.string().allow(null).default('미지정'),
-  location: Joi.string().required().messages({
-    'string.empty': 'location(장소)를 입력해주세요.',
-    'any.required': 'location(장소)값이 요청 파라미터로 전달되지 않았습니다.'
-  }),
-  contact: Joi.string().allow(null).default('미지정'),
+  openTime: Joi.string().allow(null, ''),
+  closeTime: Joi.string().allow(null, ''),
+  entranceFee: Joi.string().allow(null, '').default('미지정'),
+  artWorkCnt: Joi.string().allow(null, '').default('미지정'),
+  agencyAndSponsor: Joi.string().allow(null, '').default('미지정'),
+  location: Joi.string().allow(null, '').default('미지정'),
+  contact: Joi.string().allow(null, '').default('미지정'),
   exhibitionCategoty: Joi.string().required().messages({
     'string.empty': 'exhibitionCategoty(카테고리)를 입력해주세요.',
     'any.required': 'exhibitionCategoty(카테고리)값이 요청 파라미터로 전달되지 않았습니다.'
@@ -75,9 +66,9 @@ const exhibitionSchema = Joi.object({
         'any.required': 'author(작가 명)값이 요청 파라미터로 전달되지 않았습니다.',
       }),
     }
-  )).allow(null).default([]),
-  delImage: Joi.array().items(Joi.string()).allow(null).default([]),
-  detailLocation: Joi.object().allow(null).default({})
+  )).allow(null, '').default([]),
+  delImage: Joi.array().items(Joi.string()).allow(null, '').default([]),
+  detailLocation: Joi.object().allow(null, '').default({})
 });
 
 module.exports = exhibitionSchema;

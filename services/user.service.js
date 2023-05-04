@@ -107,7 +107,50 @@ class UserService {
       },
       to: email,
       subject: "MUSE-O에서 보내는 가입 인증 메일입니다",
-      html: `<div>이메일 인증 번호는 ${randomNumber}입니다.</div>`,
+      html: `<div style="max-width: 540px;background-color: black; border-bottom: 1px solid #eaedef; margin: 0 22px; margin-top: 60px;">
+      <div style="padding-bottom: 40px; max-width: 473px;font-size: 16px; margin-top: 60px;">
+        <a href="https://muse-o.vercel.app/" rel="noopener noreferrer" target="_blank">
+         <img src="https://woog-s3-bucket.s3.amazonaws.com/profile/92f80cf8-095e-4535-9bbd-c9b5b03d0ee0.png" style="width: 130px; margin-top: 60px; margin-left: 10px;" alt="muse-o">
+        </a>
+        <div style="font-size: 18px;color: #eaedef; font-weight: 700; margin-bottom: 10px; margin-top: 60px; margin-left: 10px;">
+          인증코드를 확인해주세요.
+        </div>
+        <span style="
+          font-size: 32px;
+          margin-left: 10px;
+          color: #eaedef; 
+          line-height: 42px; 
+          font-weight: 700; 
+          display: block; 
+          margin-top: 6px;">
+          ${randomNumber}
+        </span>
+        <div style="margin-top: 60px; margin-bottom: 40px; margin-left: 10px; line-height: 28px;color: #eaedef;">
+          <div style="display: inline-block;">이메일 인증 절차에 따라 이메일 인증코드를 </div> 
+          <div style="display: inline-block;"> 발급해드립니다.</div> 
+          <div style="display: inline-block;">인증코드는 이메일 발송</div>
+          <div style="display: inline-block;">시점으로부터 3분동안 유효합니다.</div>
+        </div>
+    
+      </div>
+    </div>
+      <div style="padding-top:20px; max-width: 540px; margin-left: 22px;">
+        <p style="font-size: 10px; color: #828C94; font-weight: 700;">본 메일은 발신 전용으로 회신되지 않습니다.</p>
+        <div style="font-size: 10px; color: #828c94;letter-spacing: -0.3;">
+          <div style="display: inline-block; margin-bottom: 4px;">
+            <span style="margin-right: 10px;">
+              서비스명: MUSE-O
+            </span>
+            <span style="margin-right: 10px;">
+              <a href="https://github.com/Muse-O" style="color: inherit; text-decoration: none;" rel="noopener noreferrer" target="_blank">
+                깃허브: https://github.com/Muse-O
+              </a>          
+            </span>      
+          </div>            
+          <div>Copyright 2023. muse-o, Co., Ltd. All rights reserved</div>
+        </div>
+      </div>
+    <img width="1px" height="1px" alt="" src="">`,
     };
 
     const result = transport.sendMail(mailContent, (err, info) => {
