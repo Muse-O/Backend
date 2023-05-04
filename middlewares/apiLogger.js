@@ -4,6 +4,10 @@ const { combine, timestamp, printf } = format;
 const DailyRotateFile = require("winston-daily-rotate-file");
 const fs = require("fs");
 const path = require("path");
+const {
+  createLogglyTransport,
+  createDefaultLogglyTransport,
+} = require("./loggly");
 
 // 로그 형식 설정
 const logFormat = printf(({ level, message, timestamp }) => {
@@ -46,16 +50,46 @@ function apiLogger(apiName) {
 }
 
 const counters = {
-  auth: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
-  login: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
-  artgram: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramAll: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramCreate: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramCreateComment: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramCreateReply: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramDelete: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramDeleteComment: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramDeleteReply: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
   artgramDetail: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
   artgramLike: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramListComments: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramListReplies: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramModify: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramModifyComment: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramModifyReply: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
   artgramScrap: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
-  artgramComment: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
-  artgramCommentLike: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  authGoogle: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  authKakao: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  authLogin: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  authNaver: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  authSignup: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  exhibitionAll: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  exhibitionCreate: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  exhibitionCreateReview: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  exhibitionDelete: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  exhibitionDetail: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  exhibitionLike: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  exhibitionListReviews: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  exhibitionModify: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  exhibitionScrap: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  mypageArtgram: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  mypageArtgramDetail: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  mypageArtgramLikes: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  mypageArtgramScraps: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  mypageExhibition: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  mypageExhibitionLikes: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  mypageExhibitionScrap: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  search: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  searchSaveLastViewed: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
 };
-function incrementCounter(apiName, method) {
+function incrementCounter(method, apiName) {
   if (!counters[method][apiName]) {
     counters[method][apiName] = 0;
   }
@@ -63,7 +97,7 @@ function incrementCounter(apiName, method) {
 }
 
 function getCounter(apiName, method) {
-  return counters[method][apiName] || 0;
+  return (counters[apiName] && counters[apiName][method]) || 0;
 }
 
 module.exports = {

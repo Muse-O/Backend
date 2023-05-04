@@ -26,11 +26,7 @@ const {
   incrementCounter,
   getCounter,
 } = require("./middlewares/apiLogger");
-const {
-  processRequest,
-  isArtgramDetail,
-  shouldAddDetail,
-} = require("./modules/counter");
+const { processRequest } = require("./modules/counter");
 
 const webSocketController = require("./controllers/websocket.cntroller");
 
@@ -104,35 +100,11 @@ const swaggerSpec = yamlFiles.reduce((acc, filePath) => {
   const spec = require(filePath);
   return { ...acc, ...spec };
 }, swaggerJSDoc(swaggerOptions));
-// app.use(
-//   morgan("dev"),
-//   morgan("tiny", {
-//     stream: {
-//       write: (message) => {
-//         const method = message.split(" ")[0];
-//         const url = message.split(" ")[1].split("?")[0];
 
-//         const action = urlToAction(url, method);
-
-//         if (action === "exclude") {
-//           return;
-//         }
-
-//         incrementCounter(action, method);
-//         const apiRequestCount = getCounter(action, method);
-
-//         const displayName = action;
-//         const logglyWinston = apiLogger(action);
-//         logglyWinston.info(
-//           `${displayName} - ${method} #${apiRequestCount}: ${message.trim()}`
-//         );
-//       },
-//     },
-//   })
-// );
 //winston api호출횟수로깅
 app.use(
   morgan("dev"),
+
   morgan("tiny", {
     stream: {
       write: (message) => {
@@ -147,10 +119,8 @@ app.use(
         if (apiName === "exclude" || apiName === undefined) {
           return;
         }
-
-  //       incrementCounter(apiName, method);
-  //       const apiRequestCount = getCounter(apiName, method);
-  //       const logger = apiLogger(apiName);
+        incrementCounter(apiName, method);
+        const apiRequestCount = getCounter(apiName, method);
 
         const logglyWinston = apiLogger(apiName);
         logglyWinston.info(
@@ -179,7 +149,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false })); // x-www-form-urlencoded형태의 데이터 해설
 app.use(cookieParser());
-app.disable('x-powered-by');
+app.disable("x-powered-by");
 
 // routes
 app.use("/api", routes);
@@ -194,7 +164,8 @@ passportConfig(); // 패스포트 설정
 app.use(
   "/",
   createProxyMiddleware({
-    target: 'https://museoh.art',
+    target: "https://museoh.art",
+
     changeOrigin: true,
   })
 );

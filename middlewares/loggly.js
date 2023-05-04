@@ -1,4 +1,3 @@
-// loggly.js
 const winston = require("winston");
 require("winston-loggly-bulk");
 
@@ -20,4 +19,6 @@ function createDefaultLogglyTransport() {
   });
 }
 
+
 module.exports = { createLogglyTransport, createDefaultLogglyTransport };
+
