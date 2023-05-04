@@ -33,7 +33,6 @@ const {
 } = require("./modules/counter");
 
 const webSocketController = require("./controllers/websocket.cntroller");
-const errorHandlerByWs = require("./middlewares/errorHandlerByWs.js");
 
 const PORT = process.env.SERVER_PORT;
 
@@ -109,39 +108,39 @@ const swaggerSpec = yamlFiles.reduce((acc, filePath) => {
 //winston api호출횟수로깅
 app.use(
   morgan("dev"),
-  morgan("tiny", {
-    stream: {
-      write: (message) => {
-        const method = message.split(" ")[0];
-        let apiPath = message.split(" ")[1].split("?")[0]; // API 경로 추출 및 쿼리 파라미터 제거
-        const apiSegments = apiPath
-          .split("/")
-          .filter((segment) => segment && segment !== "api");
+  // morgan("tiny", {
+  //   stream: {
+  //     write: (message) => {
+  //       const method = message.split(" ")[0];
+  //       let apiPath = message.split(" ")[1].split("?")[0]; // API 경로 추출 및 쿼리 파라미터 제거
+  //       const apiSegments = apiPath
+  //         .split("/")
+  //         .filter((segment) => segment && segment !== "api");
 
-        const apiName = getApiName(apiSegments);
-        if (apiName === "exclude") {
-          return;
-        }
-        const isDetail = shouldAddDetail(apiName, apiSegments);
+  //       const apiName = getApiName(apiSegments);
+  //       if (apiName === "exclude") {
+  //         return;
+  //       }
+  //       const isDetail = shouldAddDetail(apiName, apiSegments);
 
-        incrementCounter(apiName, method);
-        const apiRequestCount = getCounter(apiName, method);
-        const logger = apiLogger(apiName);
+  //       incrementCounter(apiName, method);
+  //       const apiRequestCount = getCounter(apiName, method);
+  //       const logger = apiLogger(apiName);
 
-        const displayName = isDetail ? `${apiName} Detail` : apiName;
+  //       const displayName = isDetail ? `${apiName} Detail` : apiName;
 
-        logger.info(
-          `API Request (${displayName} - ${method}) #${apiRequestCount}: ${message.trim()}`
-        );
-      },
-    },
-  })
+  //       logger.info(
+  //         `API Request (${displayName} - ${method}) #${apiRequestCount}: ${message.trim()}`
+  //       );
+  //     },
+  //   },
+  // })
 );
 
 // cors
 app.use(
   cors({
-    origin: "https://muse-oh.vercel.app", //origin 확인 필요
+    origin: "https://museoh.art", //origin 확인 필요
     credentials: true,
     optionsSuccessStatus: 200,
     exposedHeaders: ["Authorization"], //클라이언트가 응답에서 액세스할 수 있는 헤더 목록
@@ -170,7 +169,7 @@ passportConfig(); // 패스포트 설정
 app.use(
   "/",
   createProxyMiddleware({
-    target: 'https://muse-oh.vercel.app',
+    target: 'https://museoh.art',
     changeOrigin: true,
   })
 );
