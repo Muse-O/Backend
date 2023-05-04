@@ -32,7 +32,8 @@ function apiLogger(apiName) {
     ),
     transports: [
       new transports.Console(),
-      new transports.File({ filename: logFileName, level: "info" }),
+      // new transports.File({ filename: logFileName, level: "info" }),
+      createLogglyTransport(apiName),
       new DailyRotateFile({
         filename: `${createLogDir(apiName)}/%DATE%.log`,
         datePattern: "YYYY-MM-DD",
@@ -45,12 +46,15 @@ function apiLogger(apiName) {
 }
 
 const counters = {
-  GET: {},
-  POST: {},
-  PATCH: {},
-  DELETE: {},
+  auth: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  login: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgram: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramDetail: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramLike: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramScrap: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramComment: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
+  artgramCommentLike: { GET: 0, POST: 0, PATCH: 0, DELETE: 0 },
 };
-
 function incrementCounter(apiName, method) {
   if (!counters[method][apiName]) {
     counters[method][apiName] = 0;

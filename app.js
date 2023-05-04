@@ -27,7 +27,7 @@ const {
   getCounter,
 } = require("./middlewares/apiLogger");
 const {
-  getApiName,
+  processRequest,
   isArtgramDetail,
   shouldAddDetail,
 } = require("./modules/counter");
@@ -104,37 +104,61 @@ const swaggerSpec = yamlFiles.reduce((acc, filePath) => {
   const spec = require(filePath);
   return { ...acc, ...spec };
 }, swaggerJSDoc(swaggerOptions));
+// app.use(
+//   morgan("dev"),
+//   morgan("tiny", {
+//     stream: {
+//       write: (message) => {
+//         const method = message.split(" ")[0];
+//         const url = message.split(" ")[1].split("?")[0];
 
+//         const action = urlToAction(url, method);
+
+//         if (action === "exclude") {
+//           return;
+//         }
+
+//         incrementCounter(action, method);
+//         const apiRequestCount = getCounter(action, method);
+
+//         const displayName = action;
+//         const logglyWinston = apiLogger(action);
+//         logglyWinston.info(
+//           `${displayName} - ${method} #${apiRequestCount}: ${message.trim()}`
+//         );
+//       },
+//     },
+//   })
+// );
 //winston api호출횟수로깅
 app.use(
   morgan("dev"),
-  // morgan("tiny", {
-  //   stream: {
-  //     write: (message) => {
-  //       const method = message.split(" ")[0];
-  //       let apiPath = message.split(" ")[1].split("?")[0]; // API 경로 추출 및 쿼리 파라미터 제거
-  //       const apiSegments = apiPath
-  //         .split("/")
-  //         .filter((segment) => segment && segment !== "api");
+  morgan("tiny", {
+    stream: {
+      write: (message) => {
+        const method = message.split(" ")[0];
+        let apiPath = message.split(" ")[1].split("?")[0].split("/")[2];
+        const apiSegments = message
+          .split(/[/?\s]/)
+          .filter((segment) => segment && segment !== "api")
+          .slice(0, -5);
 
-  //       const apiName = getApiName(apiSegments);
-  //       if (apiName === "exclude") {
-  //         return;
-  //       }
-  //       const isDetail = shouldAddDetail(apiName, apiSegments);
+        const apiName = processRequest(apiSegments, method);
+        if (apiName === "exclude" || apiName === undefined) {
+          return;
+        }
 
   //       incrementCounter(apiName, method);
   //       const apiRequestCount = getCounter(apiName, method);
   //       const logger = apiLogger(apiName);
 
-  //       const displayName = isDetail ? `${apiName} Detail` : apiName;
-
-  //       logger.info(
-  //         `API Request (${displayName} - ${method}) #${apiRequestCount}: ${message.trim()}`
-  //       );
-  //     },
-  //   },
-  // })
+        const logglyWinston = apiLogger(apiName);
+        logglyWinston.info(
+          `${apiName} - ${method} #${apiRequestCount}: ${message.trim()}`
+        );
+      },
+    },
+  })
 );
 
 // cors
