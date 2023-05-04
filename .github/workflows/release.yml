@@ -28,7 +28,7 @@ jobs:
           echo "$SSH_PRIVATE_KEY" | base64 -d > private_key.pem
           chmod 600 private_key.pem
           rsync -avz -e 'ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' --exclude=node_modules --exclude=.git ./ env_vars.sh $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
-          ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && source env_vars.sh && rm env_vars.sh && git checkout release && git pull && npm install && sudo pm2 restart app"
+          ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && source env_vars.sh && rm env_vars.sh && git checkout release && git pull && npm install winston-loggly-bulk && sudo pm2 restart app"
           rm -f private_key.pem env_vars.sh
           
       - name: Deploy to Server 2
