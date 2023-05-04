@@ -155,9 +155,10 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false })); // x-www-form-urlencoded형태의 데이터 해설
 app.use(cookieParser());
+app.disable('x-powered-by');
 
 // routes
-app.use("/", routes);
+app.use("/api", routes);
 
 // swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
