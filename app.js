@@ -33,7 +33,6 @@ const {
 } = require("./modules/counter");
 
 const webSocketController = require("./controllers/websocket.cntroller");
-const errorHandlerByWs = require("./middlewares/errorHandlerByWs.js");
 
 const PORT = process.env.SERVER_PORT;
 
@@ -149,9 +148,9 @@ app.use(
           return;
         }
 
-        incrementCounter(apiName, method);
-        const apiRequestCount = getCounter(apiName, method);
-        const logger = apiLogger(apiName);
+  //       incrementCounter(apiName, method);
+  //       const apiRequestCount = getCounter(apiName, method);
+  //       const logger = apiLogger(apiName);
 
         const logglyWinston = apiLogger(apiName);
         logglyWinston.info(
@@ -165,7 +164,8 @@ app.use(
 // cors
 app.use(
   cors({
-    origin: "https://muse-oh.vercel.app", //origin 확인 필요
+    // origin: "https://museoh.art", //origin 확인 필요
+    origin: "*",
     credentials: true,
     optionsSuccessStatus: 200,
     exposedHeaders: ["Authorization"], //클라이언트가 응답에서 액세스할 수 있는 헤더 목록
@@ -179,6 +179,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false })); // x-www-form-urlencoded형태의 데이터 해설
 app.use(cookieParser());
+app.disable('x-powered-by');
 
 // routes
 app.use("/api", routes);
@@ -193,7 +194,7 @@ passportConfig(); // 패스포트 설정
 app.use(
   "/",
   createProxyMiddleware({
-    target: "https://muse-oh.vercel.app",
+    target: 'https://museoh.art',
     changeOrigin: true,
   })
 );
@@ -219,7 +220,6 @@ io.use((socket, next) => {
   );
 });
 
-// websoket
 io.on("connection", (socket) => {
   webSocketController.handleSocketConnection(socket, io);
 });

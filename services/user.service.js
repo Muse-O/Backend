@@ -109,7 +109,7 @@ class UserService {
       subject: "MUSE-O에서 보내는 가입 인증 메일입니다",
       html: `<div style="max-width: 540px;background-color: black; border-bottom: 1px solid #eaedef; margin: 0 22px; margin-top: 60px;">
       <div style="padding-bottom: 40px; max-width: 473px;font-size: 16px; margin-top: 60px;">
-        <a href="https://muse-o.vercel.app/" rel="noopener noreferrer" target="_blank">
+        <a href="https://museoh.shop/" rel="noopener noreferrer" target="_blank">
          <img src="https://woog-s3-bucket.s3.amazonaws.com/profile/92f80cf8-095e-4535-9bbd-c9b5b03d0ee0.png" style="width: 130px; margin-top: 60px; margin-left: 10px;" alt="muse-o">
         </a>
         <div style="font-size: 18px;color: #eaedef; font-weight: 700; margin-bottom: 10px; margin-top: 60px; margin-left: 10px;">
@@ -142,8 +142,8 @@ class UserService {
               서비스명: MUSE-O
             </span>
             <span style="margin-right: 10px;">
-              <a href="https://github.com/Muse-O" style="color: inherit; text-decoration: none;" rel="noopener noreferrer" target="_blank">
-                깃허브: https://github.com/Muse-O
+              <a href="https://museoh.shop/" style="color: inherit; text-decoration: none;" rel="noopener noreferrer" target="_blank">
+                주소: https://museoh.shop/
               </a>          
             </span>      
           </div>            
