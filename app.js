@@ -33,7 +33,6 @@ const {
 } = require("./modules/counter");
 
 const webSocketController = require("./controllers/websocket.cntroller");
-const errorHandlerByWs = require("./middlewares/errorHandlerByWs.js");
 
 const PORT = process.env.SERVER_PORT;
 
@@ -134,6 +133,7 @@ const swaggerSpec = yamlFiles.reduce((acc, filePath) => {
 //winston api호출횟수로깅
 app.use(
   morgan("dev"),
+<<<<<<< HEAD
   morgan("tiny", {
     stream: {
       write: (message) => {
@@ -148,11 +148,28 @@ app.use(
         if (apiName === "exclude" || apiName === undefined) {
           return;
         }
+=======
+  // morgan("tiny", {
+  //   stream: {
+  //     write: (message) => {
+  //       const method = message.split(" ")[0];
+  //       let apiPath = message.split(" ")[1].split("?")[0]; // API 경로 추출 및 쿼리 파라미터 제거
+  //       const apiSegments = apiPath
+  //         .split("/")
+  //         .filter((segment) => segment && segment !== "api");
 
-        incrementCounter(apiName, method);
-        const apiRequestCount = getCounter(apiName, method);
-        const logger = apiLogger(apiName);
+  //       const apiName = getApiName(apiSegments);
+  //       if (apiName === "exclude") {
+  //         return;
+  //       }
+  //       const isDetail = shouldAddDetail(apiName, apiSegments);
+>>>>>>> release
 
+  //       incrementCounter(apiName, method);
+  //       const apiRequestCount = getCounter(apiName, method);
+  //       const logger = apiLogger(apiName);
+
+<<<<<<< HEAD
         const logglyWinston = apiLogger(apiName);
         logglyWinston.info(
           `${apiName} - ${method} #${apiRequestCount}: ${message.trim()}`
@@ -160,12 +177,23 @@ app.use(
       },
     },
   })
+=======
+  //       const displayName = isDetail ? `${apiName} Detail` : apiName;
+
+  //       logger.info(
+  //         `API Request (${displayName} - ${method}) #${apiRequestCount}: ${message.trim()}`
+  //       );
+  //     },
+  //   },
+  // })
+>>>>>>> release
 );
 
 // cors
 app.use(
   cors({
-    origin: "https://muse-oh.vercel.app", //origin 확인 필요
+    // origin: "https://museoh.art", //origin 확인 필요
+    origin: "*",
     credentials: true,
     optionsSuccessStatus: 200,
     exposedHeaders: ["Authorization"], //클라이언트가 응답에서 액세스할 수 있는 헤더 목록
@@ -179,6 +207,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false })); // x-www-form-urlencoded형태의 데이터 해설
 app.use(cookieParser());
+app.disable('x-powered-by');
 
 // routes
 app.use("/api", routes);
@@ -193,7 +222,11 @@ passportConfig(); // 패스포트 설정
 app.use(
   "/",
   createProxyMiddleware({
+<<<<<<< HEAD
     target: "https://muse-oh.vercel.app",
+=======
+    target: 'https://museoh.art',
+>>>>>>> release
     changeOrigin: true,
   })
 );
@@ -219,7 +252,6 @@ io.use((socket, next) => {
   );
 });
 
-// websoket
 io.on("connection", (socket) => {
   webSocketController.handleSocketConnection(socket, io);
 });
