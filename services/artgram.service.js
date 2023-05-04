@@ -1,6 +1,7 @@
 const ArtgramRepository = require("../repositories/artgram.repository");
 const Boom = require("boom");
 const NotiRepository = require("../repositories/notification.repository");
+const dayjs = require("dayjs");
 
 class ArtgramService {
   constructor() {
@@ -15,25 +16,89 @@ class ArtgramService {
    * @param {Locals.user} userEmail 현재 로그인한 유저의 이메일
    * @returns findAllArtgrams db에서 조회해온 값
    */
+  // loadAllArtgrams = async (limit, offset, userEmail) => {
+  processArtgramData = async (artgrams, userEmail) => {
+    const findArtgrmas = await Promise.all(
+      artgrams.map(async (artgram) => {
+        const userProfile = await this.artgramRepository.getUserProfileByEmail(
+          artgram.userEmail
+        );
+        const likeCount = await this.artgramRepository.getArtgramLikeCount(
+          artgram.artgramId
+        );
+        const scrapCount = await this.artgramRepository.getArtgramScrapCount(
+          artgram.artgramId
+        );
+        const imgCount = await this.artgramRepository.getArtgramImgCount(
+          artgram.artgramId
+        );
+
+        let likedByCurrentUser;
+        let scrapByCurrentUser;
+        if (userEmail !== "guest" && userEmail !== undefined) {
+          likedByCurrentUser = await this.artgramRepository.findArtgramLike(
+            userEmail,
+            artgram.artgramId
+          );
+          scrapByCurrentUser = await this.artgramRepository.findArtgramScrap(
+            userEmail,
+            artgram.artgramId
+          );
+        } else {
+          likedByCurrentUser = null;
+          scrapByCurrentUser = null;
+        }
+
+        const { "ArtgramImgs.imgUrl": _, ...rest } = artgram;
+
+        return {
+          ...rest,
+          nickname: userProfile.UserProfile.profileNickname,
+          profileImg: userProfile.UserProfile.profileImg,
+          imgUrl: artgram["ArtgramImgs.imgUrl"],
+          likeCount,
+          imgCount,
+          scrapCount,
+          liked: !!likedByCurrentUser,
+          scrap: !!scrapByCurrentUser,
+          createdAt: dayjs(artgram.createdAt)
+            .locale("en")
+            .format("YYYY-MM-DD HH:mm:ss"),
+        };
+      })
+    );
+
+    const sortedArtgramList = findArtgrmas.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    return sortedArtgramList;
+  };
+
   loadAllArtgrams = async (limit, offset, userEmail) => {
-    let findAllArtgrams;
-    if (userEmail !== "guest" && userEmail !== undefined) {
-      // user 객체가 존재하고 userEmail 속성이 존재하는 경우
+    const artgrams = await this.artgramRepository.getAllArtgram(limit, offset);
+    const sortedArtgramList = await this.processArtgramData(
+      artgrams,
+      userEmail
+    );
 
-      findAllArtgrams = await this.artgramRepository.getAllArtgram(
-        limit,
-        offset,
-        userEmail
-      );
-    } else {
-      // user 객체가 존재하지 않거나 userEmail 속성이 존재하지 않는 경우
+    const artgramCnt = await this.artgramRepository.getArtgramCounts();
+    const hasNextPage = offset + limit < artgramCnt;
 
-      findAllArtgrams = await this.artgramRepository.getPublicAllArtgram(
-        limit,
-        offset
-      );
-    }
-    return findAllArtgrams;
+    const paginationInfo = {
+      limit,
+      offset,
+      artgramCnt,
+      hasNextPage,
+    };
+
+    return {
+      sortedArtgramList: {
+        count: artgrams.count,
+        sortedArtgramList,
+      },
+      paginationInfo,
+    };
   };
 
   /**
@@ -118,11 +183,11 @@ class ArtgramService {
    */
   removeArtgram = async (artgramId) => {
     const deleteartgram = await this.artgramRepository.removeArtgram(artgramId);
-    if (deleteartgram[0] === 0) {
-      throw Boom.notFound(
-        "게시글 삭제에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다."
-      );
-    }
+    // if (deleteartgram[0] === 0) {
+    //   throw Boom.notFound(
+    //     "게시글 삭제에 실패했습니다. 해당 게시글이 존재하지 않거나 권한이 없습니다."
+    //   );
+    // }
     return deleteartgram;
   };
 

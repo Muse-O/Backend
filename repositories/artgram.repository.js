@@ -23,9 +23,7 @@ class ArtgramRepository extends Artgrams {
    * @param {local.user} userEmail or "guest"
    * @returns sortedArtgramList AS04제외 조회 스크랩/좋아요 유무확인가능
    */
-
-  getAllArtgram = async (limit, offset, userEmail) => {
-    const myuserEmail = userEmail;
+  getAllArtgram = async (limit, offset) => {
     const findAllArtgrams = await Artgrams.findAll({
       raw: true,
       attributes: ["artgramId", "artgramTitle", "userEmail", "createdAt"],
@@ -47,185 +45,66 @@ class ArtgramRepository extends Artgrams {
       offset: offset,
       order: [["createdAt", "DESC"]],
     });
-    const findArtgrmas = await Promise.all(
-      findAllArtgrams.map(async (artgram) => {
-        const userEmail = artgram.userEmail;
-        const user = await Users.findOne({
-          where: { userEmail: userEmail },
-          include: [
-            {
-              model: UserProfile,
-              attributes: ["profileNickname", "profileImg"],
-            },
-          ],
-        });
-
-        const userProfile = user.UserProfile;
-        const artgramId = artgram.artgramId;
-
-        const likeCount = await ArtgramLike.count({
-          where: { artgramId: artgramId },
-        });
-        const scrapCount = await ArtgramScrap.count({
-          where: { artgramId: artgramId },
-        });
-
-        // 현재 사용자가 좋아요를 누른 Artgram이 있는지 확인
-        const likedByCurrentUser = await ArtgramLike.findOne({
-          where: {
-            userEmail: myuserEmail,
-            artgramId: artgramId,
-          },
-        });
-        const scrapByCurrentUser = await ArtgramScrap.findOne({
-          where: {
-            userEmail: myuserEmail,
-            artgramId: artgramId,
-          },
-        });
-
-        const imgCount = await ArtgramImg.count({
-          where: { artgramId: artgramId },
-        });
-
-        //객체분해할당 원래 객체의 속성이름과 동일한 변수이름을 사용
-        //하지만 특수문자가 들어간 경우엔 ""나 []를 사용해서 변수이름으로 사용가능
-        const { "ArtgramImgs.imgUrl": _, ...rest } = artgram;
-
-        return {
-          ...rest,
-          nickname: userProfile.profileNickname,
-          profileImg: userProfile.profileImg,
-          imgUrl: artgram["ArtgramImgs.imgUrl"],
-          likeCount,
-          imgCount,
-          scrapCount,
-          liked: !!likedByCurrentUser,
-          scrap: !!scrapByCurrentUser,
-          createdAt: dayjs(artgram.createdAt)
-            //locale은 지역또는 언어설정을 의미함.
-            .locale("en")
-            .format("YYYY-MM-DD HH:mm:ss"),
-        };
-      })
-    );
-
-    const sortedArtgramList = findArtgrmas.sort((a, b) => {
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    });
-
-    const artgramCnt = await Artgrams.count();
-    const hasNextPage = offset + limit < artgramCnt;
-
-    const paginationInfo = {
-      limit,
-      offset,
-      artgramCnt,
-      hasNextPage,
-    };
-
-    return {
-      sortedArtgramList: {
-        count: findAllArtgrams.count,
-        findArtgrmas,
-      },
-      paginationInfo,
-    };
+    return findAllArtgrams;
   };
 
-  /**
-   * 비로그인시 전체조회
-   * @param {Number} limit
-   * @param {Number} offset
-   * @param {local.user} userEmail or "guest"
-   * @returns sortedArtgramList AS04제외 조회 스크랩/좋아요 유무제외
-   */
-  getPublicAllArtgram = async (limit, offset) => {
-    const findAllArtgrams = await Artgrams.findAll({
-      raw: true,
+  getArtgramCounts = async () => {
+    const artgramCnt = await Artgrams.count();
+    return artgramCnt;
+  };
+
+  getUserProfileByEmail = async (userEmail) => {
+    const user = await Users.findOne({
+      where: { userEmail: userEmail },
       include: [
         {
-          model: ArtgramImg,
-          attributes: ["imgUrl"],
-          where: {
-            imgOrder: 1,
-          },
+          model: UserProfile,
+          attributes: ["profileNickname", "profileImg"],
         },
       ],
-      attributes: ["artgramId", "artgramTitle", "userEmail", "createdAt"],
+    });
+    return user;
+  };
+
+  getArtgramLikeCount = async (artgramId) => {
+    const likeCount = await ArtgramLike.count({
+      where: { artgramId: artgramId },
+    });
+    return likeCount;
+  };
+
+  getArtgramScrapCount = async (artgramId) => {
+    const scrapCount = await ArtgramScrap.count({
+      where: { artgramId: artgramId },
+    });
+    return scrapCount;
+  };
+
+  getArtgramImgCount = async (artgramId) => {
+    const imgCount = await ArtgramImg.count({
+      where: { artgramId: artgramId },
+    });
+    return imgCount;
+  };
+
+  findArtgramLike = async (userEmail, artgramId) => {
+    const likedByCurrentUser = await ArtgramLike.findOne({
       where: {
-        artgram_status: {
-          [Op.ne]: "AS04",
-        },
+        userEmail: userEmail,
+        artgramId: artgramId,
       },
-      limit: limit,
-      offset: offset,
-      order: [["createdAt", "DESC"]],
     });
+    return likedByCurrentUser;
+  };
 
-    const findArtgrmas = await Promise.all(
-      findAllArtgrams.map(async (artgram) => {
-        const userEmail = artgram.userEmail;
-        const user = await Users.findOne({
-          where: { userEmail: userEmail },
-          include: [
-            {
-              model: UserProfile,
-              attributes: ["profileNickname", "profileImg"],
-            },
-          ],
-        });
-
-        const userProfile = user.UserProfile;
-        const artgramId = artgram.artgramId;
-
-        const likeCount = await ArtgramLike.count({
-          where: { artgramId: artgramId },
-        });
-        const imgCount = await ArtgramImg.count({
-          where: { artgramId: artgramId },
-        });
-        const scrapCount = await ArtgramScrap.count({
-          where: { artgramId: artgramId },
-        });
-        //객체 구조분해를 사용해서 artgram행을 사용해서ArtgramImgs.imgUrl을 제거해줌
-        const { "ArtgramImgs.imgUrl": _, ...rest } = artgram;
-
-        return {
-          ...rest,
-          nickname: userProfile.profileNickname,
-          profileImg: userProfile.profileImg,
-          imgUrl: artgram["ArtgramImgs.imgUrl"],
-          likeCount,
-          imgCount,
-          scrapCount,
-          createdAt: dayjs(artgram.createdAt)
-            .locale("en")
-            .format("YYYY-MM-DD HH:mm:ss"),
-        };
-      })
-    );
-    const sortedArtgramList = findArtgrmas.sort((a, b) => {
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    });
-
-    const artgramCnt = await Artgrams.count();
-    const hasNextPage = offset + limit < artgramCnt;
-
-    const paginationInfo = {
-      limit,
-      offset,
-      artgramCnt,
-      hasNextPage,
-    };
-
-    return {
-      sortedArtgramList: {
-        count: findAllArtgrams.count,
-        findArtgrmas,
+  findArtgramScrap = async (userEmail, artgramId) => {
+    const scrapByCurrentUser = await ArtgramScrap.findOne({
+      where: {
+        userEmail: userEmail,
+        artgramId: artgramId,
       },
-      paginationInfo,
-    };
+    });
+    return scrapByCurrentUser;
   };
 
   /**
