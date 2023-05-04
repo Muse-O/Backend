@@ -140,7 +140,8 @@ app.use(
 // cors
 app.use(
   cors({
-    origin: "https://museoh.art", //origin 확인 필요
+    // origin: "https://museoh.art", //origin 확인 필요
+    origin: "*",
     credentials: true,
     optionsSuccessStatus: 200,
     exposedHeaders: ["Authorization"], //클라이언트가 응답에서 액세스할 수 있는 헤더 목록
