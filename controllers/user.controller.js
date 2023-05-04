@@ -39,7 +39,6 @@ class UserController {
     
     res
       .cookie("access_token", token, {
-        secure: true,
         httpOnly: true
       })
       .redirect(301, `https://museoh.shop/`);
