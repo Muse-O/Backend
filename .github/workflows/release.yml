@@ -13,7 +13,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         
-      - name: Deploy to Server 1
+      - name: Deploy to Server 1# 
+        #배포작업이 실패해도 동작하도록 설정.
+        continue-on-error: true
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_SERVER1 }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST_SERVER1 }}
@@ -32,10 +34,11 @@ jobs:
           rsync -avz -e 'ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' --exclude=node_modules --exclude=.git ./ $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
           ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && git checkout release && git pull && npm install && pm2 delete 0 && pm2 start app.js"
           rm -f private_key.pem env_vars.sh
-          # 배포작업이 실패해도 동작하도록 설정.
-          continue-on-error: true
+          
       
       - name: Deploy to Server 2
+      # 배포작업이 실패해도 동작하도록 설정.
+        continue-on-error: true
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_SERVER2 }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST_SERVER2 }}
@@ -55,5 +58,4 @@ jobs:
           ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && git checkout release && git pull && npm install && pm2 delete 0 && pm2 start app.js"
           rm -f private_key.pem env_vars.sh
           
-          # 배포작업이 실패해도 동작하도록 설정.
-          continue-on-error: true
+          
