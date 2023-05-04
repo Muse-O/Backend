@@ -20,7 +20,12 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER_SERVER2 }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH_SERVER2 }}
         run: |
-          echo "$SSH_PRIVATE_KEY" | base64 -d > private_key.pem
+          echo "export SSH_PRIVATE_KEY_SERVER2=${{ secrets.SSH_PRIVATE_KEY_SERVER2 }}" >> env_vars.sh
+          echo "export DEPLOY_HOST_SERVER2=${{ secrets.DEPLOY_HOST_SERVER2 }}" >> env_vars.sh
+          echo "export DEPLOY_USER_SERVER2=${{ secrets.DEPLOY_USER_SERVER2 }}" >> env_vars.sh
+          echo "export DEPLOY_PATH_SERVER2=${{ secrets.DEPLOY_PATH_SERVER2 }}" >> env_vars.sh
+
+          echo "$SSH_PRIVATE_KEY_SERVER2" | base64 -d > private_key.pem
           chmod 600 private_key.pem
           rsync -avz -e 'ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' --exclude=node_modules --exclude=.git ./ $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
           ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && git checkout release && git pull && npm install && pm2 delete 0 && pm2 start app.js"
