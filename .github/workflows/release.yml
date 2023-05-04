@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Node.js CI 
 
 on:
   push:
@@ -10,6 +10,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
       - name: Deploy to Server 2
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_SERVER2 }}
@@ -17,15 +20,15 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER_SERVER2 }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH_SERVER2 }}
         run: |
-          echo "export secrets.SSH_PRIVATE_KEY_SERVER2" >> env_vars.sh
-          echo "export secrets.DEPLOY_HOST_SERVER2" >> env_vars.sh
-          echo "export secrets.DEPLOY_USER_SERVER2" >> env_vars.sh
-          echo "export secrets.DEPLOY_PATH_SERVER2" >> env_vars.sh
-          # ... 나머지 환경 변수 추가
+          echo "export SSH_PRIVATE_KEY_SERVER2=${{ secrets.SSH_PRIVATE_KEY_SERVER2 }}" >> env_vars.sh
+          echo "export DEPLOY_HOST_SERVER2=${{ secrets.DEPLOY_HOST_SERVER2 }}" >> env_vars.sh
+          echo "export DEPLOY_USER_SERVER2=${{ secrets.DEPLOY_USER_SERVER2 }}" >> env_vars.sh
+          echo "export DEPLOY_PATH_SERVER2=${{ secrets.DEPLOY_PATH_SERVER2 }}" >> env_vars.sh
           chmod +x env_vars.sh
-          # 배포 스크립트 실행
-          echo "$SSH_PRIVATE_KEY" | base64 -d > private_key.pem
+
+          source env_vars.sh
+          echo "$SSH_PRIVATE_KEY_SERVER2" | base64 -d > private_key.pem
           chmod 600 private_key.pem
-          rsync -avz -e 'ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' --exclude=node_modules --exclude=.git ./ env_vars.sh $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
-          ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && source env_vars.sh && rm env_vars.sh && git checkout release && git pull && npm install && pm2 delete 0 && pm2 start app.js"
+          rsync -avz -e 'ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' --exclude=node_modules --exclude=.git ./ $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
+          ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && git checkout release && git pull && npm install && pm2 delete 0 && pm2 start app.js"
           rm -f private_key.pem env_vars.sh
