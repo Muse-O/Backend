@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-// loggly.js
-=======
->>>>>>> release
 const winston = require("winston");
 require("winston-loggly-bulk");
 
@@ -23,22 +19,6 @@ function createDefaultLogglyTransport() {
   });
 }
 
-<<<<<<< HEAD
-module.exports = { createLogglyTransport, createDefaultLogglyTransport };
-=======
-const logglyWinston = winston.createLogger({
-  transports: [
-    new winston.transports.Console(),
-    createDefaultLogglyTransport(),
-  ],
-  format: winston.format.combine(
-    winston.format.colorize(),
-    winston.format.timestamp(),
-    winston.format.printf((info) => {
-      return `${info.timestamp} ${info.level}: ${info.message}`;
-    })
-  ),
-});
 
-module.exports = { logglyWinston, createLogglyTransport };
->>>>>>> release
+module.exports = { createLogglyTransport, createDefaultLogglyTransport };
+
