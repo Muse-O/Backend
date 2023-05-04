@@ -195,6 +195,7 @@ io.use((socket, next) => {
   );
 });
 
+// websoket
 io.on("connection", (socket) => {
   webSocketController.handleSocketConnection(socket, io);
 });
