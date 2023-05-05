@@ -1,5 +1,9 @@
 config:
   target: "https://localhost:3000/api"
+  variables:
+    MYSQL_USERNAME_TEST: "{$.env.MYSQL_USERNAME_TEST}"
+    MYSQL_HOST_TEST: "{$.env.MYSQL_HOST_TEST}"
+    MYSQL_PASSWORD_TEST: "{$.env.MYSQL_PASSWORD_TEST}"
   phases:
     - duration: 60
       arrivalRate: 5
@@ -8,3 +12,13 @@ config:
       arrivalRate: 5
       rampTo: 50
       name: Ramp up load
+scenarios:
+  - name: "전시회조회"
+    flow:
+      - { "get": { "url": "/" } }
+      - post:
+          url: "/auth/login"
+          json:
+            email: "ekqls6812@dd.com"
+            password: "a!111222"
+      - { "get": { "url": "/exhibition" } }
