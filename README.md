@@ -2,7 +2,6 @@
 
 [![Node.js CI](https://github.com/Muse-O/Backend/actions/workflows/release.yml/badge.svg)](https://github.com/Muse-O/Backend/actions/workflows/release.yml)
 
-[![Node.js CI](https://github.com/Muse-O/Backend/actions/workflows/release.yml/badge.svg)](https://github.com/Muse-O/Backend/actions/workflows/release.yml)
 # 국내 전시 커뮤니티 - Muse-O
 
 ![MUSE-O브로셔](https://user-images.githubusercontent.com/51357635/236382171-b6eff0b3-c993-4243-876e-b8ac096f507b.png)
