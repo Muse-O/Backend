@@ -32,6 +32,12 @@ const webSocketController = require("./controllers/websocket.cntroller");
 
 const PORT = process.env.SERVER_PORT;
 
+const dotenv = require("dotenv");
+
+// 환경 변수를 로드합니다. NODE_ENV 값에 따라 적절한 파일을 사용합니다.
+const envFile = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env";
+dotenv.config({ path: envFile });
+
 const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
