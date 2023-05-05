@@ -254,5 +254,5 @@ Socket.io | 소켓 통신
 ![Backend-Architecture](https://user-images.githubusercontent.com/51357635/236399953-4caefd53-2e73-40a9-9e71-4ea8b66273db.png)
 ## 🧱 API LIST
 ## 🧱 ERD LIST
-![MUSE-O ERD]([https://user-images.githubusercontent.com/51357635/236382171-b6eff0b3-c993-4243-876e-b8ac096f507b.png](https://www.erdcloud.com/d/ySuCsb3e7Bf3DmYp3))
+![MUSE-O ERD](https://www.erdcloud.com/d/ySuCsb3e7Bf3DmYp3)
 ![image](https://user-images.githubusercontent.com/51357635/236434831-869de97c-1620-486e-a59f-7aac8984b6ea.png)
