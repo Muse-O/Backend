@@ -5,7 +5,7 @@
 # 국내 전시 커뮤니티 - Muse-O
 
 ![MUSE-O브로셔](https://user-images.githubusercontent.com/51357635/236382171-b6eff0b3-c993-4243-876e-b8ac096f507b.png)
-## 🏠 [Home Page](https://www.antsori.com)
+### 🏠 [Home Page](https://www.antsori.com)
 ---
 ## 🗂️ 목차
 
