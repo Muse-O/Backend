@@ -253,6 +253,7 @@ Socket.io | 소켓 통신
 ## 🧱 백엔드 아키텍처
 ![Backend-Architecture](https://user-images.githubusercontent.com/51357635/236399953-4caefd53-2e73-40a9-9e71-4ea8b66273db.png)
 ## 🧱 API LIST
+![API-FLOW](https://user-images.githubusercontent.com/51357635/236438491-decb96cd-0039-41d5-b25f-828c7151652d.png)
 ## 🧱 ERD LIST
-![MUSE-O ERD](https://www.erdcloud.com/d/ySuCsb3e7Bf3DmYp3)
 ![image](https://user-images.githubusercontent.com/51357635/236434831-869de97c-1620-486e-a59f-7aac8984b6ea.png)
+[ERD 자세히 보러가기](https://www.erdcloud.com/d/ySuCsb3e7Bf3DmYp3)
