@@ -201,3 +201,4 @@ Socket.io | 소켓 통신
 ## 🧱 API LIST
 
 ## 🧱 ERD
+<iframe width="600" height="336" src="https://www.erdcloud.com/p/ySuCsb3e7Bf3DmYp3" frameborder="0" allowfullscreen></iframe>
