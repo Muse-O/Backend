@@ -167,13 +167,13 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 passportConfig(); // 패스포트 설정
 
 // frontend proxy
-app.use(
-  "/",
-  createProxyMiddleware({
-    target: 'https://museoh.art',
-    changeOrigin: true,
-  })
-);
+//app.use(
+//  "/",
+//  createProxyMiddleware({
+//    target: 'https://museoh.art',
+//    changeOrigin: true,
+//  })
+//);
 
 // errorHandler
 app.use((err, req, res, next) => {
