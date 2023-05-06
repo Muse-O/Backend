@@ -107,7 +107,7 @@
 </table>
 
 ---
-## 🛠 기술스택 ([WHY?](https://spark-stove-6bf.notion.site/cf6de263fec844ba8c989b4c9a6dd32e))
+## 🛠 기술스택 ([도입 목적](https://www.notion.so/6a6f13386ed543afb9da18a282edc2d7))
 
 기술스택 | 설명
 ---|:---:
