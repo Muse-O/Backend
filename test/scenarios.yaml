@@ -1,19 +1,19 @@
 config:
-  target: "https://localhost:3000/api"
+  target: "http://3.87.217.12/api"
   variables:
     MYSQL_USERNAME_TEST: "{$.env.MYSQL_USERNAME_TEST}"
     MYSQL_HOST_TEST: "{$.env.MYSQL_HOST_TEST}"
     MYSQL_PASSWORD_TEST: "{$.env.MYSQL_PASSWORD_TEST}"
   phases:
-    - duration: 60
+    - duration: 10
       arrivalRate: 5
       name: Warm up
-    - duration: 120
-      arrivalRate: 5
-      rampTo: 50
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 20
       name: Ramp up load
 scenarios:
-  - name: "전시회조회"
+  - name: "아트그램조회"
     flow:
       - { "get": { "url": "/" } }
       - post:
@@ -21,4 +21,10 @@ scenarios:
           json:
             email: "ekqls6812@dd.com"
             password: "a!111222"
-      - { "get": { "url": "/exhibition" } }
+          capture:
+            - json: "$.token"
+              as: "auth_token"
+      - get:
+          url: "/artgram?limit=10&offset=0"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"

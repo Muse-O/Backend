@@ -167,14 +167,19 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 passportConfig(); // 패스포트 설정
 
 // frontend proxy
-app.use(
-  "/",
-  createProxyMiddleware({
-    target: "https://museoh.art",
+//프록시 환경변수 등록해서 테스트서버에서는 실행되지않도록 설정
+const proxyTarget = process.env.REACT_APP_PROXY_TARGET;
+const enableProxy = process.env.REACT_APP_ENABLE_PROXY === "true";
 
-    changeOrigin: true,
-  })
-);
+if (enableProxy) {
+  app.use(
+    "/",
+    createProxyMiddleware({
+      target: proxyTarget,
+      changeOrigin: true,
+    })
+  );
+}
 
 // errorHandler
 app.use((err, req, res, next) => {
