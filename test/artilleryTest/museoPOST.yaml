@@ -1,0 +1,188 @@
+config:
+  target: "http://3.87.217.12"
+  variables:
+    MYSQL_USERNAME_TEST: "{$.env.MYSQL_USERNAME_TEST}"
+    MYSQL_HOST_TEST: "{$.env.MYSQL_HOST_TEST}"
+    MYSQL_PASSWORD_TEST: "{$.env.MYSQL_PASSWORD_TEST}"
+  phases:
+    - duration: 10
+      arrivalRate: 30
+      name: Warm up
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 20
+      name: Ramp up load
+  payload:
+    path: "user_credentials.csv"
+    fields:
+      - "email"
+      - "password"
+      - "nickname"
+      - "imgUrl"
+      - "artgramTitle"
+      - "artgramDesc"
+      - "hashtag"
+      - "artgramId"
+      - "commentId"
+      - "comment"
+      - "commentParent"
+      - "startDate"
+      - "endDate"
+      - "category"
+      - "searchTitle"
+      - "tag"
+      - "exhibitionTitle"
+      - "exhibitionEngTitle"
+      - "exhibitionKind"
+      - "exhibitionHost"
+      - "exhibitionOnlineLink"
+      - "exhibitionLink"
+      - "postImage"
+      - "artImage"
+      - "exhibitionDesc"
+      - "entranceFee"
+      - "artWorkCnt"
+      - "agencyAndSponsor"
+      - "location"
+      - "contact"
+      - "authors"
+      - "exhibitionCategory"
+      - "detailLocation"
+      - "zonecode"
+      - "address"
+      - "addressEnglish"
+      - "addressType"
+      - "buildingName"
+      - "buildingCode"
+      - "roadAddress"
+      - "roadAddressEnglish"
+      - "autoJibunAddress"
+      - "autoJibunAddressEnglish"
+      - "Address2"
+      - "roadname"
+      - "roadnameCode"
+      - "roadnameEnglish"
+
+  before:
+    - post:
+        url: "/api/auth/login"
+        json:
+          email: "{{ email }}"
+          password: "{{ password }}"
+        capture:
+          - json: "$.token"
+            as: "auth_token"
+
+scenarios:
+  - name: "회원가입"
+    flow:
+      - post:
+          url: "/api/auth/signup"
+          json:
+            email: { { email } }
+            password: { { password } }
+            nickname: { { nickname } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "회원가입 성공"
+      - think: 1
+  - name: "아트그램 작성"
+    flow:
+      - post:
+          url: "/api/artgram"
+          json:
+            imgUrl: { { imgUrl } }
+            artgramTitle: { { artgramTitle } }
+            artgramDesc: { { artgramDesc } }
+            hashtag: { { hashtag } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 작성성공"
+      - think: 1
+  - name: "아트그램 댓글작성"
+    flow:
+      - post:
+          url: "/api/artgram/{{artgramId}}/comments"
+          json:
+            comment: { { comment } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 댓글작성성공"
+      - think: 1
+  - name: "아트그램 답글 작성"
+    flow:
+      - post:
+          url: "/api/artgram/{{ artgramId }}/comments/{{commentId}}/reply"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 답글 작성성공"
+      - think: 1
+  - name: "전시회 작성"
+    flow:
+      - post:
+          url: "/api/exhibition/write"
+          json:
+            startDate: { { startDate } }
+            endDate: { { endDate } }
+            openDay: { { openDay } }
+            closeDay: { { closeDay } }
+            significant: { { significant } }
+            exhibitionTitle: { { exhibitionTitle } }
+            exhibitionEngTitle: { { exhibitionEngTitle } }
+            exhibitionKind: { { exhibitionKind } }
+            exhibitionHost: { { exhibitionHost } }
+            exhibitionOnlineLink: { { exhibitionOnlineLink } }
+            exhibitionLink: { { exhibitionLink } }
+            postImage: { { postImage } }
+            artImage: { { artImage } }
+            exhibitionDesc: { { exhibitionDesc } }
+            entranceFee: { { entranceFee } }
+            artWorkCnt: { { artWorkCnt } }
+            agencyAndSponsor: { { agencyAndSponsor } }
+            location: { { location } }
+            contact: { { contact } }
+            authors: { { authors } }
+            exhibitionCategory: { { exhibitionCategory } }
+            zonecode: { { zonecode } }
+            address: { { address } }
+            addressEnglish: { { addressEnglish } }
+            Address: { { Address } }
+            addressType: { { addressType } }
+            buildingName: { { buildingName } }
+            buildingCode: { { buildingCode } }
+            roadAddress: { { roadAddress } }
+            roadAddressEnglish: { { roadAddressEnglish } }
+            RoadAddress: { { RoadAddress } }
+            autoJibunAddress: { { autoJibunAddress } }
+            autoJibunAddressEnglish: { { autoJibunAddressEnglish } }
+            Address2: { { Address2 } }
+            roadname: { { roadname } }
+            roadnameCode: { { roadnameCode } }
+            roadnameEnglish: { { roadnameEnglish } }
+            RoadName: { { RoadName } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "전시회 작성성공"
+      - think: 1
+  - name: "전시회 리뷰작성"
+    flow:
+      - post:
+          url: "/api/exhibition/reviews/write/{{ exhibitionId }}"
+          json:
+            hashTag: { { hashtag } }
+            reviewComment: { { reviewComment } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "전시회 리뷰작성 성공"
+      - think: 1
+  - name: "유저가 검색한 title저장"
+    flow:
+      - post:
+          url: "/api/search"
+          json:
+            title: { { title } }
+            type: { { type } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "저장성공"
+      - think: 1
