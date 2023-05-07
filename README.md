@@ -102,7 +102,6 @@
     <a href="https://github.com/seunghowhite">Github</a>
     <br/><img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=React&logoColor=white"/><br/>
     </td>
-    <td colspan='2'></td>
     </tr>
 </table>
 
