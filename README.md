@@ -121,7 +121,7 @@ CloudFlare Images | 서브 이미지 업로드(메인은 S3)
 Socket.io | 소켓 통신
 ---
 
-## 📖 라이브러리 ([WHY?](https://spark-stove-6bf.notion.site/9064e96f94854aaca56925f80d978bdb))
+## 📖 라이브러리 ([도입 목적](https://seungho-white.notion.site/8a486c22d7b94ef2b2f5a38e17c637aa))
 
 ## Dependencies
 라이브러리 | 설명
