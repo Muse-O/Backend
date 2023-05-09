@@ -30,7 +30,7 @@ const { processRequest } = require("./modules/counter");
 
 const webSocketController = require("./controllers/websocket.cntroller");
 
-const PORT = process.env.SERVER_PORT;
+const PORT = process.env.SERVER_PORT || 0;
 
 const dotenv = require("dotenv");
 
