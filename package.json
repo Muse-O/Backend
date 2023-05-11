@@ -24,6 +24,7 @@
     "window:test:unit": "set NODE_ENV=test && jest test/unit --forceExit",
     "window:test:integration": "set NODE_ENV=test && jest test/integration --forceExit",
     "start:test": "set NODE_ENV=test node app.js"
+
   },
   "keywords": [],
   "author": "",
@@ -59,11 +60,13 @@
     "request-ip": "^3.3.0",
     "sequelize": "^6.30.0",
     "socket.io": "^4.6.1",
+    "typescript": "^5.0.4",
     "winston": "^3.8.2",
     "winston-daily-rotate-file": "^4.7.1",
     "winston-loggly-bulk": "^3.2.1"
   },
   "devDependencies": {
+    "@types/node": "^20.1.1",
     "artillery": "^2.0.0-31",
     "ioredis": "^5.3.1",
     "jest": "^29.5.0",
