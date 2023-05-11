@@ -24,6 +24,7 @@ const config = {
     dialect: "mysql",
     timezone: "+09:00",
     //port: env.MYSQL_PORT,
+    port: env.MYSQL_PORT_TEST,
   },
 
   production: {

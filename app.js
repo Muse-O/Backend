@@ -26,15 +26,17 @@ const {
   incrementCounter,
   getCounter,
 } = require("./middlewares/apiLogger");
-const {
-  getApiName,
-  isArtgramDetail,
-  shouldAddDetail,
-} = require("./modules/counter");
+const { processRequest } = require("./modules/counter");
 
 const webSocketController = require("./controllers/websocket.cntroller");
 
-const PORT = process.env.SERVER_PORT;
+const PORT = process.env.SERVER_PORT || 0;
+
+const dotenv = require("dotenv");
+
+// 환경 변수를 로드합니다. NODE_ENV 값에 따라 적절한 파일을 사용합니다.
+const envFile = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env";
+dotenv.config({ path: envFile });
 
 const swaggerOptions = {
   definition: {
@@ -45,6 +47,11 @@ const swaggerOptions = {
       description:
         "로그인을 한뒤 Authorization의 토큰값을 상단의 Authorize에 Bearer없이 넣어주시고 사용하시면됩니다. try it out을 눌러야 parameter와 body값을 입력할수있습니다.",
     },
+    servers: [
+      {
+        url: "/api",
+      },
+    ],
     tags: [
       {
         name: "User",
@@ -108,33 +115,31 @@ const swaggerSpec = yamlFiles.reduce((acc, filePath) => {
 //winston api호출횟수로깅
 app.use(
   morgan("dev"),
-  // morgan("tiny", {
-  //   stream: {
-  //     write: (message) => {
-  //       const method = message.split(" ")[0];
-  //       let apiPath = message.split(" ")[1].split("?")[0]; // API 경로 추출 및 쿼리 파라미터 제거
-  //       const apiSegments = apiPath
-  //         .split("/")
-  //         .filter((segment) => segment && segment !== "api");
 
-  //       const apiName = getApiName(apiSegments);
-  //       if (apiName === "exclude") {
-  //         return;
-  //       }
-  //       const isDetail = shouldAddDetail(apiName, apiSegments);
+  morgan("tiny", {
+    stream: {
+      write: (message) => {
+        const method = message.split(" ")[0];
+        let apiPath = message.split(" ")[1].split("?")[0].split("/")[2];
+        const apiSegments = message
+          .split(/[/?\s]/)
+          .filter((segment) => segment && segment !== "api")
+          .slice(0, -5);
 
-  //       incrementCounter(apiName, method);
-  //       const apiRequestCount = getCounter(apiName, method);
-  //       const logger = apiLogger(apiName);
+        const apiName = processRequest(apiSegments, method);
+        if (apiName === "exclude" || apiName === undefined) {
+          return;
+        }
+        incrementCounter(apiName, method);
+        const apiRequestCount = getCounter(apiName, method);
 
-  //       const displayName = isDetail ? `${apiName} Detail` : apiName;
-
-  //       logger.info(
-  //         `API Request (${displayName} - ${method}) #${apiRequestCount}: ${message.trim()}`
-  //       );
-  //     },
-  //   },
-  // })
+        const logglyWinston = apiLogger(apiName);
+        logglyWinston.info(
+          `${apiName} - ${method} #${apiRequestCount}: ${message.trim()}`
+        );
+      },
+    },
+  })
 );
 
 // cors
@@ -155,7 +160,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false })); // x-www-form-urlencoded형태의 데이터 해설
 app.use(cookieParser());
-app.disable('x-powered-by');
+app.disable("x-powered-by");
 
 // routes
 app.use("/api", routes);
@@ -167,13 +172,19 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 passportConfig(); // 패스포트 설정
 
 // frontend proxy
-app.use(
-  "/",
-  createProxyMiddleware({
-    target: 'https://museoh.art',
-    changeOrigin: true,
-  })
-);
+//프록시 환경변수 등록해서 테스트서버에서는 실행되지않도록 설정
+const proxyTarget = process.env.REACT_APP_PROXY_TARGET;
+const enableProxy = process.env.REACT_APP_ENABLE_PROXY === "true";
+
+if (enableProxy) {
+  app.use(
+    "/",
+    createProxyMiddleware({
+      target: proxyTarget,
+      changeOrigin: true,
+    })
+  );
+}
 
 // errorHandler
 app.use((err, req, res, next) => {
