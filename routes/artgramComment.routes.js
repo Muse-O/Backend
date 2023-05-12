@@ -104,7 +104,7 @@ const artgramCommentController = new ArtgramCommentController();
  *       "200":
  *         description: "아트그램이 삭제되었습니다."
  *
- * /artgram/{artgramId}/comments/{commentId}/reply:
+ * /artgram/{artgramId}/comments/{commentId}/replies:
  *   get:
  *     tags:
  *       - artgramReply
@@ -160,7 +160,7 @@ const artgramCommentController = new ArtgramCommentController();
  *         description: "오류"
  *     security:
  *       - jwt: []
- * /artgram/{artgramId}/comments/{commentId}/reply/{commentParent}:
+ * /artgram/{artgramId}/comments/{commentId}/replies/{commentParent}:
  *   patch:
  *     tags:
  *       - artgramReply
@@ -200,7 +200,7 @@ const artgramCommentController = new ArtgramCommentController();
  *         description: "답글을 수정했습니다."
  *     security:
  *       - jwt: []
- * /artgram/{artgramId}/comments/{commentId}/reply/{commentParent}/remove:
+ * /artgram/{artgramId}/comments/{commentId}/replies/{commentParent}/remove:
  *   patch:
  *     tags:
  *       - artgramReply
@@ -264,24 +264,24 @@ router.patch(
 );
 //답글 조회
 router.get(
-  "/:artgramId/comments/:commentId/reply",
+  "/:artgramId/comments/:commentId/replies",
   artgramCommentController.allReply
 );
 //답글 작성
 router.post(
-  "/:artgramId/comments/:commentId/reply",
+  "/:artgramId/comments/:commentId/replies",
   authMiddleware,
   artgramCommentController.replyCreate
 );
 //답글 수정
 router.patch(
-  "/:artgramId/comments/:commentParent/reply/:commentId",
+  "/:artgramId/comments/:commentParent/replies/:commentId",
   authMiddleware,
   artgramCommentController.updateReply
 );
 //답글 삭제
 router.patch(
-  "/:artgramId/comments/:commentParent/reply/:commentId/remove",
+  "/:artgramId/comments/:commentParent/replies/:commentId/remove",
   authMiddleware,
   artgramCommentController.deleteReply
 );
