@@ -55,7 +55,7 @@ class BannerRepository {
     result.forEach((row) => {
       row.index = cnt++;
       row.sido = row.tmpAddress ? row.tmpAddress.split(' ')[0] : "";
-      row.detailRouter = '/exhibition/detail'+row.exhibitionId;
+      row.detailRouter = '/exhibition/detail/'+row.exhibitionId;
       row.author = row.author ? row.author.split(',') : [];
       
       delete row.like_cnt
@@ -114,7 +114,7 @@ class BannerRepository {
     result.forEach((row) => {
       row.index = cnt++;
       row.sido = row.tmpAddress ? row.tmpAddress.split(' ')[0] : "";
-      row.detailRouter = '/exhibition/detail'+row.exhibitionId;
+      row.detailRouter = '/exhibition/detail/'+row.exhibitionId;
       delete row.like_cnt
       delete row.tmpAddress
     })
@@ -174,7 +174,7 @@ class BannerRepository {
     result.forEach((row) => {
       row.index = cnt++;
       row.sido = row.tmpAddress ? row.tmpAddress.split(' ')[0] : "";
-      row.detailRouter = '/exhibition/detail'+row.exhibitionId;
+      row.detailRouter = '/exhibition/detail/'+row.exhibitionId;
       delete row.like_cnt
       delete row.tmpAddress
     })
@@ -229,7 +229,7 @@ class BannerRepository {
     result.forEach((row) => {
       row.index = cnt++;
       row.sido = row.tmpAddress ? row.tmpAddress.split(' ')[0] : "";
-      row.detailRouter = '/exhibition/detail'+row.exhibitionId;
+      row.detailRouter = '/exhibition/detail/'+row.exhibitionId;
       delete row.like_cnt
       delete row.tmpAddress
     })
