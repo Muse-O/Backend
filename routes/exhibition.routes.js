@@ -12,7 +12,7 @@ const commonAPIController = new CommonAPIController();
 // 전시회 목록 조회
 router.get("/", publicAuthMiddleware, exhibitionController.getExhibitionList);
 // 전시회 상세 조회
-router.get("/:exhibitionId", publicAuthMiddleware, exhibitionController.getExhibitionDetail);
+router.get("/view/:exhibitionId", publicAuthMiddleware, exhibitionController.getExhibitionDetail);
 // 전시회 등록
 router.post("/", authMiddleware, exhibitionController.writeExhibition);
 // 전시회 수정
