@@ -30,7 +30,7 @@ const { processRequest } = require("./modules/counter");
 
 const webSocketController = require("./controllers/websocket.cntroller");
 
-const PORT = process.env.SERVER_PORT;
+const PORT = process.env.SERVER_PORT || 0;
 
 const dotenv = require("dotenv");
 
@@ -47,6 +47,11 @@ const swaggerOptions = {
       description:
         "로그인을 한뒤 Authorization의 토큰값을 상단의 Authorize에 Bearer없이 넣어주시고 사용하시면됩니다. try it out을 눌러야 parameter와 body값을 입력할수있습니다.",
     },
+    servers: [
+      {
+        url: "/api",
+      },
+    ],
     tags: [
       {
         name: "User",

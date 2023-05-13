@@ -1,0 +1,219 @@
+config:
+  target: "http://3.87.217.12"
+  variables:
+    MYSQL_USERNAME_TEST: "{$.env.MYSQL_USERNAME_TEST}"
+    MYSQL_HOST_TEST: "{$.env.MYSQL_HOST_TEST}"
+    MYSQL_PASSWORD_TEST: "{$.env.MYSQL_PASSWORD_TEST}"
+  phases:
+    - duration: 10
+      arrivalRate: 30
+      name: Warm up
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 20
+      name: Ramp up load
+  payload:
+    path: "user_credentials.csv"
+    fields:
+      - "email"
+      - "password"
+  before:
+    - post:
+        url: "/api/auth/login"
+        json:
+          email: "{{ email }}"
+          password: "{{ password }}"
+        capture:
+          - json: "$.token"
+            as: "auth_token"
+    - get:
+        url: "/api/artgram?limit=10&offset=5"
+        headers:
+          Authorization: "Bearer {{ auth_token }}"
+        capture:
+          - json: "$.artgram[0].artgramId"
+            as: "artgramId"
+    - get:
+        url: "/api/artgram/{{ artgramId }}/comments"
+        headers:
+          Authorization: "Bearer {{ auth_token }}"
+        capture:
+          - json: "$.comments[0].commentId"
+            as: "commentId"
+    - get:
+        url: "/api/exhibition"
+        headers:
+          Authorization: "Bearer {{ auth_token }}"
+        capture:
+          - json: "$.exhibition[0].exhibitionId"
+            as: "exhibitionId"
+
+scenarios:
+  - name: "로그인"
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "ekqls6812@dd.com"
+            password: "a!111222"
+      - think: 1
+  - name: "아트그램 전체조회"
+    flow:
+      - get:
+          url: "/api/artgram?limit=10&offset=0"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 전체조회성공"
+      - think: 1
+  - name: "아트그램 상세조회"
+    flow:
+      - get:
+          url: "/api/artgram/{{ artgramId }}"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 상세 조회성공"
+      - think: 1
+  - name: "댓글 조회"
+    flow:
+      - get:
+          url: "/api/artgram/{{ artgramId }}/comments"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 댓글 조회성공"
+      - think: 1
+  - name: "답글 조회"
+    flow:
+      - get:
+          url: "/api/banner/{{ artgramId }}/comments/{{commentId}}/reply"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 답글 조회성공"
+      - think: 1
+  - name: "전시회 조회"
+    flow:
+      - get:
+          url: "/api/exhibition"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "전시회 조회성공"
+      - think: 1
+  - name: "전시회 상세조회"
+    flow:
+      - get:
+          url: "/api/exhibition/{{ exhibitionId }}"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "전시회 조회성공"
+      - think: 1
+  - name: "전시회 리뷰조회"
+    flow:
+      - get:
+          url: "/api/exhibition/{{ exhibitionId }}/review"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "전시회 리뷰 조회성공"
+      - think: 1
+  - name: "검색"
+    flow:
+      - get:
+          url: "/api/search?searchText=삭제"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "검색성공"
+      - think: 1
+  - name: "메인페이지 개인전조회"
+    flow:
+      - get:
+          url: "/api/banner/getPersonalExhibitionsByRecent"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "메인페이지 개인전조회성공"
+      - think: 1
+  - name: "메인페이지 전시회 좋아요순"
+    flow:
+      - get:
+          url: "/api/banner/getOpenExhibitionsSortedByMostLike"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "메인페이지 전시회 좋아요순 조회성공"
+      - think: 1
+  - name: "최근 전시조회"
+    flow:
+      - get:
+          url: "/api/banner/getOpenExhibitionsSortedByDate"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "메인페이지 최신전시 조회성공"
+      - think: 1
+  - name: "예정 전시조회"
+    flow:
+      - get:
+          url: "/api/banner/getFutureExhibitionsSortedByNearest"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "메인페이지 예정전시 조회성공"
+      - think: 1
+  - name: "최근 작성된 아트그램 조회"
+    flow:
+      - get:
+          url: "/api/banner/getLatestArtgrams"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "메인페이지 아트그램 조회성공"
+      - think: 1
+  - name: "마이페이지 프로필 조회"
+    flow:
+      - get:
+          url: "/api/mypage"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "마이페이지 프로필조회성공"
+      - think: 1
+  - name: "작성한 전시회조회"
+    flow:
+      - get:
+          url: "/api/banner/exhibition"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "마이페이지 작성전시 조회성공"
+      - think: 1
+  - name: "마이페이지 좋아요한 전시회조회"
+    flow:
+      - get:
+          url: "/api/banner/exhibition/likes"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "마이페이지 좋아요한 전시회 조회성공"
+      - think: 1
+  - name: "마이페이지 스크랩한 전시회조회"
+    flow:
+      - get:
+          url: "/api/banner/exhibition/scraps"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "마이페이지 스크랩한 조회성공"
+      - think: 1
+  - name: "마이페이지 작성한 아트그램조회"
+    flow:
+      - get:
+          url: "/api/mypage/artgram"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "마이페이지 작성한 아트그램조회성공"
+      - think: 1
+  - name: "마이페이지 좋아요한 아트그램조회"
+    flow:
+      - get:
+          url: "/api/mypage/artgram/likes"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "마이페이지 좋아요한 아트그램 조회성공"
+      - think: 1
+  - name: "마이페이지 스크랩한 아트그램조회"
+    flow:
+      - get:
+          url: "/api/mypage/artgram/scraps"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "마이페이지 스크랩한 아트그램조회성공"
+      - think: 1

@@ -1,0 +1,230 @@
+config:
+  target: "http://3.87.217.12"
+  variables:
+    MYSQL_USERNAME_TEST: "{$.env.MYSQL_USERNAME_TEST}"
+    MYSQL_HOST_TEST: "{$.env.MYSQL_HOST_TEST}"
+    MYSQL_PASSWORD_TEST: "{$.env.MYSQL_PASSWORD_TEST}"
+  phases:
+    - duration: 10
+      arrivalRate: 30
+      name: Warm up
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 20
+      name: Ramp up load
+  payload:
+    path: "user_credentials.csv"
+    fields:
+      - "email"
+      - "password"
+      - "nickname"
+      - "imgUrl"
+      - "artgramTitle"
+      - "email"
+      - "password"
+      - "imgUrl"
+      - "artgramTitle"
+      - "artgramDesc"
+      - "hashtag"
+      - "artgramId"
+      - "commentId"
+      - "comment"
+      - "commentParent"
+      - "limit"
+      - "offset"
+      - "startDate"
+      - "endDate"
+      - "category"
+      - "searchTitle"
+      - "tag"
+      - "where"
+      - "exhibitionId"
+      - "profileImg"
+      - "introduction"
+      - "searchText"
+      - "title"
+      - "type"
+  before:
+    - post:
+        url: "/api/auth/login"
+        json:
+          email: "{{ email }}"
+          password: "{{ password }}"
+        capture:
+          - json: "$.token"
+            as: "auth_token"
+
+scenarios:
+  - name: "아트그램 수정"
+    flow:
+      - patch:
+          url: "/api/artgram/{{artgramId}}"
+          json:
+            artgramTitle: { { artgramTitle } }
+            artgramDesc: { { artgramDesc } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 수정성공"
+      - think: 1
+  - name: "아트그램 삭제"
+    flow:
+      - patch:
+          url: "/api/artgram/{{ artgramId }}/remove"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 삭제성공"
+      - think: 1
+  - name: "아트그램 좋아요"
+    flow:
+      - patch:
+          url: "/api/artgram/{{ artgramId }}/likes"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 좋아요 성공"
+      - think: 1
+  - name: "아트그램 스크랩"
+    flow:
+      - patch:
+          url: "/api/banner/{{ artgramId }}/scrap"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 스크랩성공"
+      - think: 1
+  - name: "아트그램 댓글수정"
+    flow:
+      - patch:
+          url: "/api/artgram/{{ artgramId }}/comments/{{commentId}}"
+          json:
+            comment: { { comment } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 상세 조회성공"
+      - think: 1
+  - name: "아트그램 댓글 삭제"
+    flow:
+      - patch:
+          url: "/api/artgram/{{ artgramId }}/comments/{{commentId}}/remove"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 댓글삭제 성공"
+      - think: 1
+  - name: "아트그램 답글 수정"
+    flow:
+      - patch:
+          url: "/api/artgram/{{ artgramId }}/commentParent/reply/{{commentId}}"
+          json:
+            comment: { { comment } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 답글수정 성공"
+      - think: 1
+  - name: "아트그램 답글 삭제"
+    flow:
+      - patch:
+          url: "/api/artgram/{{ artgramId }}/commentParent/reply/{{commentId}}/remove"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "아트그램 답글삭제 성공"
+      - think: 1
+  - name: "전시회 수정"
+    flow:
+      - patch:
+          url: "/api/exhibition/update/{{exhibitionId}}"
+          json:
+            startDate: { { startDate } }
+            endDate: { { endDate } }
+            openDay: { { openDay } }
+            closeDay: { { closeDay } }
+            significant: { { significant } }
+            exhibitionTitle: { { exhibitionTitle } }
+            exhibitionEngTitle: { { exhibitionEngTitle } }
+            exhibitionKind: { { exhibitionKind } }
+            exhibitionHost: { { exhibitionHost } }
+            exhibitionOnlineLink: { { exhibitionOnlineLink } }
+            exhibitionLink: { { exhibitionLink } }
+            postImage: { { postImage } }
+            artImage: { { artImage } }
+            exhibitionDesc: { { exhibitionDesc } }
+            entranceFee: { { entranceFee } }
+            artWorkCnt: { { artWorkCnt } }
+            agencyAndSponsor: { { agencyAndSponsor } }
+            location: { { location } }
+            contact: { { contact } }
+            authors: { { authors } }
+            exhibitionCategory: { { exhibitionCategory } }
+            zonecode: { { zonecode } }
+            address: { { address } }
+            addressEnglish: { { addressEnglish } }
+            Address: { { Address } }
+            addressType: { { addressType } }
+            buildingName: { { buildingName } }
+            buildingCode: { { buildingCode } }
+            roadAddress: { { roadAddress } }
+            roadAddressEnglish: { { roadAddressEnglish } }
+            RoadAddress: { { RoadAddress } }
+            autoJibunAddress: { { autoJibunAddress } }
+            autoJibunAddressEnglish: { { autoJibunAddressEnglish } }
+            Address2: { { Address2 } }
+            roadname: { { roadname } }
+            roadnameCode: { { roadnameCode } }
+            roadnameEnglish: { { roadnameEnglish } }
+            RoadName: { { RoadName } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "전시회 수정성공"
+      - think: 1
+  - name: "전시회 삭제"
+    flow:
+      - delete:
+          url: "/api/exhibition/delete/{{exhibitionId}}"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "전시회 조회성공"
+      - think: 1
+  - name: "전시회 좋아요"
+    flow:
+      - patch:
+          url: "/api/exhibition/like/{{ exhibitionId }}"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "전시회 좋아요성공"
+      - think: 1
+  - name: "전시회 스크랩"
+    flow:
+      - patch:
+          url: "/api/exhibition/scrap/{{ exhibitionId }}/review"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "전시회 스크랩성공"
+      - think: 1
+  - name: "전시회 리뷰수정"
+    flow:
+      - patch:
+          url: "/api/exhibition/reviews/write/{{ exhibitionId }}"
+          json:
+            hashTag: { { hashtag } }
+            reviewComment: { { reviewComment } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "전시회 리뷰수정성공"
+      - think: 1
+  - name: "전시회 리뷰삭제"
+    flow:
+      - delete:
+          url: "/api/exhibition/reviews/delete/{{ exhibitionId }}"
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "전시회 리뷰삭제성공"
+      - think: 1
+  - name: "마이페이지 수정"
+    flow:
+      - patch:
+          url: "/mypage"
+          json:
+            profileImg: { { profileImg } }
+            nickname: { { nickname } }
+            introduction: { { introduction } }
+          headers:
+            Authorization: "Bearer {{ auth_token }}"
+      - log: "마이페이지 수정성공"
+      - think: 1
