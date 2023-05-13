@@ -30,7 +30,7 @@ const { processRequest } = require("./modules/counter");
 
 const webSocketController = require("./controllers/websocket.cntroller");
 
-const PORT = process.env.SERVER_PORT || 0;
+const PORT = process.env.SERVER_PORT;
 
 const dotenv = require("dotenv");
 
@@ -45,13 +45,8 @@ const swaggerOptions = {
       title: "Muse_O 전시회페이지",
       version: "1.0.0",
       description:
-        "로그인을 한뒤 Authorization의 토큰값을 상단의 Authorize에 Bearer없이 넣어주시고 사용하시면됩니다. try it out을 눌러야 parameter와 body값을 입력할수있습니다.",
+        "로그인을 한뒤 Authorization의 토큰값을 상단의 Authorize에 Bearer없이 넣어주시고 사용하시면 됩니다. try it out을 눌러야 parameter와 body값을 입력할수있습니다.",
     },
-    servers: [
-      {
-        url: "/api",
-      },
-    ],
     tags: [
       {
         name: "User",
@@ -145,7 +140,7 @@ app.use(
 // cors
 app.use(
   cors({
-    origin: "https://museoh.art", //origin 확인 필요
+    // origin: "https://museoh.art", //origin 확인 필요
     origin: "*",
     credentials: true,
     optionsSuccessStatus: 200,
@@ -172,6 +167,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 passportConfig(); // 패스포트 설정
 
 // frontend proxy
+
 //프록시 환경변수 등록해서 테스트서버에서는 실행되지않도록 설정
 const proxyTarget = process.env.REACT_APP_PROXY_TARGET;
 const enableProxy = process.env.REACT_APP_ENABLE_PROXY === "true";

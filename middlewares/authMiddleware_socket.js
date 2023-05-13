@@ -5,7 +5,6 @@ const { Users, UserProfile } = require("../models");
 
 module.exports = async (chatroom, token, socket) => {
   const [authType, authToken] = (token ?? "").split(" ");
-
   if (authType !== "Bearer" || !authToken) {
     // 채팅방에서 퇴장
     socket.leave(chatroom);

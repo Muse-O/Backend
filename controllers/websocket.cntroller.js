@@ -11,7 +11,7 @@ const handleSocketConnection = (socket, io) => {
     chatInfo.chatRoomId = socket.handshake.query.chatRoomId;
     chatInfo.user = await authMiddleWare(
       chatInfo.chatRoomId,
-      socket.request.cookies.chat_access_token,
+      socket.handshake.auth.authorization,
       socket
     );
     socket.join(chatInfo.chatRoomId);
