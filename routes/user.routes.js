@@ -122,19 +122,19 @@ const userController = new UserController();
  */
 
 // 회원가입 전 이메일 중복확인
-router.post("/emailconfirm", userController.emailConfirm);
+router.post("/user/check", userController.emailConfirm);
 
 // 인증 메일 발송 및 레디스 저장
-router.post("/emailvalidate", userController.emailValidate);
+router.post("/email", userController.emailValidate);
 
 // 인증번호 검증
-router.post("/emailcodecheck", userController.emailValidateNumCheck);
+router.post("/email/check", userController.emailValidateNumCheck);
 
 // 회원가입
-router.post("/signup", userController.userSignup);
+router.post("/user", userController.userSignup); //
 
 // 로컬 로그인
-router.post("/login", authLoginMiddleware, userController.localLogin);
+router.post("/token", authLoginMiddleware, userController.localLogin);
 
 // 카카오 로그인 auth/kakao
 router.get("/kakao", passport.authenticate("kakao"));
