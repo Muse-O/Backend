@@ -7,6 +7,6 @@ const UploadController = require("../controllers/upload.controller")
 const uploadController = new UploadController();
 
 // CLOUDFLARE IMAGES URL 요청
-router.get("/", authMiddleware, uploadController.getImageUploadUrl);
+router.get("/cloudflare-images-url", authMiddleware, uploadController.getImageUploadUrl);
 
 module.exports = router;
