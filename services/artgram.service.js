@@ -2,6 +2,8 @@ const ArtgramRepository = require("../repositories/artgram.repository");
 const Boom = require("boom");
 const NotiRepository = require("../repositories/notification.repository");
 const dayjs = require("dayjs");
+const { sequelize } = require("../models");
+const Sequelize = sequelize.constructor;
 
 class ArtgramService {
   constructor() {
@@ -16,89 +18,65 @@ class ArtgramService {
    * @param {Locals.user} userEmail 현재 로그인한 유저의 이메일
    * @returns findAllArtgrams db에서 조회해온 값
    */
-  // loadAllArtgrams = async (limit, offset, userEmail) => {
-  processArtgramData = async (artgrams, userEmail) => {
-    const findArtgrmas = await Promise.all(
-      artgrams.map(async (artgram) => {
-        const userProfile = await this.artgramRepository.getUserProfileByEmail(
-          artgram.userEmail
-        );
-        const likeCount = await this.artgramRepository.getArtgramLikeCount(
-          artgram.artgramId
-        );
-        const scrapCount = await this.artgramRepository.getArtgramScrapCount(
-          artgram.artgramId
-        );
-        const imgCount = await this.artgramRepository.getArtgramImgCount(
-          artgram.artgramId
-        );
-
-        let likedByCurrentUser;
-        let scrapByCurrentUser;
-        if (userEmail !== "guest" && userEmail !== undefined) {
-          likedByCurrentUser = await this.artgramRepository.findArtgramLike(
-            userEmail,
-            artgram.artgramId
-          );
-          scrapByCurrentUser = await this.artgramRepository.findArtgramScrap(
-            userEmail,
-            artgram.artgramId
-          );
-        } else {
-          likedByCurrentUser = null;
-          scrapByCurrentUser = null;
-        }
-
-        const { "ArtgramImgs.imgUrl": _, ...rest } = artgram;
-
-        return {
-          ...rest,
-          nickname: userProfile.UserProfile.profileNickname,
-          profileImg: userProfile.UserProfile.profileImg,
-          imgUrl: artgram["ArtgramImgs.imgUrl"],
-          likeCount,
-          imgCount,
-          scrapCount,
-          liked: !!likedByCurrentUser,
-          scrap: !!scrapByCurrentUser,
-          createdAt: dayjs(artgram.createdAt)
-            .locale("en")
-            .format("YYYY-MM-DD HH:mm:ss"),
-        };
-      })
-    );
-
-    const sortedArtgramList = findArtgrmas.sort((a, b) => {
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    });
-
-    return sortedArtgramList;
-  };
-
   loadAllArtgrams = async (limit, offset, userEmail) => {
-    const artgrams = await this.artgramRepository.getAllArtgram(limit, offset);
-    const sortedArtgramList = await this.processArtgramData(
-      artgrams,
-      userEmail
-    );
+    const t = await sequelize.transaction({
+      isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.REPEATABLE_READ,
+    });
+    try {
+      const artgrams = await this.artgramRepository.findAllArtgrams(
+        limit,
+        offset
+      );
 
-    const artgramCnt = await this.artgramRepository.getArtgramCounts();
-    const hasNextPage = offset + limit < artgramCnt;
+      const findLikeAndScrap = await Promise.all(
+        artgrams.map(async (artgram) => {
+          let likedByCurrentUser;
+          let scrapByCurrentUser;
 
-    const paginationInfo = {
-      limit,
-      offset,
-      artgramCnt,
-      hasNextPage,
-    };
+          if (userEmail !== "guest" && userEmail !== undefined) {
+            likedByCurrentUser = await this.artgramRepository.findArtgramLike(
+              userEmail,
+              artgram.artgram_id
+            );
+            scrapByCurrentUser = await this.artgramRepository.findArtgramScrap(
+              userEmail,
+              artgram.artgram_id
+            );
+          }
 
-    return {
-      sortedArtgramList: {
-        count: artgrams.count,
-        sortedArtgramList,
-      },
-      paginationInfo,
-    };
+          return {
+            ...artgram,
+            likedByCurrentUser,
+            scrapByCurrentUser,
+          };
+        })
+      );
+
+      const sortedArtgramList = findLikeAndScrap.sort((a, b) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+
+      const artgramCnt = await this.artgramRepository.getArtgramCounts();
+      const hasNextPage = offset + limit < artgramCnt;
+
+      const paginationInfo = {
+        limit,
+        offset,
+        artgramCnt,
+        hasNextPage,
+      };
+      await t.commit();
+      return {
+        sortedArtgramList: {
+          count: artgrams.count,
+          sortedArtgramList,
+        },
+        paginationInfo,
+      };
+    } catch (error) {
+      await t.rollback();
+      throw error;
+    }
   };
 
   /**

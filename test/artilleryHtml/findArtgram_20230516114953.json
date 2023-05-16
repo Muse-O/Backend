@@ -1,0 +1,125 @@
+{
+  "aggregate": {
+    "counters": {
+      "vusers.failed": 0,
+      "vusers.completed": 3,
+      "vusers.created_by_name.아트그램 전체조회": 3,
+      "vusers.created": 3,
+      "http.requests": 3,
+      "http.codes.200": 3,
+      "http.responses": 3
+    },
+    "rates": {
+      "http.request_rate": 1
+    },
+    "firstCounterAt": 1684205398499,
+    "firstHistogramAt": 1684205398746,
+    "lastCounterAt": 1684205400799,
+    "lastHistogramAt": 1684205400799,
+    "firstMetricAt": 1684205398499,
+    "lastMetricAt": 1684205400799,
+    "period": 1684205400000,
+    "summaries": {
+      "vusers.session_length": {
+        "min": 2219.5,
+        "max": 2274.5,
+        "count": 3,
+        "p50": 2276.1,
+        "median": 2276.1,
+        "p75": 2276.1,
+        "p90": 2276.1,
+        "p95": 2276.1,
+        "p99": 2276.1,
+        "p999": 2276.1
+      },
+      "http.response_time": {
+        "min": 194,
+        "max": 262,
+        "count": 3,
+        "p50": 232.8,
+        "median": 232.8,
+        "p75": 232.8,
+        "p90": 232.8,
+        "p95": 232.8,
+        "p99": 232.8,
+        "p999": 232.8
+      }
+    },
+    "histograms": {
+      "vusers.session_length": {
+        "min": 2219.5,
+        "max": 2274.5,
+        "count": 3,
+        "p50": 2276.1,
+        "median": 2276.1,
+        "p75": 2276.1,
+        "p90": 2276.1,
+        "p95": 2276.1,
+        "p99": 2276.1,
+        "p999": 2276.1
+      },
+      "http.response_time": {
+        "min": 194,
+        "max": 262,
+        "count": 3,
+        "p50": 232.8,
+        "median": 232.8,
+        "p75": 232.8,
+        "p90": 232.8,
+        "p95": 232.8,
+        "p99": 232.8,
+        "p999": 232.8
+      }
+    }
+  },
+  "intermediate": [
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 3,
+        "vusers.created": 3,
+        "http.requests": 3,
+        "http.codes.200": 3,
+        "http.responses": 3
+      },
+      "rates": {
+        "http.request_rate": 3
+      },
+      "firstCounterAt": 1684205398499,
+      "firstHistogramAt": 1684205398746,
+      "lastCounterAt": 1684205398786,
+      "lastHistogramAt": 1684205398786,
+      "firstMetricAt": 1684205398499,
+      "lastMetricAt": 1684205398786,
+      "period": "1684205390000",
+      "http.request_rate": null,
+      "summaries": {
+        "http.response_time": {
+          "min": 194,
+          "max": 262,
+          "count": 3,
+          "p50": 232.8,
+          "median": 232.8,
+          "p75": 232.8,
+          "p90": 232.8,
+          "p95": 232.8,
+          "p99": 232.8,
+          "p999": 232.8
+        }
+      },
+      "histograms": {
+        "http.response_time": {
+          "min": 194,
+          "max": 262,
+          "count": 3,
+          "p50": 232.8,
+          "median": 232.8,
+          "p75": 232.8,
+          "p90": 232.8,
+          "p95": 232.8,
+          "p99": 232.8,
+          "p999": 232.8
+        }
+      }
+    }
+  ]
+}

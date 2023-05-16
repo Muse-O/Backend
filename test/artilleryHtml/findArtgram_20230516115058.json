@@ -1,0 +1,447 @@
+{
+  "aggregate": {
+    "counters": {
+      "vusers.created_by_name.아트그램 전체조회": 920,
+      "vusers.created": 920,
+      "http.requests": 920,
+      "http.codes.200": 920,
+      "http.responses": 920,
+      "vusers.failed": 0,
+      "vusers.completed": 920
+    },
+    "rates": {
+      "http.request_rate": 12
+    },
+    "firstCounterAt": 1684205462459,
+    "firstHistogramAt": 1684205462724,
+    "lastCounterAt": 1684205504419,
+    "lastHistogramAt": 1684205504419,
+    "firstMetricAt": 1684205462459,
+    "lastMetricAt": 1684205504419,
+    "period": 1684205500000,
+    "summaries": {
+      "http.response_time": {
+        "min": 52,
+        "max": 252,
+        "count": 920,
+        "p50": 58.6,
+        "median": 58.6,
+        "p75": 62.2,
+        "p90": 68.7,
+        "p95": 71.5,
+        "p99": 98.5,
+        "p999": 223.7
+      },
+      "vusers.session_length": {
+        "min": 2054.8,
+        "max": 2281,
+        "count": 920,
+        "p50": 2059.5,
+        "median": 2059.5,
+        "p75": 2059.5,
+        "p90": 2059.5,
+        "p95": 2101.1,
+        "p99": 2101.1,
+        "p999": 2231
+      }
+    },
+    "histograms": {
+      "http.response_time": {
+        "min": 52,
+        "max": 252,
+        "count": 920,
+        "p50": 58.6,
+        "median": 58.6,
+        "p75": 62.2,
+        "p90": 68.7,
+        "p95": 71.5,
+        "p99": 98.5,
+        "p999": 223.7
+      },
+      "vusers.session_length": {
+        "min": 2054.8,
+        "max": 2281,
+        "count": 920,
+        "p50": 2059.5,
+        "median": 2059.5,
+        "p75": 2059.5,
+        "p90": 2059.5,
+        "p95": 2101.1,
+        "p99": 2101.1,
+        "p999": 2231
+      }
+    }
+  },
+  "intermediate": [
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 222,
+        "vusers.created": 222,
+        "http.requests": 222,
+        "http.codes.200": 221,
+        "http.responses": 221,
+        "vusers.failed": 0,
+        "vusers.completed": 161
+      },
+      "rates": {
+        "http.request_rate": 30
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684205462459,
+      "firstHistogramAt": 1684205462724,
+      "lastCounterAt": 1684205469979,
+      "lastHistogramAt": 1684205469979,
+      "firstMetricAt": 1684205462459,
+      "lastMetricAt": 1684205469979,
+      "period": "1684205460000",
+      "summaries": {
+        "http.response_time": {
+          "min": 52,
+          "max": 252,
+          "count": 221,
+          "p50": 58.6,
+          "median": 58.6,
+          "p75": 63.4,
+          "p90": 70.1,
+          "p95": 74.4,
+          "p99": 130.3,
+          "p999": 223.7
+        },
+        "vusers.session_length": {
+          "min": 2056.1,
+          "max": 2281,
+          "count": 161,
+          "p50": 2059.5,
+          "median": 2059.5,
+          "p75": 2059.5,
+          "p90": 2101.1,
+          "p95": 2101.1,
+          "p99": 2186.8,
+          "p999": 2231
+        }
+      },
+      "histograms": {
+        "http.response_time": {
+          "min": 52,
+          "max": 252,
+          "count": 221,
+          "p50": 58.6,
+          "median": 58.6,
+          "p75": 63.4,
+          "p90": 70.1,
+          "p95": 74.4,
+          "p99": 130.3,
+          "p999": 223.7
+        },
+        "vusers.session_length": {
+          "min": 2056.1,
+          "max": 2281,
+          "count": 161,
+          "p50": 2059.5,
+          "median": 2059.5,
+          "p75": 2059.5,
+          "p90": 2101.1,
+          "p95": 2101.1,
+          "p99": 2186.8,
+          "p999": 2231
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 300,
+        "vusers.created": 300,
+        "http.requests": 300,
+        "http.codes.200": 300,
+        "http.responses": 300,
+        "vusers.failed": 0,
+        "vusers.completed": 298
+      },
+      "rates": {
+        "http.request_rate": 30
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684205470031,
+      "firstHistogramAt": 1684205470031,
+      "lastCounterAt": 1684205479974,
+      "lastHistogramAt": 1684205479971,
+      "firstMetricAt": 1684205470031,
+      "lastMetricAt": 1684205479974,
+      "period": "1684205470000",
+      "summaries": {
+        "http.response_time": {
+          "min": 52,
+          "max": 117,
+          "count": 300,
+          "p50": 59.7,
+          "median": 59.7,
+          "p75": 64.7,
+          "p90": 71.5,
+          "p95": 77.5,
+          "p99": 92.8,
+          "p999": 98.5
+        },
+        "vusers.session_length": {
+          "min": 2056.2,
+          "max": 2109.7,
+          "count": 298,
+          "p50": 2059.5,
+          "median": 2059.5,
+          "p75": 2059.5,
+          "p90": 2059.5,
+          "p95": 2101.1,
+          "p99": 2101.1,
+          "p999": 2101.1
+        }
+      },
+      "histograms": {
+        "http.response_time": {
+          "min": 52,
+          "max": 117,
+          "count": 300,
+          "p50": 59.7,
+          "median": 59.7,
+          "p75": 64.7,
+          "p90": 71.5,
+          "p95": 77.5,
+          "p99": 92.8,
+          "p999": 98.5
+        },
+        "vusers.session_length": {
+          "min": 2056.2,
+          "max": 2109.7,
+          "count": 298,
+          "p50": 2059.5,
+          "median": 2059.5,
+          "p75": 2059.5,
+          "p90": 2059.5,
+          "p95": 2101.1,
+          "p99": 2101.1,
+          "p999": 2101.1
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 263,
+        "vusers.created": 263,
+        "http.requests": 263,
+        "http.codes.200": 262,
+        "http.responses": 262,
+        "vusers.failed": 0,
+        "vusers.completed": 282
+      },
+      "rates": {
+        "http.request_rate": 29
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684205480000,
+      "firstHistogramAt": 1684205480000,
+      "lastCounterAt": 1684205489955,
+      "lastHistogramAt": 1684205489955,
+      "firstMetricAt": 1684205480000,
+      "lastMetricAt": 1684205489955,
+      "period": "1684205480000",
+      "summaries": {
+        "http.response_time": {
+          "min": 52,
+          "max": 110,
+          "count": 262,
+          "p50": 57.4,
+          "median": 57.4,
+          "p75": 59.7,
+          "p90": 63.4,
+          "p95": 68.7,
+          "p99": 74.4,
+          "p999": 98.5
+        },
+        "vusers.session_length": {
+          "min": 2054.8,
+          "max": 2118.8,
+          "count": 282,
+          "p50": 2059.5,
+          "median": 2059.5,
+          "p75": 2059.5,
+          "p90": 2059.5,
+          "p95": 2101.1,
+          "p99": 2101.1,
+          "p999": 2101.1
+        }
+      },
+      "histograms": {
+        "http.response_time": {
+          "min": 52,
+          "max": 110,
+          "count": 262,
+          "p50": 57.4,
+          "median": 57.4,
+          "p75": 59.7,
+          "p90": 63.4,
+          "p95": 68.7,
+          "p99": 74.4,
+          "p999": 98.5
+        },
+        "vusers.session_length": {
+          "min": 2054.8,
+          "max": 2118.8,
+          "count": 282,
+          "p50": 2059.5,
+          "median": 2059.5,
+          "p75": 2059.5,
+          "p90": 2059.5,
+          "p95": 2101.1,
+          "p99": 2101.1,
+          "p999": 2101.1
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 125,
+        "vusers.created": 125,
+        "http.requests": 125,
+        "vusers.failed": 0,
+        "vusers.completed": 155,
+        "http.codes.200": 127,
+        "http.responses": 127
+      },
+      "rates": {
+        "http.request_rate": 14
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684205490015,
+      "firstHistogramAt": 1684205490015,
+      "lastCounterAt": 1684205499801,
+      "lastHistogramAt": 1684205499801,
+      "firstMetricAt": 1684205490015,
+      "lastMetricAt": 1684205499801,
+      "period": "1684205490000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 2056.7,
+          "max": 2178.9,
+          "count": 155,
+          "p50": 2059.5,
+          "median": 2059.5,
+          "p75": 2059.5,
+          "p90": 2059.5,
+          "p95": 2059.5,
+          "p99": 2101.1,
+          "p999": 2101.1
+        },
+        "http.response_time": {
+          "min": 53,
+          "max": 173,
+          "count": 127,
+          "p50": 56.3,
+          "median": 56.3,
+          "p75": 58.6,
+          "p90": 59.7,
+          "p95": 63.4,
+          "p99": 90.9,
+          "p999": 108.9
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 2056.7,
+          "max": 2178.9,
+          "count": 155,
+          "p50": 2059.5,
+          "median": 2059.5,
+          "p75": 2059.5,
+          "p90": 2059.5,
+          "p95": 2059.5,
+          "p99": 2101.1,
+          "p999": 2101.1
+        },
+        "http.response_time": {
+          "min": 53,
+          "max": 173,
+          "count": 127,
+          "p50": 56.3,
+          "median": 56.3,
+          "p75": 58.6,
+          "p90": 59.7,
+          "p95": 63.4,
+          "p99": 90.9,
+          "p999": 108.9
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 10,
+        "vusers.created": 10,
+        "http.requests": 10,
+        "vusers.failed": 0,
+        "vusers.completed": 24,
+        "http.codes.200": 10,
+        "http.responses": 10
+      },
+      "rates": {
+        "http.request_rate": 6
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684205500268,
+      "firstHistogramAt": 1684205500313,
+      "lastCounterAt": 1684205504419,
+      "lastHistogramAt": 1684205504419,
+      "firstMetricAt": 1684205500268,
+      "lastMetricAt": 1684205504419,
+      "period": "1684205500000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 2057,
+          "max": 2076.5,
+          "count": 24,
+          "p50": 2059.5,
+          "median": 2059.5,
+          "p75": 2059.5,
+          "p90": 2059.5,
+          "p95": 2059.5,
+          "p99": 2059.5,
+          "p999": 2059.5
+        },
+        "http.response_time": {
+          "min": 54,
+          "max": 61,
+          "count": 10,
+          "p50": 55.2,
+          "median": 55.2,
+          "p75": 56.3,
+          "p90": 57.4,
+          "p95": 57.4,
+          "p99": 57.4,
+          "p999": 57.4
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 2057,
+          "max": 2076.5,
+          "count": 24,
+          "p50": 2059.5,
+          "median": 2059.5,
+          "p75": 2059.5,
+          "p90": 2059.5,
+          "p95": 2059.5,
+          "p99": 2059.5,
+          "p999": 2059.5
+        },
+        "http.response_time": {
+          "min": 54,
+          "max": 61,
+          "count": 10,
+          "p50": 55.2,
+          "median": 55.2,
+          "p75": 56.3,
+          "p90": 57.4,
+          "p95": 57.4,
+          "p99": 57.4,
+          "p999": 57.4
+        }
+      }
+    }
+  ]
+}

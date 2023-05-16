@@ -14,7 +14,7 @@
       ]
     }
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "test/unit/services/admin.service.test.js"],
   "exclude": ["node_modules", "dist"]
 }
 

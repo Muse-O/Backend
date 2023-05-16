@@ -46,13 +46,15 @@ class RedisConnector {
 
   _setRedisClient() {
     this.client = redis.createClient({
-      url: `redis://:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`,
-      legacyMode: true,
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+      password: process.env.REDIS_PASSWORD,
     });
   }
 
   getClient() {
-    return this.client.v4;
+    // return this.client.v4;
+    return this.client;
   }
 }
 

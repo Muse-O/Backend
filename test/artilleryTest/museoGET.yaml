@@ -1,5 +1,5 @@
 config:
-  target: "http://3.87.217.12"
+  target: "http://43.200.5.104"
   variables:
     MYSQL_USERNAME_TEST: "{$.env.MYSQL_USERNAME_TEST}"
     MYSQL_HOST_TEST: "{$.env.MYSQL_HOST_TEST}"
