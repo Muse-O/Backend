@@ -17,7 +17,6 @@
     "test:coverage": "NODE_ENV=test jest --coverage --forceExit",
     "test:unit": "NODE_ENV=test jest test/unit --forceExit",
     "test:integration": "NODE_ENV=test jest test/integration --forceExit",
-    "window:tests": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles",
     "window:test": "set NODE_ENV=test && jest --forceExit --detectOpenHandles",
     "window:test:silent": "set NODE_ENV=test && jest --silent --forceExit",
     "window:test:coverage": "set NODE_ENV=test && jest --coverage --forceExit --detectOpenHandles",

@@ -9,102 +9,83 @@ const {
   ArtgramsComment,
 } = require("../models");
 const artgramModify = require("../modules/artgramModify");
-const { Op, Sequelize } = require("sequelize");
+const { Op, Sequelize, QueryTypes } = require("sequelize");
+const { sequelize } = require("../models/index");
 const dayjs = require("dayjs");
 
-class ArtgramRepository extends Artgrams {
-  constructor() {
-    super();
-  }
+class ArtgramRepository {
   /**
-   * 로그인시 아트그램 전체조회
-   * @param {number} limit 요청할 아트그램 게시글 수
-   * @param {number} offset 조회 아트그램 게시글 시작점
-   * @param {local.user} userEmail or "guest"
-   * @returns sortedArtgramList AS04제외 조회 스크랩/좋아요 유무확인가능
+   * 로그인 유무에 따른 like, scrap값 반환
    */
-  getAllArtgram = async (limit, offset) => {
-    const findAllArtgrams = await Artgrams.findAll({
-      raw: true,
-      attributes: ["artgramId", "artgramTitle", "userEmail", "createdAt"],
-      include: [
-        {
-          model: ArtgramImg,
-          attributes: ["imgUrl"],
-          where: {
-            imgOrder: 1,
-          },
-        },
-      ],
+  findArtgramLike = async (userEmail, artgram_id) => {
+    const likedByCurrentUser = await ArtgramLike.findOne({
       where: {
-        artgram_status: {
-          [Op.ne]: "AS04",
-        },
+        userEmail: userEmail,
+        artgramId: artgram_id,
       },
-      limit: limit,
-      offset: offset,
-      order: [["createdAt", "DESC"]],
     });
-    return findAllArtgrams;
+    return likedByCurrentUser;
+  };
+
+  findArtgramScrap = async (userEmail, artgram_id) => {
+    const scrapByCurrentUser = await ArtgramScrap.findOne({
+      where: {
+        userEmail: userEmail,
+        artgramId: artgram_id,
+      },
+    });
+    return scrapByCurrentUser;
   };
 
   getArtgramCounts = async () => {
     const artgramCnt = await Artgrams.count();
     return artgramCnt;
   };
-
-  getUserProfileByEmail = async (userEmail) => {
-    const user = await Users.findOne({
-      where: { userEmail: userEmail },
-      include: [
-        {
-          model: UserProfile,
-          attributes: ["profileNickname", "profileImg"],
+  /**
+   * 아트그램 전체조회
+   * @param {number} limit 요청할 아트그램 게시글 수
+   * @param {number} offset 조회 아트그램 게시글 시작점
+   * @param {local.user} userEmail
+   * @returns sortedArtgramList AS04제외 조회 스크랩/좋아요 유무확인가능
+   */
+  findAllArtgrams = async (limit, offset) => {
+    const artgrams = await sequelize.query(
+      `
+      SELECT
+        artgrams.artgram_id,
+        artgrams.artgram_title,
+        artgrams.user_email,
+        artgrams.created_at,
+        artgram_img.img_url,
+        COUNT(artgram_img.artgram_id) AS imgCount,
+        COUNT(artgram_like.artgram_id) AS likeCount,
+        COUNT(artgram_scrap.artgram_id) AS scrapCount
+      FROM
+        artgrams
+      LEFT JOIN
+        artgram_img ON artgrams.artgram_id = artgram_img.artgram_id AND artgram_img.img_order = 1
+      LEFT JOIN
+        artgram_like ON artgrams.artgram_id = artgram_like.artgram_id
+      LEFT JOIN
+        artgram_scrap ON artgrams.artgram_id = artgram_scrap.artgram_id
+      WHERE
+        artgrams.artgram_status != 'AS04'
+      GROUP BY
+        artgrams.artgram_id
+      ORDER BY
+        artgrams.created_at DESC
+      LIMIT :limit OFFSET :offset
+    `,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          limit: parseInt(limit),
+          offset: parseInt(offset),
         },
-      ],
-    });
-    return user;
-  };
+      }
+    );
 
-  getArtgramLikeCount = async (artgramId) => {
-    const likeCount = await ArtgramLike.count({
-      where: { artgramId: artgramId },
-    });
-    return likeCount;
-  };
-
-  getArtgramScrapCount = async (artgramId) => {
-    const scrapCount = await ArtgramScrap.count({
-      where: { artgramId: artgramId },
-    });
-    return scrapCount;
-  };
-
-  getArtgramImgCount = async (artgramId) => {
-    const imgCount = await ArtgramImg.count({
-      where: { artgramId: artgramId },
-    });
-    return imgCount;
-  };
-
-  findArtgramLike = async (userEmail, artgramId) => {
-    const likedByCurrentUser = await ArtgramLike.findOne({
-      where: {
-        userEmail: userEmail,
-        artgramId: artgramId,
-      },
-    });
-    return likedByCurrentUser;
-  };
-
-  findArtgramScrap = async (userEmail, artgramId) => {
-    const scrapByCurrentUser = await ArtgramScrap.findOne({
-      where: {
-        userEmail: userEmail,
-        artgramId: artgramId,
-      },
-    });
-    return scrapByCurrentUser;
+    return artgrams;
   };
 
   /**
@@ -387,70 +368,6 @@ class ArtgramRepository extends Artgrams {
     );
 
     const modify = await artgramModify(artgramId, imgUrlArray, hashtag);
-    // // 1. 기존 해시태그 가져오기
-    // const existingHashtags = await ArtgramHashtag.findAll({
-    //   where: { artgramId },
-    // });
-
-    // // 2. 새 해시태그를 기준으로 추가 및 업데이트 수행
-    // for (let newHashtag of hashtag) {
-    //   const existingHashtag = existingHashtags.find(
-    //     (h) => h.tagName === newHashtag
-    //   );
-
-    //   if (existingHashtag) {
-    //     // 해시태그가 이미 존재하면 업데이트
-    //     await ArtgramHashtag.update(
-    //       { tagName: newHashtag },
-    //       { where: { artgramTagId: existingHashtag.artgramTagId } }
-    //     );
-    //   } else {
-    //     // 해시태그가 존재하지 않으면 추가
-    //     await ArtgramHashtag.create({ tagName: newHashtag, artgramId });
-    //   }
-    // }
-
-    // // 3. 기존 해시태그를 기준으로 삭제 수행
-    // for (let existingHashtag of existingHashtags) {
-    //   if (!hashtag.includes(existingHashtag.tagName)) {
-    //     // 새 해시태그에 없는 경우 삭제
-    //     await ArtgramHashtag.destroy({
-    //       where: { artgramTagId: existingHashtag.artgramTagId },
-    //     });
-    //   }
-    // }
-    // // 1. 기존 이미지 가져오기
-    // const existingImgs = await ArtgramImg.findAll({
-    //   where: { artgramId },
-    // });
-
-    // // 2. 새 이미지를 기준으로 추가 및 업데이트 수행
-    // let imgOrder = 1;
-    // for (let newImg of imgUrlArray) {
-    //   const existingImg = existingImgs.find((h) => h.tagName === newImg);
-
-    //   if (existingImg) {
-    //     // 이미지가 이미 존재하면 업데이트
-    //     await ArtgramImg.update(
-    //       { imgUrl: newImg, imgOrder },
-    //       { where: { artgramImgId: existingImg.artgramImgId } }
-    //     );
-    //   } else {
-    //     // 이미지가 존재하지 않으면 추가
-    //     await ArtgramImg.create({ imgOrder, imgUrl: newImg, artgramId });
-    //   }
-    //   imgOrder++; // imgOrder 속성 값 증가
-    // }
-
-    // // 3. 기존 이미지를 기준으로 삭제 수행
-    // for (let existingImg of existingImgs) {
-    //   if (!imgUrlArray.includes(existingImg.tagName)) {
-    //     // 새 이미지에 없는 경우 삭제
-    //     await ArtgramImg.destroy({
-    //       where: { artgramImgId: existingImg.artgramImgId },
-    //     });
-    //   }
-    // }
 
     return changeArtgram;
   };

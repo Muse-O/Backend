@@ -1,0 +1,22 @@
+config:
+  target: "http://localhost:3000"
+  variables:
+    MYSQL_USERNAME_TEST: "{$.env.MYSQL_USERNAME_TEST}"
+    MYSQL_HOST_TEST: "{$.env.MYSQL_HOST_TEST}"
+    MYSQL_PASSWORD_TEST: "{$.env.MYSQL_PASSWORD_TEST}"
+  phases:
+    - duration: 20
+      arrivalRate: 30
+      name: Warm up
+    - duration: 100
+      arrivalRate: 30
+      rampTo: 60
+      name: Ramp up load
+
+scenarios:
+  - name: "아트그램 전체조회"
+    flow:
+      - get:
+          url: "/api/artgram?limit=10&offset=0"
+      - log: "아트그램 전체조회 성공"
+      - think: 2

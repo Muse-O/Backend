@@ -1,0 +1,204 @@
+{
+  "aggregate": {
+    "counters": {
+      "vusers.created_by_name.아트그램 전체조회": 1971,
+      "vusers.created": 3900,
+      "http.requests": 3900,
+      "vusers.created_by_name.아트그램 상세조회": 1929,
+      "errors.ECONNREFUSED": 3900,
+      "vusers.failed": 3900
+    },
+    "rates": {
+      "http.request_rate": 49
+    },
+    "firstCounterAt": 1684198138303,
+    "lastCounterAt": 1684198211055,
+    "firstMetricAt": 1684198138303,
+    "lastMetricAt": 1684198211055,
+    "period": 1684198210000,
+    "summaries": {},
+    "histograms": {}
+  },
+  "intermediate": [
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 23,
+        "vusers.created": 47,
+        "http.requests": 47,
+        "vusers.created_by_name.아트그램 상세조회": 24
+      },
+      "rates": {
+        "http.request_rate": 39
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684198138303,
+      "lastCounterAt": 1684198139997,
+      "firstMetricAt": 1684198138303,
+      "lastMetricAt": 1684198139997,
+      "period": "1684198130000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 221,
+        "vusers.created": 416,
+        "http.requests": 416,
+        "errors.ECONNREFUSED": 283,
+        "vusers.failed": 283,
+        "vusers.created_by_name.아트그램 상세조회": 195
+      },
+      "rates": {
+        "http.request_rate": 41
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684198140009,
+      "lastCounterAt": 1684198149988,
+      "firstMetricAt": 1684198140009,
+      "lastMetricAt": 1684198149988,
+      "period": "1684198140000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 상세조회": 471,
+        "vusers.created": 913,
+        "http.requests": 913,
+        "errors.ECONNREFUSED": 913,
+        "vusers.failed": 913,
+        "vusers.created_by_name.아트그램 전체조회": 442
+      },
+      "rates": {
+        "http.request_rate": 92
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684198150002,
+      "lastCounterAt": 1684198159986,
+      "firstMetricAt": 1684198150002,
+      "lastMetricAt": 1684198159986,
+      "period": "1684198150000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 상세조회": 369,
+        "vusers.created": 778,
+        "http.requests": 778,
+        "errors.ECONNREFUSED": 807,
+        "vusers.failed": 807,
+        "vusers.created_by_name.아트그램 전체조회": 409
+      },
+      "rates": {
+        "http.request_rate": 78
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684198160000,
+      "lastCounterAt": 1684198169991,
+      "firstMetricAt": 1684198160000,
+      "lastMetricAt": 1684198169991,
+      "period": "1684198160000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "errors.ECONNREFUSED": 669,
+        "vusers.failed": 669,
+        "vusers.created_by_name.아트그램 전체조회": 315,
+        "vusers.created": 641,
+        "http.requests": 641,
+        "vusers.created_by_name.아트그램 상세조회": 326
+      },
+      "rates": {
+        "http.request_rate": 66
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684198170017,
+      "lastCounterAt": 1684198179997,
+      "firstMetricAt": 1684198170017,
+      "lastMetricAt": 1684198179997,
+      "period": "1684198170000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 상세조회": 256,
+        "vusers.created": 509,
+        "http.requests": 507,
+        "errors.ECONNREFUSED": 535,
+        "vusers.failed": 535,
+        "vusers.created_by_name.아트그램 전체조회": 253
+      },
+      "rates": {
+        "http.request_rate": 53
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684198180008,
+      "lastCounterAt": 1684198189999,
+      "firstMetricAt": 1684198180008,
+      "lastMetricAt": 1684198189999,
+      "period": "1684198180000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "http.requests": 377,
+        "errors.ECONNREFUSED": 405,
+        "vusers.failed": 405,
+        "vusers.created_by_name.아트그램 상세조회": 176,
+        "vusers.created": 375,
+        "vusers.created_by_name.아트그램 전체조회": 199
+      },
+      "rates": {
+        "http.request_rate": 39
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684198190000,
+      "lastCounterAt": 1684198199972,
+      "firstMetricAt": 1684198190000,
+      "lastMetricAt": 1684198199972,
+      "period": "1684198190000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "errors.ECONNREFUSED": 268,
+        "vusers.failed": 268,
+        "vusers.created_by_name.아트그램 상세조회": 112,
+        "vusers.created": 221,
+        "http.requests": 221,
+        "vusers.created_by_name.아트그램 전체조회": 109
+      },
+      "rates": {
+        "http.request_rate": 27
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684198200001,
+      "lastCounterAt": 1684198209990,
+      "firstMetricAt": 1684198200001,
+      "lastMetricAt": 1684198209990,
+      "period": "1684198200000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "errors.ECONNREFUSED": 20,
+        "vusers.failed": 20
+      },
+      "rates": {},
+      "firstCounterAt": 1684198210020,
+      "lastCounterAt": 1684198211055,
+      "firstMetricAt": 1684198210020,
+      "lastMetricAt": 1684198211055,
+      "period": "1684198210000",
+      "summaries": {},
+      "histograms": {}
+    }
+  ]
+}

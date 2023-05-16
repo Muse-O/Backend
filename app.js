@@ -145,7 +145,7 @@ app.use(
 // cors
 app.use(
   cors({
-    // origin: "https://museoh.art", //origin 확인 필요
+    origin: "https://museoh.art", //origin 확인 필요
     origin: "*",
     credentials: true,
     optionsSuccessStatus: 200,
@@ -191,12 +191,6 @@ app.use((err, req, res, next) => {
   errorHandler(err, req, res, next);
 });
 
-// // API 성능 테스트 결과를 로깅하는 함수
-// function logApiPerformanceTestResult(apiName, testResult) {
-//   apiLogger.info(
-//     `API Performance Test Result (${apiName}): ${JSON.stringify(testResult)}`
-//   );
-// }
 // socket.request.cookie/socket.request.session 객체를 사용 가능
 io.use((socket, next) => {
   // 외부모듈 미들웨어를 안에다 쓰일수 있다. 미들웨어 확장 원칙에 따라 res, req인자를 준다

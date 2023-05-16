@@ -20,7 +20,9 @@ class UserController {
       const token = await this.userService.generateToken(email);
       res.set("Authorization", `${token}`);
 
-      return res.status(201).json({ message: "로그인에 성공했습니다" });
+      return res
+        .status(201)
+        .json({ message: "로그인에 성공했습니다", token: token });
     } catch (error) {
       logger.error(error.message);
       next(error);
@@ -32,17 +34,15 @@ class UserController {
    */
   socialCallback = async (req, res, next) => {
     try {
-    const email = req.user.userEmail
-    const token = await this.userService.generateToken(email);
+      const email = req.user.userEmail;
+      const token = await this.userService.generateToken(email);
 
-    console.log("strategy 성공시", email)
-    
-    res
-      .cookie("access_token", token)
-      .redirect(301, `https://museoh.shop/`);
-    } catch (error){
-    logger.error(error.message);
-    next(error);
+      console.log("strategy 성공시", email);
+
+      res.cookie("access_token", token).redirect(301, `https://museoh.shop/`);
+    } catch (error) {
+      logger.error(error.message);
+      next(error);
     }
   };
 
