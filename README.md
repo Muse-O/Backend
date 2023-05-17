@@ -161,7 +161,6 @@ Socket.io | 소켓 통신
 
 라이브러리 | 설명
 ---|:---:
-<img src='https://img.shields.io/badge/cross--env-7.0.3-lightgrey'> | 운영체제 관계없이 환경변수설정
 <img src='https://img.shields.io/badge/jest-29.5.0-lightgrey'> | 테스트 프레임워크
 <img src='https://img.shields.io/badge/supertest-6.3.3-lightgrey'> | HTTP 요청을 테스트
 <img src='https://img.shields.io/badge/nodemon-2.0.22-lightgrey'> | 서버 자동 재시작
