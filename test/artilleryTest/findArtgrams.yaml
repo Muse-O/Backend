@@ -1,5 +1,5 @@
 config:
-  target: "http://localhost:3000"
+  target: "http://43.200.5.104:3000"
   variables:
     MYSQL_USERNAME_TEST: "{$.env.MYSQL_USERNAME_TEST}"
     MYSQL_HOST_TEST: "{$.env.MYSQL_HOST_TEST}"
@@ -7,11 +7,10 @@ config:
   phases:
     - duration: 20
       arrivalRate: 30
-      name: Warm up
+      name: "Warm up"
     - duration: 100
-      arrivalRate: 30
-      rampTo: 60
-      name: Ramp up load
+      arrivalCount: 2600
+      name: "Ramp up load"
 
 scenarios:
   - name: "아트그램 전체조회"
