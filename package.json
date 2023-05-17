@@ -23,7 +23,6 @@
     "window:test:unit": "set NODE_ENV=test && jest test/unit --forceExit",
     "window:test:integration": "set NODE_ENV=test && jest test/integration --forceExit",
     "start:test": "set NODE_ENV=test node app.js"
-
   },
   "keywords": [],
   "author": "",

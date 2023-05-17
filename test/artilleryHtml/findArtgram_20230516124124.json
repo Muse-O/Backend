@@ -1,0 +1,301 @@
+{
+  "aggregate": {
+    "counters": {
+      "vusers.created_by_name.아트그램 전체조회": 5100,
+      "vusers.created": 5100,
+      "http.requests": 5100,
+      "errors.ECONNREFUSED": 5100,
+      "vusers.failed": 5100
+    },
+    "rates": {
+      "http.request_rate": 41
+    },
+    "firstCounterAt": 1684208489177,
+    "lastCounterAt": 1684208612381,
+    "firstMetricAt": 1684208489177,
+    "lastMetricAt": 1684208612381,
+    "period": 1684208610000,
+    "summaries": {},
+    "histograms": {}
+  },
+  "intermediate": [
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 22,
+        "vusers.created": 22,
+        "http.requests": 22
+      },
+      "rates": {
+        "http.request_rate": 22
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208489177,
+      "lastCounterAt": 1684208489963,
+      "firstMetricAt": 1684208489177,
+      "lastMetricAt": 1684208489963,
+      "period": "1684208480000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 300,
+        "vusers.created": 300,
+        "http.requests": 300,
+        "errors.ECONNREFUSED": 260,
+        "vusers.failed": 260
+      },
+      "rates": {
+        "http.request_rate": 30
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208490023,
+      "lastCounterAt": 1684208499999,
+      "firstMetricAt": 1684208490023,
+      "lastMetricAt": 1684208499999,
+      "period": "1684208490000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 300,
+        "vusers.created": 300,
+        "http.requests": 300,
+        "errors.ECONNREFUSED": 299,
+        "vusers.failed": 299
+      },
+      "rates": {
+        "http.request_rate": 30
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208500023,
+      "lastCounterAt": 1684208509987,
+      "firstMetricAt": 1684208500023,
+      "lastMetricAt": 1684208509987,
+      "period": "1684208500000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 311,
+        "vusers.created": 311,
+        "http.requests": 311,
+        "errors.ECONNREFUSED": 306,
+        "vusers.failed": 306
+      },
+      "rates": {
+        "http.request_rate": 32
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208510012,
+      "lastCounterAt": 1684208519988,
+      "firstMetricAt": 1684208510012,
+      "lastMetricAt": 1684208519988,
+      "period": "1684208510000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "errors.ECONNREFUSED": 338,
+        "vusers.failed": 338,
+        "vusers.created_by_name.아트그램 전체조회": 344,
+        "vusers.created": 344,
+        "http.requests": 344
+      },
+      "rates": {
+        "http.request_rate": 35
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208520014,
+      "lastCounterAt": 1684208529977,
+      "firstMetricAt": 1684208520014,
+      "lastMetricAt": 1684208529977,
+      "period": "1684208520000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 373,
+        "vusers.created": 373,
+        "http.requests": 373,
+        "errors.ECONNREFUSED": 367,
+        "vusers.failed": 367
+      },
+      "rates": {
+        "http.request_rate": 38
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208530001,
+      "lastCounterAt": 1684208539990,
+      "firstMetricAt": 1684208530001,
+      "lastMetricAt": 1684208539990,
+      "period": "1684208530000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 402,
+        "vusers.created": 402,
+        "http.requests": 402,
+        "errors.ECONNREFUSED": 397,
+        "vusers.failed": 397
+      },
+      "rates": {
+        "http.request_rate": 41
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208540005,
+      "lastCounterAt": 1684208549996,
+      "firstMetricAt": 1684208540005,
+      "lastMetricAt": 1684208549996,
+      "period": "1684208540000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "errors.ECONNREFUSED": 426,
+        "vusers.failed": 426,
+        "vusers.created_by_name.아트그램 전체조회": 433,
+        "vusers.created": 433,
+        "http.requests": 433
+      },
+      "rates": {
+        "http.request_rate": 44
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208550012,
+      "lastCounterAt": 1684208559992,
+      "firstMetricAt": 1684208550012,
+      "lastMetricAt": 1684208559992,
+      "period": "1684208550000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 463,
+        "vusers.created": 463,
+        "http.requests": 463,
+        "errors.ECONNREFUSED": 454,
+        "vusers.failed": 454
+      },
+      "rates": {
+        "http.request_rate": 47
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208560018,
+      "lastCounterAt": 1684208569994,
+      "firstMetricAt": 1684208560018,
+      "lastMetricAt": 1684208569994,
+      "period": "1684208560000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "errors.ECONNREFUSED": 487,
+        "vusers.failed": 487,
+        "vusers.created_by_name.아트그램 전체조회": 490,
+        "vusers.created": 490,
+        "http.requests": 490
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208570003,
+      "lastCounterAt": 1684208579994,
+      "firstMetricAt": 1684208570003,
+      "lastMetricAt": 1684208579994,
+      "period": "1684208570000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 522,
+        "vusers.created": 522,
+        "http.requests": 522,
+        "errors.ECONNREFUSED": 514,
+        "vusers.failed": 514
+      },
+      "rates": {
+        "http.request_rate": 53
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208580004,
+      "lastCounterAt": 1684208589992,
+      "firstMetricAt": 1684208580004,
+      "lastMetricAt": 1684208589992,
+      "period": "1684208580000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "errors.ECONNREFUSED": 547,
+        "vusers.failed": 547,
+        "vusers.created_by_name.아트그램 전체조회": 550,
+        "vusers.created": 550,
+        "http.requests": 550
+      },
+      "rates": {
+        "http.request_rate": 56
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208590003,
+      "lastCounterAt": 1684208599997,
+      "firstMetricAt": 1684208590003,
+      "lastMetricAt": 1684208599997,
+      "period": "1684208590000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.아트그램 전체조회": 581,
+        "vusers.created": 581,
+        "http.requests": 581,
+        "errors.ECONNREFUSED": 576,
+        "vusers.failed": 576
+      },
+      "rates": {
+        "http.request_rate": 59
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1684208600000,
+      "lastCounterAt": 1684208609992,
+      "firstMetricAt": 1684208600000,
+      "lastMetricAt": 1684208609992,
+      "period": "1684208600000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "errors.ECONNREFUSED": 129,
+        "vusers.failed": 129,
+        "vusers.created_by_name.아트그램 전체조회": 9,
+        "vusers.created": 9,
+        "http.requests": 9
+      },
+      "rates": {
+        "http.request_rate": 9
+      },
+      "firstCounterAt": 1684208610021,
+      "lastCounterAt": 1684208612381,
+      "firstMetricAt": 1684208610021,
+      "lastMetricAt": 1684208612381,
+      "period": "1684208610000",
+      "http.request_rate": null,
+      "summaries": {},
+      "histograms": {}
+    }
+  ]
+}
