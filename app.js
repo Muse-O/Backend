@@ -15,12 +15,8 @@ const cors = require("cors");
 const routes = require("./routes");
 const logger = require("./middlewares/logger.js");
 const errorHandler = require("./middlewares/errorHandler.js");
-const swaggerJSDoc = require("swagger-jsdoc");
-const swaggerUi = require("swagger-ui-express");
-const glob = require("glob");
 const passport = require("passport");
 const passportConfig = require("./passport");
-const { description } = require("./schemas/mypageReqSchema");
 const {
   apiLogger,
   incrementCounter,
@@ -37,80 +33,6 @@ const dotenv = require("dotenv");
 // 환경 변수를 로드합니다. NODE_ENV 값에 따라 적절한 파일을 사용합니다.
 const envFile = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env";
 dotenv.config({ path: envFile });
-
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Muse_O 전시회페이지",
-      version: "1.0.0",
-      description:
-        "로그인을 한뒤 Authorization의 토큰값을 상단의 Authorize에 Bearer없이 넣어주시고 사용하시면됩니다. try it out을 눌러야 parameter와 body값을 입력할수있습니다.",
-    },
-    servers: [
-      {
-        url: "/api",
-      },
-    ],
-    tags: [
-      {
-        name: "User",
-        description: "유저등록",
-      },
-      {
-        name: "search",
-        description: "검색기능 로그인필요x",
-      },
-      {
-        name: "artgram",
-        description: "아트그램 CRUD",
-      },
-      {
-        name: "artgramComment",
-        description: "아트그램 댓글 CRUD",
-      },
-
-      {
-        name: "artgramReply",
-        description: "아트그램 답글 CRUD",
-      },
-      {
-        name: "notification",
-        description: "알림기능",
-      },
-    ],
-    securityDefinitions: {
-      jwt: {
-        type: "apiKey",
-        name: "Authorization",
-        in: "header",
-      },
-    },
-    security: [
-      {
-        jwt: [],
-      },
-    ],
-    components: {
-      securitySchemes: {
-        jwt: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "Bearer",
-        },
-      },
-    },
-  },
-  apis: ["./routes/*.js"],
-};
-
-// get all YAML files in the swagger folder
-const yamlFiles = glob.sync("./swagger/*.yaml");
-// merge all YAML files into a single swagger specification
-const swaggerSpec = yamlFiles.reduce((acc, filePath) => {
-  const spec = require(filePath);
-  return { ...acc, ...spec };
-}, swaggerJSDoc(swaggerOptions));
 
 //winston api호출횟수로깅
 app.use(
@@ -164,9 +86,6 @@ app.disable("x-powered-by");
 
 // routes
 app.use("/api", routes);
-
-// swagger
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // passport
 passportConfig(); // 패스포트 설정
