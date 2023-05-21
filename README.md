@@ -329,7 +329,7 @@ createExhibition = async (mode, userEmail, exhibitionReq) => {
   }
 };
 ```
-
+---
 ### 2. passport 전략 실행 후  콜백 라우터에서 프론트도메인으로 redirect 시 쿠키값 안담기는 현상 - 문서아
 
 #### 문제
@@ -381,14 +381,14 @@ app.use(
 ![image](https://github.com/Muse-O/Backend/assets/51357635/718ecad8-2968-49e5-8e02-2fee1c96ba43)
 #### 해결
 - 백엔드 api uri 앞에 /api를 추가하여 겹치지 않게 설정함
-
+---
 ### 3. Jest 환경변수로 인한 에러해결 - 김다빈
 #### 문제
 - jest연결 시도중 환경변수 적용안되는 에러발생.
 #### 해결
 I. config를 참조하지 못해서 models의 index에서 조건문을 설정
 II. config의 dialect가 연결되어있지않다는 에러가 발생해 조건문을 작성
-
+---
 ### 4. 메시지 HTTPS 적용 후 소켓 통신 장애 - 임건
 #### 문제
 - 클라이언트에서 기존 HTTP 프로토콜을 사용한 웹소캣 방식에서 HTTPS 적용 시 웹소켓 커넥션이 이뤄지지 않는 문제 발생.
