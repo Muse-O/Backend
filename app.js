@@ -23,6 +23,10 @@ const {
   getCounter,
 } = require("./middlewares/apiLogger");
 const { processRequest } = require("./modules/counter");
+const swaggerJSDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+const glob = require("glob");
+const { swaggerOptions } = require("./swagger/swaggerOpthons");
 
 const webSocketController = require("./controllers/websocket.cntroller");
 
@@ -86,6 +90,18 @@ app.disable("x-powered-by");
 
 // routes
 app.use("/api", routes);
+// get all YAML files in the swagger folder
+const yamlFiles = glob.sync("./swagger/*.yaml");
+// merge all YAML files into a single swagger specification
+const swaggerSpec = yamlFiles.reduce((acc, filePath) => {
+  const spec = require(filePath);
+  console.log("spec", spec);
+  return { ...acc, ...spec };
+}, swaggerJSDoc(swaggerOptions));
+console.log("swaggerSpec", swaggerSpec);
+
+// swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // passport
 passportConfig(); // 패스포트 설정
